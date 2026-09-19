@@ -1,26 +1,525 @@
-/* Boostlane customer dashboard */
+/* ==================================================
+   BOOSTLANE GLOBAL STYLES
+================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f8ff;
+  color: #172554;
+  line-height: 1.6;
+}
+
+
+/* ==================================================
+   HEADER
+================================================== */
+
+.header {
+  background: #061b4f;
+  color: white;
+  padding: 18px 7%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 27px;
+  font-weight: bold;
+  color: white;
+}
+
+.logo-icon {
+  color: #38bdf8;
+  margin-right: 8px;
+}
+
+.logo span span {
+  color: #38bdf8;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav a:hover {
+  color: #38bdf8;
+}
+
+
+/* ==================================================
+   BUTTONS
+================================================== */
+
+.top-button,
+.main-button,
+.whatsapp-button {
+  border: none;
+
+  padding: 12px 22px;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-weight: bold;
+
+  display: inline-block;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.top-button,
+.main-button {
+  background: #38bdf8;
+  color: #06204f;
+}
+
+.top-button:hover,
+.main-button:hover {
+  background: #7dd3fc;
+  transform: translateY(-1px);
+}
+
+.whatsapp-button {
+  background: #22c55e;
+  color: white;
+}
+
+.whatsapp-button:hover {
+  background: #16a34a;
+}
+
+
+/* ==================================================
+   HERO
+================================================== */
+
+.hero {
+  background: linear-gradient(
+    120deg,
+    #0b1f52,
+    #2563eb
+  );
+
+  color: white;
+
+  padding: 95px 8%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 40px;
+
+  min-height: 470px;
+}
+
+.hero-content {
+  max-width: 650px;
+}
+
+.small-title {
+  color: #38bdf8;
+
+  font-size: 13px;
+
+  font-weight: bold;
+
+  letter-spacing: 3px;
+
+  margin-bottom: 12px;
+}
+
+.hero h1 {
+  font-size: 48px;
+
+  line-height: 1.15;
+
+  margin-bottom: 25px;
+}
+
+.hero h1 span {
+  color: #38bdf8;
+}
+
+.hero p {
+  font-size: 18px;
+
+  margin-bottom: 30px;
+}
+
+.hero-visual {
+  text-align: center;
+
+  color: #38bdf8;
+}
+
+.growth-symbol {
+  font-size: 170px;
+
+  font-weight: bold;
+}
+
+.growth-bars {
+  display: flex;
+
+  align-items: end;
+
+  justify-content: center;
+
+  gap: 12px;
+}
+
+.growth-bars span {
+  width: 35px;
+
+  background: #38bdf8;
+
+  border-radius: 6px 6px 0 0;
+}
+
+.growth-bars span:nth-child(1) {
+  height: 55px;
+}
+
+.growth-bars span:nth-child(2) {
+  height: 95px;
+}
+
+.growth-bars span:nth-child(3) {
+  height: 140px;
+}
+
+
+/* ==================================================
+   GENERAL SECTIONS
+================================================== */
+
+.section {
+  padding: 75px 8%;
+
+  text-align: center;
+}
+
+.section h2,
+.about-section h2,
+.contact-section h2 {
+  font-size: 34px;
+
+  margin-bottom: 10px;
+}
+
+.section-description {
+  color: #64748b;
+
+  margin-bottom: 35px;
+}
+
+
+/* ==================================================
+   SERVICES
+================================================== */
+
+.service-container {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 22px;
+
+  margin-top: 35px;
+}
+
+.service-card {
+  background: white;
+
+  padding: 28px 22px;
+
+  border-radius: 15px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.08);
+
+  text-align: left;
+
+  transition: 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-icon {
+  font-size: 30px;
+
+  margin-bottom: 12px;
+}
+
+.service-card h3 {
+  margin-bottom: 10px;
+}
+
+.service-card p {
+  color: #64748b;
+
+  margin-bottom: 18px;
+}
+
+.service-card a {
+  color: #2563eb;
+
+  font-weight: bold;
+
+  text-decoration: none;
+}
+
+
+/* ==================================================
+   ABOUT
+================================================== */
+
+.about-section {
+  background: #e0f2fe;
+
+  padding: 65px 8%;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 50px;
+}
+
+.about-section p {
+  color: #334155;
+}
+
+.benefits p {
+  margin-bottom: 12px;
+
+  font-weight: bold;
+
+  color: #1d4ed8;
+}
+
+
+/* ==================================================
+   CONTACT
+================================================== */
+
+.contact-section {
+  background: #061b4f;
+
+  color: white;
+
+  padding: 70px 8%;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 50px;
+
+  align-items: center;
+}
+
+.contact-section p {
+  margin-bottom: 25px;
+}
+
+.contact-box {
+  background: #102d68;
+
+  padding: 35px;
+
+  border-radius: 15px;
+}
+
+
+/* ==================================================
+   ACCOUNT
+================================================== */
+
+.account-section {
+  background: #f4f8ff;
+
+  padding: 80px 8%;
+}
+
+.account-container {
+  max-width: 520px;
+
+  margin: 0 auto;
+}
+
+.account-header {
+  text-align: center;
+
+  margin-bottom: 30px;
+}
+
+.account-header h2 {
+  font-size: 34px;
+
+  margin-bottom: 10px;
+
+  color: #172554;
+}
+
+.account-header p:last-child {
+  color: #64748b;
+}
+
+.account-card {
+  background: white;
+
+  padding: 35px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+.account-tabs {
+  display: flex;
+
+  gap: 10px;
+
+  margin-bottom: 25px;
+}
+
+.account-tab {
+  flex: 1;
+
+  border: none;
+
+  padding: 12px;
+
+  border-radius: 8px;
+
+  background: #e0f2fe;
+
+  color: #172554;
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.account-tab.active {
+  background: #2563eb;
+
+  color: white;
+}
+
+.account-card label {
+  display: block;
+
+  margin: 14px 0 7px;
+
+  font-weight: bold;
+
+  color: #172554;
+}
+
+.account-card input {
+  width: 100%;
+
+  padding: 13px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+
+  outline: none;
+}
+
+.account-card input:focus {
+  border-color: #2563eb;
+}
+
+.account-button {
+  width: 100%;
+
+  margin-top: 22px;
+}
+
+#account-message {
+  margin-top: 18px;
+
+  text-align: center;
+
+  font-weight: bold;
+}
+
+
+/* ==================================================
+   DASHBOARD
+================================================== */
 
 .dashboard-section {
   background: #f4f8ff;
-  padding: 75px 8%;
+
+  padding: 80px 8%;
 }
 
 .dashboard-container {
   max-width: 1100px;
+
   margin: 0 auto;
 }
 
 .dashboard-header {
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
   gap: 25px;
+
   margin-bottom: 35px;
 }
 
 .dashboard-header h2 {
   font-size: 34px;
+
   color: #172554;
+
   margin-bottom: 8px;
 }
 
@@ -30,49 +529,161 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
   gap: 22px;
 }
 
 .dashboard-card {
   background: white;
+
   padding: 30px;
+
   border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.08);
 }
 
 .dashboard-icon {
   font-size: 35px;
+
   margin-bottom: 15px;
 }
 
 .dashboard-card h3 {
   color: #172554;
+
   margin-bottom: 10px;
 }
 
 .dashboard-card p {
   color: #64748b;
+
   margin-bottom: 22px;
 }
 
 .dashboard-message {
   background: #e0f2fe;
+
   color: #1d4ed8;
+
   padding: 18px;
+
   border-radius: 10px;
+
   margin-top: 25px;
+
   text-align: center;
+
   font-weight: bold;
 }
 
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.footer {
+  background: #031238;
+
+  color: white;
+
+  padding: 25px 8%;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 20px;
+
+  flex-wrap: wrap;
+}
+
+.footer p {
+  color: #cbd5e1;
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
 @media (max-width: 850px) {
+
+  .hero {
+    text-align: center;
+
+    flex-direction: column;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .service-container {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .about-section,
+  .contact-section {
+    grid-template-columns: 1fr;
+  }
+
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
   .dashboard-header {
     flex-direction: column;
+
     align-items: flex-start;
   }
+
+}
+
+
+@media (max-width: 550px) {
+
+  .header {
+    justify-content: center;
+  }
+
+  .nav {
+    justify-content: center;
+
+    gap: 12px;
+  }
+
+  .hero {
+    padding: 65px 6%;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .section {
+    padding: 55px 6%;
+  }
+
+  .service-container {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    text-align: center;
+
+    justify-content: center;
+  }
+
+  .account-card {
+    padding: 25px;
+  }
+
 }
