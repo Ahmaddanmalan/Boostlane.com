@@ -94,12 +94,13 @@ function showSignupForm() {
       required
     >
 
-    <button
-      type="submit"
-      class="main-button account-button"
-    >
-      Create Account
-    </button>
+   <button
+  type="button"
+  class="main-button account-button"
+  onclick="alert('🔥 BOOSTLANE BUTTON IS WORKING!')"
+>
+  Create Account
+</button>
 
   `;
 
