@@ -1,86 +1,42 @@
-.account-section {
-  background: #f4f8ff;
-  padding: 75px 8%;
-}
-
-.account-container {
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-.account-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.account-header h2 {
-  font-size: 34px;
-  margin-bottom: 10px;
-  color: #172554;
-}
-
-.account-header p:last-child {
-  color: #64748b;
-}
-
-.account-card {
-  background: white;
-  padding: 35px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
-}
-
-.account-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-}
-
-.account-tab {
-  flex: 1;
+/* Boostlane button style */
+.top-button,
+.main-button,
+.whatsapp-button,
+.account-button {
+  background: #38bdf8;
+  color: #06204f;
   border: none;
-  padding: 12px;
-  border-radius: 8px;
-  background: #e0f2fe;
-  color: #172554;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
   font-weight: bold;
+  display: inline-block;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.account-tab.active {
-  background: #2563eb;
+.top-button:hover,
+.main-button:hover,
+.account-button:hover {
+  background: #7dd3fc;
+}
+
+.whatsapp-button {
+  background: #22c55e;
   color: white;
 }
 
-.account-card label {
-  display: block;
-  margin: 14px 0 7px;
-  font-weight: bold;
+.whatsapp-button:hover {
+  background: #16a34a;
+}
+
+.account-tab {
+  background: #e0f2fe;
   color: #172554;
-}
-
-.account-card input {
-  width: 100%;
-  padding: 13px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-}
-
-.account-card input:focus {
-  border-color: #2563eb;
-}
-
-.account-button {
   border: none;
-  cursor: pointer;
-  margin-top: 22px;
-  width: 100%;
 }
 
-#account-message {
-  margin-top: 18px;
-  text-align: center;
-  font-weight: bold;
+.account-tab.active {
+  background: #38bdf8;
+  color: #06204f;
 }
