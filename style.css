@@ -1,42 +1,78 @@
-/* Boostlane button style */
-.top-button,
-.main-button,
-.whatsapp-button,
-.account-button {
-  background: #38bdf8;
-  color: #06204f;
-  border: none;
-  padding: 12px 22px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-block;
-  cursor: pointer;
-  transition: 0.2s ease;
+/* Boostlane customer dashboard */
+
+.dashboard-section {
+  background: #f4f8ff;
+  padding: 75px 8%;
 }
 
-.top-button:hover,
-.main-button:hover,
-.account-button:hover {
-  background: #7dd3fc;
+.dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-.whatsapp-button {
-  background: #22c55e;
-  color: white;
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 35px;
 }
 
-.whatsapp-button:hover {
-  background: #16a34a;
-}
-
-.account-tab {
-  background: #e0f2fe;
+.dashboard-header h2 {
+  font-size: 34px;
   color: #172554;
-  border: none;
+  margin-bottom: 8px;
 }
 
-.account-tab.active {
-  background: #38bdf8;
-  color: #06204f;
+.dashboard-header p:last-child {
+  color: #64748b;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-icon {
+  font-size: 35px;
+  margin-bottom: 15px;
+}
+
+.dashboard-card h3 {
+  color: #172554;
+  margin-bottom: 10px;
+}
+
+.dashboard-card p {
+  color: #64748b;
+  margin-bottom: 22px;
+}
+
+.dashboard-message {
+  background: #e0f2fe;
+  color: #1d4ed8;
+  padding: 18px;
+  border-radius: 10px;
+  margin-top: 25px;
+  text-align: center;
+  font-weight: bold;
+}
+
+@media (max-width: 850px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
