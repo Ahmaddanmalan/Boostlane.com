@@ -1,5 +1,5 @@
 /* ==================================================
-   BOOSTLANE SUPABASE CONFIGURATION
+   BOOSTLANE AUTH SYSTEM
 ================================================== */
 
 const SUPABASE_URL =
@@ -10,17 +10,7 @@ const SUPABASE_KEY =
 
 
 /* ==================================================
-   START SUPABASE
-================================================== */
-
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-
-/* ==================================================
-   GET HTML ELEMENTS
+   ELEMENTS
 ================================================== */
 
 const signupForm =
@@ -47,65 +37,17 @@ const dashboardUser =
 const logoutButton =
   document.getElementById("logout-button");
 
-const servicesButton =
-  document.getElementById("services-button");
-
-const ordersButton =
-  document.getElementById("orders-button");
-
-const dashboardMessage =
-  document.getElementById("dashboard-message");
-
 
 /* ==================================================
-   MESSAGE FUNCTION
+   MESSAGE
 ================================================== */
 
 function showMessage(text, error = false) {
-
-  if (!accountMessage) return;
 
   accountMessage.textContent = text;
 
   accountMessage.style.color =
     error ? "#dc2626" : "#16a34a";
-}
-
-
-/* ==================================================
-   SIGN UP TAB
-================================================== */
-
-if (signupTab) {
-
-  signupTab.addEventListener("click", () => {
-
-    signupTab.classList.add("active");
-
-    loginTab.classList.remove("active");
-
-    showSignupForm();
-
-  });
-
-}
-
-
-/* ==================================================
-   LOGIN TAB
-================================================== */
-
-if (loginTab) {
-
-  loginTab.addEventListener("click", () => {
-
-    loginTab.classList.add("active");
-
-    signupTab.classList.remove("active");
-
-    showLoginForm();
-
-  });
 
 }
 
@@ -115,8 +57,6 @@ if (loginTab) {
 ================================================== */
 
 function showSignupForm() {
-
-  if (!signupForm) return;
 
   signupForm.innerHTML = `
 
@@ -164,90 +104,142 @@ function showSignupForm() {
   `;
 
 
-  signupForm.onsubmit = async (event) => {
+  signupForm.addEventListener(
+    "submit",
+    signupUser
+  );
 
-    event.preventDefault();
-
-    const name =
-      document
-        .getElementById("signup-name")
-        .value
-        .trim();
-
-    const email =
-      document
-        .getElementById("signup-email")
-        .value
-        .trim();
-
-    const password =
-      document
-        .getElementById("signup-password")
-        .value;
+}
 
 
-    showMessage(
-      "Creating your account..."
-    );
+/* ==================================================
+   CREATE ACCOUNT
+================================================== */
+
+async function signupUser(event) {
+
+  event.preventDefault();
+
+  console.log("Create Account button clicked");
 
 
-    try {
+  const name =
+    document
+      .getElementById("signup-name")
+      .value
+      .trim();
 
-      const { data, error } =
-        await supabase.auth.signUp({
 
-          email: email,
+  const email =
+    document
+      .getElementById("signup-email")
+      .value
+      .trim();
 
-          password: password,
 
-          options: {
+  const password =
+    document
+      .getElementById("signup-password")
+      .value;
+
+
+  showMessage(
+    "Creating your account..."
+  );
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${SUPABASE_URL}/auth/v1/signup`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            "apikey":
+              SUPABASE_KEY
+          },
+
+          body: JSON.stringify({
+
+            email: email,
+
+            password: password,
 
             data: {
               full_name: name
             }
 
-          }
-
-        });
-
-
-      if (error) {
-
-        showMessage(
-          error.message,
-          true
-        );
-
-        return;
-
-      }
-
-
-      if (data.user) {
-
-        showMessage(
-          "Account created successfully! Check your email if confirmation is required."
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "SIGN UP ERROR:",
-        error
+          })
+        }
       );
 
+
+    const result =
+      await response.json();
+
+
+    console.log(
+      "Supabase signup response:",
+      result
+    );
+
+
+    if (!response.ok) {
+
       showMessage(
-        "Something went wrong. Please try again.",
+        result.msg ||
+        result.message ||
+        "Unable to create account.",
         true
       );
 
+      return;
+
     }
 
-  };
+
+    showMessage(
+      "✅ Account created successfully! Check your email if confirmation is required."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "SIGNUP ERROR:",
+      error
+    );
+
+
+    showMessage(
+      "❌ Connection error. Please check your internet connection and try again.",
+      true
+    );
+
+  }
 
 }
+
+
+/* ==================================================
+   LOGIN TAB
+================================================== */
+
+loginTab.addEventListener(
+  "click",
+  showLoginForm
+);
+
+
+signupTab.addEventListener(
+  "click",
+  showSignupForm
+);
 
 
 /* ==================================================
@@ -255,8 +247,6 @@ function showSignupForm() {
 ================================================== */
 
 function showLoginForm() {
-
-  if (!signupForm) return;
 
   signupForm.innerHTML = `
 
@@ -292,90 +282,123 @@ function showLoginForm() {
   `;
 
 
-  signupForm.onsubmit = async (event) => {
+  signupForm.onsubmit =
+    async function(event) {
 
-    event.preventDefault();
-
-
-    const email =
-      document
-        .getElementById("login-email")
-        .value
-        .trim();
+      event.preventDefault();
 
 
-    const password =
-      document
-        .getElementById("login-password")
-        .value;
+      showMessage(
+        "Logging you in..."
+      );
 
 
-    showMessage(
-      "Logging you in..."
-    );
+      const email =
+        document
+          .getElementById("login-email")
+          .value
+          .trim();
 
 
-    try {
-
-      const { data, error } =
-        await supabase.auth.signInWithPassword({
-
-          email: email,
-
-          password: password
-
-        });
+      const password =
+        document
+          .getElementById("login-password")
+          .value;
 
 
-      if (error) {
+      try {
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "application/json",
+
+                "apikey":
+                  SUPABASE_KEY
+
+              },
+
+              body: JSON.stringify({
+
+                email: email,
+
+                password: password
+
+              })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        console.log(
+          "Login response:",
+          result
+        );
+
+
+        if (!response.ok) {
+
+          showMessage(
+            result.msg ||
+            result.message ||
+            "Login failed.",
+            true
+          );
+
+          return;
+
+        }
+
+
+        localStorage.setItem(
+          "boostlane_access_token",
+          result.access_token
+        );
+
+
+        localStorage.setItem(
+          "boostlane_user",
+          JSON.stringify(result.user)
+        );
+
+
+        showDashboard(
+          result.user
+        );
+
+
+      } catch (error) {
+
+        console.error(error);
 
         showMessage(
-          error.message,
+          "Connection error. Please try again.",
           true
         );
 
-        return;
-
       }
 
-
-      if (data.user) {
-
-        showDashboard(
-          data.user
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
-
-      showMessage(
-        "Login failed. Please try again.",
-        true
-      );
-
-    }
-
-  };
+    };
 
 }
 
 
 /* ==================================================
-   SHOW DASHBOARD
+   DASHBOARD
 ================================================== */
 
 function showDashboard(user) {
-
-  if (!accountSection || !dashboardSection) {
-    return;
-  }
-
 
   accountSection.style.display =
     "none";
@@ -388,14 +411,10 @@ function showDashboard(user) {
     user.user_metadata?.full_name;
 
 
-  if (dashboardUser) {
-
-    dashboardUser.textContent =
-      name
-        ? `Welcome ${name}. Manage your account, services, and orders.`
-        : "Manage your account, services, and orders.";
-
-  }
+  dashboardUser.textContent =
+    name
+      ? `Welcome ${name}. Manage your account, services, and orders.`
+      : "Manage your account, services, and orders.";
 
 
   dashboardSection.scrollIntoView({
@@ -409,248 +428,29 @@ function showDashboard(user) {
    LOGOUT
 ================================================== */
 
-if (logoutButton) {
-
-  logoutButton.addEventListener(
-    "click",
-    async () => {
-
-      const { error } =
-        await supabase.auth.signOut();
-
-
-      if (error) {
-
-        console.error(error);
-
-        return;
-
-      }
-
-
-      if (dashboardSection) {
-
-        dashboardSection.style.display =
-          "none";
-
-      }
-
-
-      if (accountSection) {
-
-        accountSection.style.display =
-          "block";
-
-        accountSection.scrollIntoView({
-          behavior: "smooth"
-        });
-
-      }
-
-
-      showMessage(
-        "You have been logged out."
-      );
-
-    }
-  );
-
-}
-
-
-/* ==================================================
-   VIEW SERVICES
-================================================== */
-
-if (servicesButton) {
-
-  servicesButton.addEventListener(
-    "click",
-    () => {
-
-      if (dashboardMessage) {
-
-        dashboardMessage.textContent =
-          "Our service ordering system is coming next. 🚀";
-
-      }
-
-    }
-  );
-
-}
-
-
-/* ==================================================
-   MY ORDERS
-================================================== */
-
-if (ordersButton) {
-
-  ordersButton.addEventListener(
-    "click",
-    async () => {
-
-      if (!dashboardMessage) return;
-
-
-      dashboardMessage.textContent =
-        "Loading your orders...";
-
-
-      try {
-
-        const {
-          data: {
-            user
-          }
-        } =
-          await supabase.auth.getUser();
-
-
-        if (!user) {
-
-          dashboardMessage.textContent =
-            "Please login again.";
-
-          return;
-
-        }
-
-
-        const {
-          data,
-          error
-        } =
-          await supabase
-            .from("orders")
-            .select("*")
-            .eq("user_id", user.id)
-            .order(
-              "created_at",
-              {
-                ascending: false
-              }
-            );
-
-
-        if (error) {
-
-          console.error(
-            "ORDERS ERROR:",
-            error
-          );
-
-          dashboardMessage.textContent =
-            "Unable to load your orders yet.";
-
-          return;
-
-        }
-
-
-        if (!data || data.length === 0) {
-
-          dashboardMessage.textContent =
-            "You don't have any orders yet.";
-
-          return;
-
-        }
-
-
-        dashboardMessage.innerHTML =
-          `<strong>You have ${data.length} order(s).</strong>`;
-
-      } catch (error) {
-
-        console.error(error);
-
-        dashboardMessage.textContent =
-          "Something went wrong while loading orders.";
-
-      }
-
-    }
-  );
-
-}
-
-
-/* ==================================================
-   CHECK EXISTING LOGIN SESSION
-================================================== */
-
-async function checkUser() {
-
-  try {
-
-    const {
-      data: {
-        session
-      }
-    } =
-      await supabase.auth.getSession();
-
-
-    if (session && session.user) {
-
-      showDashboard(
-        session.user
-      );
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "SESSION ERROR:",
-      error
+logoutButton.addEventListener(
+  "click",
+  function() {
+
+    localStorage.removeItem(
+      "boostlane_access_token"
     );
 
-  }
-
-}
-
-
-/* ==================================================
-   AUTH STATE LISTENER
-================================================== */
-
-supabase.auth.onAuthStateChange(
-  (event, session) => {
-
-    if (
-      event === "SIGNED_IN" &&
-      session
-    ) {
-
-      showDashboard(
-        session.user
-      );
-
-    }
+    localStorage.removeItem(
+      "boostlane_user"
+    );
 
 
-    if (
-      event === "SIGNED_OUT"
-    ) {
+    dashboardSection.style.display =
+      "none";
 
-      if (dashboardSection) {
+    accountSection.style.display =
+      "block";
 
-        dashboardSection.style.display =
-          "none";
 
-      }
-
-      if (accountSection) {
-
-        accountSection.style.display =
-          "block";
-
-      }
-
-    }
+    showMessage(
+      "You have been logged out."
+    );
 
   }
 );
@@ -662,9 +462,7 @@ supabase.auth.onAuthStateChange(
 
 showSignupForm();
 
-checkUser();
-
 
 console.log(
-  "✅ Boostlane JavaScript is running."
+  "✅ BOOSTLANE SCRIPT IS RUNNING"
 );
