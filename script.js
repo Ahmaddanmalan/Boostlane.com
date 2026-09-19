@@ -5,16 +5,6 @@
 const SUPABASE_URL =
   "https://whseefadqutdrsachypc.supabase.co";
 
-
-/*
-   IMPORTANT:
-
-   Replace ONLY the text below with your
-   Supabase LEGACY ANON KEY.
-
-   Do NOT use the service_role key.
-*/
-
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
 
@@ -68,10 +58,12 @@ const dashboardMessage =
 
 
 /* ==================================================
-   SHOW MESSAGE
+   MESSAGE FUNCTION
 ================================================== */
 
 function showMessage(text, error = false) {
+
+  if (!accountMessage) return;
 
   accountMessage.textContent = text;
 
@@ -84,30 +76,38 @@ function showMessage(text, error = false) {
    SIGN UP TAB
 ================================================== */
 
-signupTab.addEventListener("click", function () {
+if (signupTab) {
 
-  signupTab.classList.add("active");
+  signupTab.addEventListener("click", () => {
 
-  loginTab.classList.remove("active");
+    signupTab.classList.add("active");
 
-  showSignupForm();
+    loginTab.classList.remove("active");
 
-});
+    showSignupForm();
+
+  });
+
+}
 
 
 /* ==================================================
    LOGIN TAB
 ================================================== */
 
-loginTab.addEventListener("click", function () {
+if (loginTab) {
 
-  loginTab.classList.add("active");
+  loginTab.addEventListener("click", () => {
 
-  signupTab.classList.remove("active");
+    loginTab.classList.add("active");
 
-  showLoginForm();
+    signupTab.classList.remove("active");
 
-});
+    showLoginForm();
+
+  });
+
+}
 
 
 /* ==================================================
@@ -115,6 +115,8 @@ loginTab.addEventListener("click", function () {
 ================================================== */
 
 function showSignupForm() {
+
+  if (!signupForm) return;
 
   signupForm.innerHTML = `
 
@@ -129,7 +131,6 @@ function showSignupForm() {
       required
     >
 
-
     <label for="signup-email">
       Email
     </label>
@@ -140,7 +141,6 @@ function showSignupForm() {
       placeholder="Enter your email"
       required
     >
-
 
     <label for="signup-password">
       Password
@@ -154,7 +154,6 @@ function showSignupForm() {
       required
     >
 
-
     <button
       type="submit"
       class="main-button account-button"
@@ -165,36 +164,34 @@ function showSignupForm() {
   `;
 
 
-  signupForm.onsubmit =
-    async function (event) {
+  signupForm.onsubmit = async (event) => {
 
-      event.preventDefault();
+    event.preventDefault();
 
+    const name =
+      document
+        .getElementById("signup-name")
+        .value
+        .trim();
 
-      const name =
-        document
-          .getElementById("signup-name")
-          .value
-          .trim();
+    const email =
+      document
+        .getElementById("signup-email")
+        .value
+        .trim();
 
-
-      const email =
-        document
-          .getElementById("signup-email")
-          .value
-          .trim();
-
-
-      const password =
-        document
-          .getElementById("signup-password")
-          .value;
+    const password =
+      document
+        .getElementById("signup-password")
+        .value;
 
 
-      showMessage(
-        "Creating your account..."
-      );
+    showMessage(
+      "Creating your account..."
+    );
 
+
+    try {
 
       const { data, error } =
         await supabase.auth.signUp({
@@ -206,9 +203,7 @@ function showSignupForm() {
           options: {
 
             data: {
-
               full_name: name
-
             }
 
           }
@@ -228,12 +223,6 @@ function showSignupForm() {
       }
 
 
-      /*
-        If email confirmation is enabled,
-        Supabase may not log the user in
-        until they confirm their email.
-      */
-
       if (data.user) {
 
         showMessage(
@@ -242,7 +231,21 @@ function showSignupForm() {
 
       }
 
-    };
+    } catch (error) {
+
+      console.error(
+        "SIGN UP ERROR:",
+        error
+      );
+
+      showMessage(
+        "Something went wrong. Please try again.",
+        true
+      );
+
+    }
+
+  };
 
 }
 
@@ -252,6 +255,8 @@ function showSignupForm() {
 ================================================== */
 
 function showLoginForm() {
+
+  if (!signupForm) return;
 
   signupForm.innerHTML = `
 
@@ -266,7 +271,6 @@ function showLoginForm() {
       required
     >
 
-
     <label for="login-password">
       Password
     </label>
@@ -278,7 +282,6 @@ function showLoginForm() {
       required
     >
 
-
     <button
       type="submit"
       class="main-button account-button"
@@ -289,29 +292,30 @@ function showLoginForm() {
   `;
 
 
-  signupForm.onsubmit =
-    async function (event) {
+  signupForm.onsubmit = async (event) => {
 
-      event.preventDefault();
-
-
-      const email =
-        document
-          .getElementById("login-email")
-          .value
-          .trim();
+    event.preventDefault();
 
 
-      const password =
-        document
-          .getElementById("login-password")
-          .value;
+    const email =
+      document
+        .getElementById("login-email")
+        .value
+        .trim();
 
 
-      showMessage(
-        "Logging you in..."
-      );
+    const password =
+      document
+        .getElementById("login-password")
+        .value;
 
+
+    showMessage(
+      "Logging you in..."
+    );
+
+
+    try {
 
       const { data, error } =
         await supabase.auth.signInWithPassword({
@@ -337,17 +341,27 @@ function showLoginForm() {
 
       if (data.user) {
 
-        showMessage(
-          "Login successful!"
-        );
-
         showDashboard(
           data.user
         );
 
       }
 
-    };
+    } catch (error) {
+
+      console.error(
+        "LOGIN ERROR:",
+        error
+      );
+
+      showMessage(
+        "Login failed. Please try again.",
+        true
+      );
+
+    }
+
+  };
 
 }
 
@@ -357,6 +371,11 @@ function showLoginForm() {
 ================================================== */
 
 function showDashboard(user) {
+
+  if (!accountSection || !dashboardSection) {
+    return;
+  }
+
 
   accountSection.style.display =
     "none";
@@ -369,15 +388,12 @@ function showDashboard(user) {
     user.user_metadata?.full_name;
 
 
-  if (name) {
+  if (dashboardUser) {
 
     dashboardUser.textContent =
-      `Welcome ${name}. Manage your account, services, and orders.`;
-
-  } else {
-
-    dashboardUser.textContent =
-      "Manage your account, services, and orders.";
+      name
+        ? `Welcome ${name}. Manage your account, services, and orders.`
+        : "Manage your account, services, and orders.";
 
   }
 
@@ -393,147 +409,203 @@ function showDashboard(user) {
    LOGOUT
 ================================================== */
 
-logoutButton.addEventListener(
-  "click",
-  async function () {
+if (logoutButton) {
 
-    const { error } =
-      await supabase.auth.signOut();
+  logoutButton.addEventListener(
+    "click",
+    async () => {
+
+      const { error } =
+        await supabase.auth.signOut();
 
 
-    if (error) {
+      if (error) {
 
-      alert(error.message);
+        console.error(error);
 
-      return;
+        return;
+
+      }
+
+
+      if (dashboardSection) {
+
+        dashboardSection.style.display =
+          "none";
+
+      }
+
+
+      if (accountSection) {
+
+        accountSection.style.display =
+          "block";
+
+        accountSection.scrollIntoView({
+          behavior: "smooth"
+        });
+
+      }
+
+
+      showMessage(
+        "You have been logged out."
+      );
 
     }
+  );
 
-
-    dashboardSection.style.display =
-      "none";
-
-    accountSection.style.display =
-      "block";
-
-
-    accountSection.scrollIntoView({
-      behavior: "smooth"
-    });
-
-
-    showMessage(
-      "You have been logged out."
-    );
-
-  }
-);
+}
 
 
 /* ==================================================
    VIEW SERVICES
 ================================================== */
 
-servicesButton.addEventListener(
-  "click",
-  function () {
+if (servicesButton) {
 
-    dashboardMessage.textContent =
-      "Our service ordering system will appear here next. 🚀";
+  servicesButton.addEventListener(
+    "click",
+    () => {
 
-  }
-);
+      if (dashboardMessage) {
+
+        dashboardMessage.textContent =
+          "Our service ordering system is coming next. 🚀";
+
+      }
+
+    }
+  );
+
+}
 
 
 /* ==================================================
    MY ORDERS
 ================================================== */
 
-ordersButton.addEventListener(
-  "click",
-  async function () {
+if (ordersButton) {
 
-    const {
-      data: {
-        user
-      }
-    } =
-      await supabase.auth.getUser();
+  ordersButton.addEventListener(
+    "click",
+    async () => {
 
+      if (!dashboardMessage) return;
 
-    if (!user) {
 
       dashboardMessage.textContent =
-        "Please login again.";
-
-      return;
-
-    }
+        "Loading your orders...";
 
 
-    const {
-      data,
-      error
-    } =
-      await supabase
-        .from("orders")
-        .select("*")
-        .eq("user_id", user.id)
-        .order(
-          "created_at",
-          {
-            ascending: false
+      try {
+
+        const {
+          data: {
+            user
           }
-        );
+        } =
+          await supabase.auth.getUser();
 
 
-    if (error) {
+        if (!user) {
 
-      dashboardMessage.textContent =
-        "Unable to load your orders yet.";
+          dashboardMessage.textContent =
+            "Please login again.";
 
-      console.error(error);
+          return;
 
-      return;
+        }
+
+
+        const {
+          data,
+          error
+        } =
+          await supabase
+            .from("orders")
+            .select("*")
+            .eq("user_id", user.id)
+            .order(
+              "created_at",
+              {
+                ascending: false
+              }
+            );
+
+
+        if (error) {
+
+          console.error(
+            "ORDERS ERROR:",
+            error
+          );
+
+          dashboardMessage.textContent =
+            "Unable to load your orders yet.";
+
+          return;
+
+        }
+
+
+        if (!data || data.length === 0) {
+
+          dashboardMessage.textContent =
+            "You don't have any orders yet.";
+
+          return;
+
+        }
+
+
+        dashboardMessage.innerHTML =
+          `<strong>You have ${data.length} order(s).</strong>`;
+
+      } catch (error) {
+
+        console.error(error);
+
+        dashboardMessage.textContent =
+          "Something went wrong while loading orders.";
+
+      }
 
     }
+  );
 
-
-    if (!data || data.length === 0) {
-
-      dashboardMessage.textContent =
-        "You don't have any orders yet.";
-
-      return;
-
-    }
-
-
-    dashboardMessage.innerHTML =
-      `<strong>You have ${data.length} order(s).</strong>`;
-
-  }
-);
+}
 
 
 /* ==================================================
-   CHECK CURRENT LOGIN SESSION
+   CHECK EXISTING LOGIN SESSION
 ================================================== */
 
 async function checkUser() {
 
-  const {
-    data: {
-      session
+  try {
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabase.auth.getSession();
+
+
+    if (session && session.user) {
+
+      showDashboard(
+        session.user
+      );
+
     }
-  } =
-    await supabase.auth.getSession();
 
+  } catch (error) {
 
-  if (session && session.user) {
-
-    showDashboard(
-      session.user
+    console.error(
+      "SESSION ERROR:",
+      error
     );
 
   }
@@ -542,11 +614,11 @@ async function checkUser() {
 
 
 /* ==================================================
-   WATCH LOGIN / LOGOUT CHANGES
+   AUTH STATE LISTENER
 ================================================== */
 
 supabase.auth.onAuthStateChange(
-  function (event, session) {
+  (event, session) => {
 
     if (
       event === "SIGNED_IN" &&
@@ -564,11 +636,19 @@ supabase.auth.onAuthStateChange(
       event === "SIGNED_OUT"
     ) {
 
-      dashboardSection.style.display =
-        "none";
+      if (dashboardSection) {
 
-      accountSection.style.display =
-        "block";
+        dashboardSection.style.display =
+          "none";
+
+      }
+
+      if (accountSection) {
+
+        accountSection.style.display =
+          "block";
+
+      }
 
     }
 
@@ -577,9 +657,14 @@ supabase.auth.onAuthStateChange(
 
 
 /* ==================================================
-   START APP
+   START BOOSTLANE
 ================================================== */
 
 showSignupForm();
 
-check
+checkUser();
+
+
+console.log(
+  "✅ Boostlane JavaScript is running."
+);
