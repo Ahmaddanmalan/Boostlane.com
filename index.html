@@ -918,14 +918,112 @@
 
       </section>
 
+<!-- FUND ACCOUNT -->
 
-      <!-- FUND ACCOUNT -->
+<section
+  class="page"
+  id="fund"
+>
 
-      <section
-        class="page"
-        id="fund"
+  <h1 class="page-title">
+    Fund Account
+  </h1>
+
+  <div class="form-box">
+
+    <h2 style="margin-bottom:10px;">
+      Your Funding Account
+    </h2>
+
+    <p style="color:#6b7280;margin-bottom:20px;">
+      Transfer money to this account to fund your Boostlane wallet.
+    </p>
+
+    <div
+      style="
+        background:linear-gradient(135deg,#111827,#2563eb);
+        color:white;
+        padding:22px;
+        border-radius:15px;
+        margin-bottom:20px;
+      "
+    >
+
+      <div style="font-size:13px;opacity:.8;">
+        BANK
+      </div>
+
+      <div
+        id="virtualBankName"
+        style="font-size:20px;font-weight:bold;margin-bottom:18px;"
+      >
+        Loading...
+      </div>
+
+
+      <div style="font-size:13px;opacity:.8;">
+        ACCOUNT NAME
+      </div>
+
+      <div
+        id="virtualAccountName"
+        style="font-size:17px;font-weight:bold;margin-bottom:18px;"
+      >
+        Loading...
+      </div>
+
+
+      <div style="font-size:13px;opacity:.8;">
+        ACCOUNT NUMBER
+      </div>
+
+      <div
+        style="display:flex;align-items:center;gap:10px;"
       >
 
+        <div
+          id="virtualAccountNumber"
+          style="font-size:25px;font-weight:bold;letter-spacing:1px;"
+        >
+          Loading...
+        </div>
+
+        <button
+          onclick="copyVirtualAccount()"
+          style="
+            background:white;
+            color:#2563eb;
+            border:none;
+            padding:8px 12px;
+            border-radius:8px;
+            font-weight:bold;
+          "
+        >
+          Copy
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="virtualAccountMessage"
+      class="auth-message"
+    >
+    </div>
+
+
+    <p style="font-size:13px;color:#6b7280;">
+      Your account number is assigned specifically to your Boostlane account.
+      Only fund your wallet using the account details shown above.
+    </p>
+
+  </div>
+
+</section>
+
+      
         <h1 class="page-title">
           Fund Account
         </h1>
@@ -1088,8 +1186,9 @@ const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
 
 const db = supabase.createClient(
-  SUPABASE_URL,
+  SUPABASE_URL 
   SUPABASE_ANON_KEY
+ 
 );
 
 
