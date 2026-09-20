@@ -1,575 +1,934 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Boostlane Dashboard</title>
 
-  <title>Boostlane.com | Your Growth Starts Here</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f8ff;color:#172554}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
 
-  <link rel="stylesheet" href="style.css">
+header{
+  background:#061b4f;color:white;padding:18px 6%;
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:100
+}
+.logo{font-size:27px;font-weight:bold}
+.logo span{color:#38bdf8}
+.menu-btn{background:#2563eb;color:white;border:0;padding:10px 14px;border-radius:9px;font-size:22px}
+
+.layout{display:flex;min-height:calc(100vh - 75px)}
+
+.sidebar{
+  width:250px;background:#dff2ff;padding:25px 15px;
+  border-right:1px solid #c7e5f8
+}
+.sidebar button{
+  width:100%;border:0;background:transparent;text-align:left;
+  padding:17px 15px;border-radius:10px;margin-bottom:7px;
+  color:#334155;font-weight:bold
+}
+.sidebar button.active,.sidebar button:hover{
+  background:#c8defb;color:#1d4ed8
+}
+
+.main{flex:1;padding:30px;max-width:1250px;margin:auto}
+
+.welcome{
+  background:linear-gradient(135deg,#061b4f,#1769c2);
+  color:white;padding:28px;border-radius:18px;margin-bottom:25px
+}
+.welcome h1{font-size:28px;margin-bottom:5px}
+.welcome p{color:#dbeafe}
+
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:25px
+}
+.card{
+  background:white;border-radius:17px;padding:25px;
+  box-shadow:0 8px 25px rgba(6,27,79,.08)
+}
+.stat-title{color:#64748b;margin-bottom:8px}
+.balance{font-size:30px;font-weight:bold;color:#061b4f}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+.card h2{font-size:21px;margin-bottom:20px;color:#061b4f}
+
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-weight:bold;margin-bottom:6px}
+.form-group input,.form-group select{
+  width:100%;padding:13px;border:1px solid #cbd5e1;
+  border-radius:9px;background:white;outline:none
+}
+.form-group input:focus,.form-group select:focus{border-color:#2563eb}
+
+.primary{
+  background:#2563eb;color:white;border:0;border-radius:9px;
+  padding:13px 20px;font-weight:bold
+}
+.primary:hover{background:#1d4ed8}
+
+.green{background:#22c55e}
+.red{background:#ef4444}
+
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{
+  padding:12px 8px;text-align:left;border-bottom:1px solid #e2e8f0
+}
+.table th{color:#64748b;font-size:13px}
+
+.badge{
+  padding:5px 9px;border-radius:20px;font-size:12px;
+  background:#e0f2fe;color:#0369a1
+}
+
+.page{display:none}
+.page.active{display:block}
+
+.profile-row{
+  padding:15px 0;border-bottom:1px solid #e2e8f0
+}
+.profile-row span{display:block;color:#64748b;font-size:13px}
+.profile-row strong{display:block;margin-top:4px}
+
+.message{
+  margin-top:12px;padding:12px;border-radius:8px;
+  display:none
+}
+.message.show{display:block}
+.success{background:#dcfce7;color:#166534}
+.error{background:#fee2e2;color:#991b1b}
+
+.mobile-menu{display:none}
+
+@media(max-width:850px){
+  .sidebar{display:none;position:fixed;left:0;top:75px;bottom:0;z-index:99}
+  .sidebar.open{display:block}
+  .mobile-menu{display:block}
+  .stats{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .main{padding:18px}
+}
+
+@media(min-width:851px){
+  .menu-btn{display:none}
+}
+</style>
 </head>
 
 <body>
 
-  <!-- ================= HEADER ================= -->
+<header>
+  <div class="logo">🚀 Boost<span>lane</span></div>
+  <button class="menu-btn" id="menuBtn">☰</button>
+</header>
 
-  <header class="header">
+<div class="layout">
 
-    <div class="logo">
-      <span class="logo-icon">↗</span>
-      <span>Boost<span>lane</span></span>
+<aside class="sidebar" id="sidebar">
+
+  <button class="active" data-page="dashboard">📊 Dashboard</button>
+  <button data-page="services">🛍️ Services</button>
+  <button data-page="orders">📋 Orders</button>
+  <button data-page="transactions">💳 Transactions</button>
+  <button data-page="wallet">💰 Fund Account</button>
+  <button data-page="support">💬 Support</button>
+  <button data-page="account">👤 Account</button>
+  <button id="logoutBtn">🚪 Logout</button>
+
+</aside>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+
+<section class="page active" id="dashboard">
+
+  <div class="welcome">
+    <h1>Welcome, <span id="customerName">Customer</span> 👋</h1>
+    <p id="customerEmail"></p>
+  </div>
+
+  <div class="stats">
+
+    <div class="card">
+      <div class="stat-title">Account Balance</div>
+      <div class="balance">₦<span id="balance">0.00</span></div>
     </div>
 
-    <nav class="nav">
-
-      <a href="#home">Home</a>
-
-      <a href="#services">Services</a>
-
-      <a href="#about">About</a>
-
-      <a href="#contact">Contact</a>
-
-      <a href="#account" class="top-button">
-        Login / Sign Up
-      </a>
-
-    </nav>
-
-  </header>
-
-
-  <!-- ================= MAIN ================= -->
-
-  <main>
-
-
-    <!-- ================= HERO ================= -->
-
-    <section id="home" class="hero">
-
-      <div class="hero-content">
-
-        <p class="small-title">
-          SOCIAL MEDIA GROWTH SOLUTIONS
-        </p>
-
-        <h1>
-          Boost Your Social Media.
-          <br>
-          <span>Grow Your Business.</span>
-        </h1>
-
-        <p>
-          We help business owners and creators improve their
-          social media presence, reach more people, and build
-          stronger brands online.
-        </p>
-
-        <a href="#account" class="main-button">
-          Get Started Now ↗
-        </a>
-
-      </div>
-
-
-      <div class="hero-visual">
-
-        <div class="growth-symbol">
-          ↗
-        </div>
-
-        <div class="growth-bars">
-
-          <span></span>
-          <span></span>
-          <span></span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ================= SERVICES ================= -->
-
-    <section id="services" class="section services">
-
-      <p class="small-title">
-        OUR SERVICES
-      </p>
-
-      <h2>
-        What We Offer
-      </h2>
-
-      <p class="section-description">
-        Simple solutions to help your social media presence grow.
-      </p>
-
-
-      <div class="service-container">
-
-
-        <div class="service-card">
-
-          <div class="card-icon">
-            👥
-          </div>
-
-          <h3>
-            More Followers
-          </h3>
-
-          <p>
-            Reach more people and build an active social media audience.
-          </p>
-
-          <a href="#account">
-            Get Started ↗
-          </a>
-
-        </div>
-
-
-        <div class="service-card">
-
-          <div class="card-icon">
-            ❤️
-          </div>
-
-          <h3>
-            Higher Engagement
-          </h3>
-
-          <p>
-            Improve likes, comments, shares, and audience interaction.
-          </p>
-
-          <a href="#account">
-            Get Started ↗
-          </a>
-
-        </div>
-
-
-        <div class="service-card">
-
-          <div class="card-icon">
-            📈
-          </div>
-
-          <h3>
-            Account Growth
-          </h3>
-
-          <p>
-            Use simple strategies to improve your online visibility.
-          </p>
-
-          <a href="#account">
-            Get Started ↗
-          </a>
-
-        </div>
-
-
-        <div class="service-card">
-
-          <div class="card-icon">
-            🛡️
-          </div>
-
-          <h3>
-            Safe Support
-          </h3>
-
-          <p>
-            Get helpful guidance and support for your social media goals.
-          </p>
-
-          <a href="#contact">
-            Contact Us ↗
-          </a>
-
-        </div>
-
-
-      </div>
-
-    </section>
-
-
-    <!-- ================= ABOUT ================= -->
-
-    <section id="about" class="about-section">
-
-      <div>
-
-        <p class="small-title">
-          ABOUT BOOSTLANE
-        </p>
-
-        <h2>
-          Your Growth Partner
-        </h2>
-
-        <p>
-          Boostlane helps business owners and creators improve
-          their online presence through social media support,
-          promotion, and growth strategies.
-        </p>
-
-      </div>
-
-
-      <div class="benefits">
-
-        <p>✓ Fast and reliable service</p>
-
-        <p>✓ Affordable solutions</p>
-
-        <p>✓ Helpful customer support</p>
-
-        <p>✓ Your success matters</p>
-
-      </div>
-
-    </section>
-
-
-    <!-- ================= CONTACT ================= -->
-
-    <section id="contact" class="contact-section">
-
-      <div>
-
-        <p class="small-title">
-          GET IN TOUCH
-        </p>
-
-        <h2>
-          We're Here to Help
-        </h2>
-
-        <p>
-          Have questions or need support?
-          Send us a message on WhatsApp.
-        </p>
-
-        <a
-          href="https://wa.me/2349064527157"
-          class="whatsapp-button"
-          target="_blank"
-        >
-          Chat with us on WhatsApp ↗
-        </a>
-
-      </div>
-
-
-      <div class="contact-box">
-
-        <h3>
-          Start Your Growth Journey
-        </h3>
-
-        <p>
-          Contact Boostlane today and let's grow together.
-        </p>
-
-        <a
-          href="https://wa.me/2349064527157"
-          class="main-button"
-          target="_blank"
-        >
-          Contact Us
-        </a>
-
-      </div>
-
-    </section>
-
-
-    <!-- ================= ACCOUNT ================= -->
-
-    <section id="account" class="account-section">
-
-      <div class="account-container">
-
-        <div class="account-header">
-
-          <p class="small-title">
-            BOOSTLANE ACCOUNT
-          </p>
-
-          <h2>
-            Start Your Growth Journey with mr_danmalan groups LTD
-          </h2>
-
-          <p>
-            Create an account to order services and manage your orders.
-          </p>
-
-        </div>
-
-
-        <div class="account-card">
-
-          <div class="account-tabs">
-
-            <button
-              id="signup-tab"
-              class="account-tab active"
-              type="button"
-            >
-              Sign Up
-            </button>
-
-            <button
-              id="login-tab"
-              class="account-tab"
-              type="button"
-            >
-              Login
-            </button>
-
-          </div>
-
-
-          <!-- SIGN UP FORM -->
-
-          <form id="signup-form">
-
-            <label for="signup-name">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              id="signup-name"
-              placeholder="Enter your full name"
-              required
-            >
-
-
-            <label for="signup-email">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="signup-email"
-              placeholder="Enter your email"
-              required
-            >
-
-
-            <label for="signup-password">
-              Password
-            </label>
-
-            <input
-              type="password"
-              id="signup-password"
-              placeholder="Create a password"
-              minlength="6"
-              required
-            >
-
-<button
-  type="button"
-  class="main-button account-button"
-  onclick="alert('🔥 TEST WORKS')"
->
-  TEST BUTTON
-</button>
-
-            >
-              Create Account
-            </button>
-
-          </form>
-
-
-          <p id="account-message"></p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ================= DASHBOARD ================= -->
-
-    <section
-      id="dashboard"
-      class="dashboard-section"
-      style="display: none;"
-    >
-
-      <div class="dashboard-container">
-
-
-        <div class="dashboard-header">
-
-          <div>
-
-            <p class="small-title">
-              BOOSTLANE DASHBOARD
-            </p>
-
-            <h2>
-              Welcome to Boostlane 👋
-            </h2>
-
-            <p id="dashboard-user">
-              Manage your account, services, and orders.
-            </p>
-
-          </div>
-
-
-          <button
-            id="logout-button"
-            class="main-button"
-            type="button"
-          >
-            Logout
-          </button>
-
-        </div>
-
-
-        <div class="dashboard-grid">
-
-
-          <!-- SERVICE CARD -->
-
-          <div class="dashboard-card">
-
-            <div class="dashboard-icon">
-              🚀
-            </div>
-
-            <h3>
-              Available Services
-            </h3>
-
-            <p>
-              Choose a social media service and start your order.
-            </p>
-
-            <button
-              id="services-button"
-              class="main-button"
-              type="button"
-            >
-              View Services
-            </button>
-
-          </div>
-
-
-          <!-- ORDERS CARD -->
-
-          <div class="dashboard-card">
-
-            <div class="dashboard-icon">
-              📦
-            </div>
-
-            <h3>
-              My Orders
-            </h3>
-
-            <p>
-              View your previous and current Boostlane 
-            >
-              My Orders
-            </button>
-
-          </div>
-
-
-          <!-- SUPPORT CARD -->
-
-          <div class="dashboard-card">
-
-            <div class="dashboard-icon">
-              💬
-            </div>
-
-            <h3>
-              Customer Support
-            </h3>
-
-            <p>
-              Need help? Contact Boostlane directly on WhatsApp.
-            </p>
-
-            <a
-              href="https://wa.me/2349064527157"
-              class="main-button"
-              target="_blank"
-            >
-              Chat With Us
-            </a>
-
-          </div>
-
-
-        </div>
-
-
-        <div
-          id="dashboard-message"
-          class="dashboard-message"
-        >
-          Your dashboard is ready.
-        </div>
-
-
-      </div>
-
-    </section>
-
-
-  </main>
-
-
-  <!-- ================= FOOTER ================= -->
-
-  <footer class="footer">
-
-    <div class="logo">
-
-      <span class="logo-icon">
-        ↗
-      </span>
-
-      <span>
-        Boost<span>lane</span>
-      </span>
-
+    <div class="card">
+      <div class="stat-title">Total Orders</div>
+      <div class="balance" id="totalOrders">0</div>
     </div>
 
-    <p>
-      © 2026 Boostlane.com. All rights reserved.
+    <div class="card">
+      <div class="stat-title">Completed Orders</div>
+      <div class="balance" id="completedOrders">0</div>
+    </div>
+
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>🚀 Quick Order</h2>
+
+      <form id="orderForm">
+
+        <div class="form-group">
+          <label>Service</label>
+          <select id="service" required>
+            <option value="">Choose service</option>
+            <option>Instagram Followers</option>
+            <option>Instagram Likes</option>
+            <option>TikTok Followers</option>
+            <option>TikTok Likes</option>
+            <option>YouTube Views</option>
+            <option>YouTube Subscribers</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Account / Post Link</label>
+          <input id="link" type="url" placeholder="https://..." required>
+        </div>
+
+        <div class="form-group">
+          <label>Package</label>
+          <input id="package" placeholder="Example: 1,000 followers" required>
+        </div>
+
+        <button class="primary" type="submit">
+          Submit Order
+        </button>
+
+        <div id="orderMessage" class="message"></div>
+
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>📦 Recent Orders</h2>
+      <div id="recentOrders">Loading...</div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- SERVICES -->
+
+<section class="page" id="services">
+
+  <div class="card">
+    <h2>🛍️ Boostlane Services</h2>
+
+    <div class="grid">
+
+      <div class="card">
+        <h2>📸 Instagram</h2>
+        <p>Followers, likes and engagement.</p>
+      </div>
+
+      <div class="card">
+        <h2>🎵 TikTok</h2>
+        <p>Followers, likes and engagement.</p>
+      </div>
+
+      <div class="card">
+        <h2>▶️ YouTube</h2>
+        <p>Views and subscribers.</p>
+      </div>
+
+      <div class="card">
+        <h2>💬 Engagement</h2>
+        <p>Grow interaction around your content.</p>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ORDERS -->
+
+<section class="page" id="orders">
+
+  <div class="card">
+    <h2>📋 My Orders</h2>
+
+    <div style="overflow-x:auto">
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Package</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody id="ordersTable"></tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- TRANSACTIONS -->
+
+<section class="page" id="transactions">
+
+  <div class="card">
+    <h2>💳 Transactions</h2>
+
+    <div style="overflow-x:auto">
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody id="transactionsTable"></tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- WALLET -->
+
+<section class="page" id="wallet">
+
+  <div class="card">
+
+    <h2>💰 Fund Your Account</h2>
+
+    <p style="margin-bottom:20px;color:#64748b">
+      Add money to your Boostlane wallet.
     </p>
 
-  </footer>
+    <form id="fundForm">
+
+      <div class="form-group">
+        <label>Amount (₦)</label>
+        <input
+          id="fundAmount"
+          type="number"
+          min="100"
+          placeholder="Example: 5000"
+          required
+        >
+      </div>
+
+      <button class="primary green" type="submit">
+        Request Funding
+      </button>
+
+      <div id="fundMessage" class="message"></div>
+
+    </form>
+
+    <p style="margin-top:20px;color:#64748b;font-size:14px">
+      Your funding request will appear in your transactions.
+    </p>
+
+  </div>
+
+</section>
 
 
-  <!-- ================= SUPABASE ================= -->
+<!-- SUPPORT -->
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<section class="page" id="support">
 
-  <!-- ================= YOUR JAVASCRIPT ================= -->
+  <div class="card">
 
-  <script src="script.js"></script>
+    <h2>💬 Customer Support</h2>
+
+    <p style="margin-bottom:20px">
+      Need help with an order, payment or account?
+    </p>
+
+    <a
+      href="https://wa.me/2349064527157"
+      target="_blank"
+    >
+      <button class="primary green">
+        Chat With Boostlane Support
+      </button>
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- ACCOUNT -->
+
+<section class="page" id="account">
+
+  <div class="card">
+
+    <h2>👤 My Account</h2>
+
+    <div class="profile-row">
+      <span>Name</span>
+      <strong id="profileName">—</strong>
+    </div>
+
+    <div class="profile-row">
+      <span>Email</span>
+      <strong id="profileEmail">—</strong>
+    </div>
+
+    <div class="profile-row">
+      <span>User ID</span>
+      <strong id="profileId">—</strong>
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+"https://whseefadqutdrsachypc.supabase.co";
+
+const SUPABASE_ANON_KEY =
+"PASTE_YOUR_EXISTING_ANON_KEY_HERE";
+
+const db =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentUser = null;
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+document.querySelectorAll(".sidebar button[data-page]")
+.forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    const page = button.dataset.page;
+
+    document.querySelectorAll(".page")
+    .forEach(p => p.classList.remove("active"));
+
+    document.getElementById(page)
+    .classList.add("active");
+
+    document.querySelectorAll(".sidebar button")
+    .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+    document.getElementById("sidebar")
+    .classList.remove("open");
+
+    if(page === "orders") loadOrders();
+    if(page === "transactions") loadTransactions();
+
+  });
+
+});
+
+
+document.getElementById("menuBtn")
+.addEventListener("click", () => {
+
+  document.getElementById("sidebar")
+  .classList.toggle("open");
+
+});
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+async function startApp(){
+
+  const {
+    data:{
+      session
+    }
+  } = await db.auth.getSession();
+
+  if(!session){
+
+    window.location.href = "index.html";
+
+    return;
+  }
+
+  currentUser = session.user;
+
+  await loadCustomer();
+
+  await loadOrders();
+
+  await loadTransactions();
+
+}
+
+
+db.auth.onAuthStateChange(
+  (event,session)=>{
+
+    if(!session){
+
+      window.location.href = "index.html";
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   CUSTOMER PROFILE
+========================================================= */
+
+async function loadCustomer(){
+
+  const {
+    data:profile
+  } = await db
+    .from("profiles")
+    .select("*")
+    .eq("id",currentUser.id)
+    .maybeSingle();
+
+
+  const name =
+    profile?.full_name ||
+    currentUser.user_metadata?.full_name ||
+    "Customer";
+
+
+  document.getElementById("customerName")
+  .textContent = name;
+
+  document.getElementById("customerEmail")
+  .textContent = currentUser.email;
+
+  document.getElementById("profileName")
+  .textContent = name;
+
+  document.getElementById("profileEmail")
+  .textContent = currentUser.email;
+
+  document.getElementById("profileId")
+  .textContent = currentUser.id;
+
+
+  const {
+    data:wallet
+  } = await db
+    .from("wallets")
+    .select("balance")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+
+
+  document.getElementById("balance")
+  .textContent =
+    Number(wallet?.balance || 0)
+    .toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2
+      }
+    );
+
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+async function loadOrders(){
+
+  const {
+    data,
+    error
+  } = await db
+    .from("orders")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .order(
+      "created_at",
+      {ascending:false}
+    );
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  document.getElementById("totalOrders")
+  .textContent = data.length;
+
+
+  document.getElementById("completedOrders")
+  .textContent =
+    data.filter(
+      o =>
+        String(o.status)
+        .toLowerCase()
+        .includes("complete")
+    ).length;
+
+
+  const table =
+    document.getElementById("ordersTable");
+
+  table.innerHTML = "";
+
+
+  data.forEach(order=>{
+
+    const row =
+      document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${safe(order.service || "Service")}</td>
+      <td>${safe(order.package || "")}</td>
+      <td>
+        <span class="badge">
+          ${safe(order.status || "pending")}
+        </span>
+      </td>
+      <td>
+        ${new Date(order.created_at)
+        .toLocaleDateString()}
+      </td>
+    `;
+
+    table.appendChild(row);
+
+  });
+
+
+  const recent =
+    document.getElementById("recentOrders");
+
+  recent.innerHTML = "";
+
+
+  if(!data.length){
+
+    recent.innerHTML =
+      "<p>No orders yet.</p>";
+
+    return;
+  }
+
+
+  data.slice(0,5).forEach(order=>{
+
+    const div =
+      document.createElement("div");
+
+    div.style.padding="12px 0";
+    div.style.borderBottom=
+      "1px solid #e2e8f0";
+
+    div.innerHTML=`
+      <strong>${safe(order.service || "Service")}</strong>
+      <br>
+      <small>
+        ${safe(order.package || "")}
+        ·
+        ${safe(order.status || "pending")}
+      </small>
+    `;
+
+    recent.appendChild(div);
+
+  });
+
+}
+
+
+/* =========================================================
+   CREATE ORDER
+========================================================= */
+
+document.getElementById("orderForm")
+.addEventListener("submit",async e=>{
+
+  e.preventDefault();
+
+
+  const service =
+    document.getElementById("service").value;
+
+  const link =
+    document.getElementById("link").value;
+
+  const packageName =
+    document.getElementById("package").value;
+
+
+  const {
+    error
+  } = await db
+    .from("orders")
+    .insert({
+
+      user_id:currentUser.id,
+
+      service:service,
+
+      account_link:link,
+
+      package:packageName,
+
+      status:"pending"
+
+    });
+
+
+  const msg =
+    document.getElementById("orderMessage");
+
+
+  if(error){
+
+    msg.textContent =
+      error.message;
+
+    msg.className =
+      "message show error";
+
+    return;
+  }
+
+
+  msg.textContent =
+    "Order submitted successfully.";
+
+  msg.className =
+    "message show success";
+
+
+  e.target.reset();
+
+  await loadOrders();
+
+});
+
+
+/* =========================================================
+   TRANSACTIONS
+========================================================= */
+
+async function loadTransactions(){
+
+  const {
+    data,
+    error
+  } = await db
+    .from("transactions")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .order(
+      "created_at",
+      {ascending:false}
+    );
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  const table =
+    document.getElementById(
+      "transactionsTable"
+    );
+
+  table.innerHTML = "";
+
+
+  data.forEach(transaction=>{
+
+    const row =
+      document.createElement("tr");
+
+    row.innerHTML=`
+      <td>${safe(transaction.type)}</td>
+      <td>₦${Number(transaction.amount || 0).toLocaleString()}</td>
+      <td>
+        <span class="badge">
+          ${safe(transaction.status)}
+        </span>
+      </td>
+      <td>
+        ${new Date(transaction.created_at)
+        .toLocaleDateString()}
+      </td>
+    `;
+
+    table.appendChild(row);
+
+  });
+
+}
+
+
+/* =========================================================
+   FUND ACCOUNT
+========================================================= */
+
+document.getElementById("fundForm")
+.addEventListener("submit",async e=>{
+
+  e.preventDefault();
+
+
+  const amount =
+    Number(
+      document.getElementById("fundAmount").value
+    );
+
+
+  const {
+    error
+  } = await db
+    .from("transactions")
+    .insert({
+
+      user_id:currentUser.id,
+
+      type:"deposit",
+
+      amount:amount,
+
+      status:"pending"
+
+    });
+
+
+  const msg =
+    document.getElementById("fundMessage");
+
+
+  if(error){
+
+    msg.textContent =
+      error.message;
+
+    msg.className =
+      "message show error";
+
+    return;
+  }
+
+
+  msg.textContent =
+    "Funding request submitted.";
+
+  msg.className =
+    "message show success";
+
+
+  e.target.reset();
+
+  await loadTransactions();
+
+});
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+document.getElementById("logoutBtn")
+.addEventListener("click",async()=>{
+
+  await db.auth.signOut();
+
+  window.location.href="index.html";
+
+});
+
+
+/* =========================================================
+   SECURITY
+========================================================= */
+
+function safe(value){
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    value ?? "";
+
+  return div.innerHTML;
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+startApp();
+
+</script>
 
 </body>
-</
+</html>
