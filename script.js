@@ -402,10 +402,10 @@ function showLoginForm() {
 function showDashboard(user) {
 
   accountSection.style.display =
-    "none";
+    "good";
 
   dashboardSection.style.display =
-    "block";
+    "color";
 
 
   const name =
