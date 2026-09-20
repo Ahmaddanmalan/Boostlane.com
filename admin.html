@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Boostlane Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f7fb;
+      color: #111827;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* ================= LOGIN ================= */
+
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #111827, #2563eb);
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 35px 25px;
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+
+    .logo {
+      text-align: center;
+      color: #2563eb;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .login-title {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #374151;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      outline: none;
+    }
+
+    .login-box input:focus {
+      border-color: #2563eb;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 9px;
+      padding: 13px 18px;
+      font-weight: bold;
+      color: white;
+      background: #2563eb;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+    }
+
+    .full-btn {
+      width: 100%;
+    }
+
+    .message {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+
+    .success {
+      color: #16a34a;
+    }
+
+    /* ================= ADMIN ================= */
+
+    #adminApp {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 65px;
+      background: #111827;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .topbar-logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .admin-label {
+      font-size: 13px;
+      opacity: .8;
+      margin-right: 15px;
+    }
+
+    .logout-btn {
+      background: #ef4444;
+      border: none;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 8px;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 65px);
+    }
+
+    .sidebar {
+      width: 230px;
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      padding: 18px 10px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 13px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .content {
+      flex: 1;
+      padding: 25px;
+      overflow-x: auto;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-title {
+      font-size: 28px;
+      margin-bottom: 22px;
+    }
+
+    /* ================= STAT CARDS ================= */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    }
+
+    .stat-label {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 27px;
+      font-weight: bold;
+    }
+
+    /* ================= PANELS ================= */
+
+    .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    }
+
+    .panel-title {
+      font-size: 19px;
+      margin-bottom: 18px;
+    }
+
+    /* ================= TABLE ================= */
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 13px;
+      border-bottom: 1px solid #edf0f3;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    td {
+      font-size: 14px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-completed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-failed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-processing {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    /* ================= SEARCH ================= */
+
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      margin-bottom: 18px;
+      outline: none;
+    }
+
+    /* ================= ACTIONS ================= */
+
+    .small-btn {
+      border: none;
+      padding: 7px 10px;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      font-size: 12px;
+    }
+
+    .small-btn.red {
+      background: #ef4444;
+    }
+
+    .small-btn.green {
+      background: #16a34a;
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media(max-width: 900px) {
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .sidebar {
+        width: 190px;
+      }
+    }
+
+    @media(max-width: 650px) {
+
+      .topbar {
+        padding: 0 12px;
+      }
+
+      .topbar-logo {
+        font-size: 18px;
+      }
+
+      .admin-label {
+        display: none;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+      }
+
+      .nav-btn {
+        min-width: 125px;
+        margin-right: 5px;
+        margin-bottom: 0;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .stat-card {
+        padding: 15px;
+      }
+
+      .stat-value {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+
+<!-- ======================================================
+     ADMIN LOGIN
+====================================================== -->
+
+<div id="loginScreen">
+
+  <div class="login-box">
+
+    <div class="logo">
+      🚀 Boostlane
+    </div>
+
+    <h2 class="login-title">
+      Admin Dashboard
+    </h2>
+
+    <div
+      id="loginMessage"
+      class="message"
+    ></div>
+
+    <input
+      type="email"
+      id="adminEmail"
+      placeholder="Admin Email"
+    >
+
+    <input
+      type="password"
+      id="adminPassword"
+      placeholder="Password"
+    >
+
+    <button
+      class="btn full-btn"
+      id="adminLoginBtn"
+    >
+      Login
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     ADMIN APPLICATION
+====================================================== -->
+
+<div id="adminApp">
+
+
+  <!-- TOP BAR -->
+
+  <div class="topbar">
+
+    <div class="topbar-logo">
+      🚀 Boostlane Admin
+    </div>
+
+    <div>
+
+      <span
+        class="admin-label"
+        id="adminEmailDisplay"
+      >
+        Admin
+      </span>
+
+      <button
+        class="logout-btn"
+        id="logoutBtn"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="layout">
+
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+      <button
+        class="nav-btn active"
+        data-page="dashboard"
+      >
+        📊 Dashboard
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="customers"
+      >
+        👥 Customers
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="orders"
+      >
+        🛒 Orders
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="transactions"
+      >
+        💳 Transactions
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="wallets"
+      >
+        💰 Wallets
+      </button>
+
+    </div>
+
+
+    <!-- CONTENT -->
+
+    <div class="content">
+
+
+      <!-- ==================================================
+           DASHBOARD
+      ================================================== -->
+
+      <section
+        class="page active"
+        id="dashboard"
+      >
+
+        <h1 class="page-title">
+          Dashboard
+        </h1>
+
+
+        <div class="stats">
+
+          <div class="stat-card">
+
+            <div class="stat-label">
+              Total Customers
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalCustomers"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-label">
+              Total Orders
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalOrders"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-label">
+              Pending Orders
+            </div>
+
+            <div
+              class="stat-value"
+              id="pendingOrders"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-label">
+              Total Wallet Balance
+            </div>
+
+            <div
+              class="stat-value"
+              id="totalBalance"
+            >
+              ₦0.00
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="panel">
+
+          <h2 class="panel-title">
+            Recent Customers
+          </h2>
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Joined</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="recentCustomersTable">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+
+        <div class="panel">
+
+          <h2 class="panel-title">
+            Recent Orders
+          </h2>
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Service</th>
+                  <th>Package</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="recentOrdersTable">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           CUSTOMERS
+      ================================================== -->
+
+      <section
+        class="page"
+        id="customers"
+      >
+
+        <h1 class="page-title">
+          Customers
+        </h1>
+
+        <div class="panel">
+
+          <input
+            type="text"
+            id="customerSearch"
+            class="search-box"
+            placeholder="Search customers..."
+          >
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Wallet</th>
+                  <th>Joined</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="customersTable">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           ORDERS
+      ================================================== -->
+
+      <section
+        class="page"
+        id="orders"
+      >
+
+        <h1 class="page-title">
+          Orders
+        </h1>
+
+        <div class="panel">
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Package</th>
+                  <th>Link</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="ordersTable">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           TRANSACTIONS
+      ================================================== -->
+
+      <section
+        class="page"
+        id="transactions"
+      >
+
+        <h1 class="page-title">
+          Transactions
+        </h1>
+
+        <div class="panel">
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Customer</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="transactionsTable">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           WALLETS
+      ================================================== -->
+
+      <section
+        class="page"
+        id="wallets"
+      >
+
+        <h1 class="page-title">
+          Customer Wallets
+        </h1>
+
+        <div class="panel">
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Customer</th>
+                  <th>Balance</th>
+                  <th>Updated</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="walletsTable">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* ======================================================
+   SUPABASE
+====================================================== */
+
+const SUPABASE_URL =
+  "https://whseefadqutdrsachypc.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "PASTE_YOUR_EXISTING_ANON_KEY_HERE";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* ======================================================
+   GLOBAL DATA
+====================================================== */
+
+let currentUser = null;
+
+let allCustomers = [];
+
+let customerMap = {};
+
+
+/* ======================================================
+   LOGIN
+====================================================== */
+
+document
+  .getElementById("adminLoginBtn")
+  .onclick = async function() {
+
+    const email =
+      document
+        .getElementById("adminEmail")
+        .value
+        .trim();
+
+    const password =
+      document
+        .getElementById("adminPassword")
+        .value;
+
+    const message =
+      document.getElementById(
+        "loginMessage"
+      );
+
+    message.className =
+      "message";
+
+
+    if (!email || !password) {
+
+      message.textContent =
+        "Enter your email and password.";
+
+      message.classList.add("error");
+
+      return;
+    }
+
+
+    message.textContent =
+      "Logging in...";
+
+
+    const {
+      data,
+      error
+    } =
+      await db.auth.signInWithPassword({
+
+        email,
+        password
+
+      });
+
+
+    if (error) {
+
+      message.textContent =
+        error.message;
+
+      message.classList.add("error");
+
+      return;
+
+    }
+
+
+    currentUser =
+      data.user;
+
+
+    const isAdmin =
+      await checkAdmin();
+
+
+    if (!isAdmin) {
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      message.textContent =
+        "This account is not an administrator.";
+
+      message.classList.add("error");
+
+      return;
+
+    }
+
+
+    openAdmin();
+
+  };
+
+
+/* ======================================================
+   CHECK ADMIN
+====================================================== */
+
+async function checkAdmin() {
+
+  if (!currentUser) {
+    return false;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("role")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if (error || !data) {
+    return false;
+  }
+
+
+  return data.role === "admin";
+
+}
+
+
+/* ======================================================
+   OPEN ADMIN
+====================================================== */
+
+async function openAdmin() {
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "none";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display = "block";
+
+
+  document
+    .getElementById("adminEmailDisplay")
+    .textContent =
+      currentUser.email || "Admin";
+
+
+  await loadAllData();
+
+}
+
+
+/* ======================================================
+   SESSION CHECK
+====================================================== */
+
+async function checkSession() {
+
+  const {
+    data: {
+      session
+    }
+  } =
+    await db.auth.getSession();
+
+
+  if (!session) {
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  currentUser =
+    session.user;
+
+
+  const isAdmin =
+    await checkAdmin();
+
+
+  if (isAdmin) {
+
+    openAdmin();
+
+  } else {
+
+    await db.auth.signOut();
+
+    showLogin();
+
+  }
+
+}
+
+
+/* ======================================================
+   SHOW LOGIN
+====================================================== */
+
+function showLogin() {
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "flex";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display = "none";
+
+}
+
+
+/* ======================================================
+   LOGOUT
+====================================================== */
+
+document
+  .getElementById("logoutBtn")
+  .onclick = async function() {
+
+    await db.auth.signOut();
+
+    currentUser = null;
+
+    showLogin();
+
+  };
+
+
+/* ======================================================
+   NAVIGATION
+====================================================== */
+
+document
+  .querySelectorAll(".nav-btn")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      function() {
+
+        const page =
+          this.dataset.page;
+
+
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach(btn => {
+
+            btn.classList.remove(
+              "active"
+            );
+
+          });
+
+
+        this.classList.add("active");
+
+
+        document
+          .querySelectorAll(".page")
+          .forEach(section => {
+
+            section.classList.remove(
+              "active"
+            );
+
+          });
+
+
+        document
+          .getElementById(page)
+          .classList.add("active");
+
+      });
+
+  });
+
+
+/* ======================================================
+   LOAD EVERYTHING
+====================================================== */
+
+async function loadAllData() {
+
+  await loadCustomers();
+
+  await loadWallets();
+
+  await loadOrders();
+
+  await loadTransactions();
+
+  updateDashboard();
+
+}
+
+
+/* ======================================================
+   LOAD CUSTOMERS
+====================================================== */
+
+async function loadCustomers() {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Customers error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  allCustomers =
+    data || [];
+
+
+  customerMap = {};
+
+
+  allCustomers.forEach(
+    customer => {
+
+      customerMap[
+        customer.id
+      ] = customer;
+
+    }
+  );
+
+
+  renderCustomers(
+    allCustomers
+  );
+
+  renderRecentCustomers(
+    allCustomers.slice(
+      0,
+      5
+    )
+  );
+
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      allCustomers.length;
+
+}
+
+
+/* ======================================================
+   RENDER CUSTOMERS
+====================================================== */
+
+function renderCustomers(
+  customers
+) {
+
+  const table =
+    document.getElementById(
+      "customersTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  if (!customers.length) {
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="5">
+          No customers found.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  customers.forEach(
+    customer => {
+
+      const wallet =
+        walletMap[
+          customer.id
+        ];
+
+
+      const balance =
+        wallet
+          ? Number(
+              wallet.balance || 0
+            )
+          : 0;
+
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer.full_name ||
+            "No name"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.phone ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${balance.toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits: 2
+            }
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            customer.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* ======================================================
+   RECENT CUSTOMERS
+====================================================== */
+
+function renderRecentCustomers(
+  customers
+) {
+
+  const table =
+    document.getElementById(
+      "recentCustomersTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  customers.forEach(
+    customer => {
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer.full_name ||
+            "No name"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.phone ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            customer.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* ======================================================
+   WALLETS
+====================================================== */
+
+let walletMap = {};
+
+
+async function loadWallets() {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("wallets")
+      .select("*");
+
+
+  if (error) {
+
+    console.error(
+      "Wallet error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  walletMap = {};
+
+
+  (data || []).forEach(
+    wallet => {
+
+      walletMap[
+        wallet.user_id
+      ] = wallet;
+
+    }
+  );
+
+
+  const table =
+    document.getElementById(
+      "walletsTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  let total =
+    0;
+
+
+  (data || []).forEach(
+    wallet => {
+
+      const customer =
+        customerMap[
+          wallet.user_id
+        ];
+
+
+      const balance =
+        Number(
+          wallet.balance || 0
+        );
+
+
+      total += balance;
+
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            customer?.email ||
+            wallet.user_id
+          )}
+        </td>
+
+        <td>
+          ₦${balance.toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits: 2
+            }
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            wallet.updated_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+
+  document
+    .getElementById(
+      "totalBalance"
+    )
+    .textContent =
+      "₦" +
+      total.toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits: 2
+        }
+      );
+
+}
+
+
+/* ======================================================
+   ORDERS
+====================================================== */
+
+let allOrders = [];
+
+
+async function loadOrders() {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Orders error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  allOrders =
+    data || [];
+
+
+  const table =
+    document.getElementById(
+      "ordersTable"
+    );
+
+
+  const recentTable =
+    document.getElementById(
+      "recentOrdersTable"
+    );
+
+
+  table.innerHTML = "";
+
+  recentTable.innerHTML = "";
+
+
+  allOrders.forEach(
+    order => {
+
+      const customer =
+        customerMap[
+          order.user_id
+        ];
+
+
+      const status =
+        order.status ||
+        "pending";
+
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            customer?.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.service ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.package ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.account_link ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            status
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            order.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+
+  allOrders
+    .slice(0, 5)
+    .forEach(
+      order => {
+
+        const row =
+          document.createElement(
+            "tr"
+          );
+
+
+        row.innerHTML = `
+
+          <td>
+            ${escapeHTML(
+              order.service ||
+              "-"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              order.package ||
+              "-"
+            )}
+          </td>
+
+          <td>
+            ${statusBadge(
+              order.status ||
+              "pending"
+            )}
+          </td>
+
+          <td>
+            ${formatDate(
+              order.created_at
+            )}
+          </td>
+
+        `;
+
+
+        recentTable.appendChild(
+          row
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "totalOrders"
+    )
+    .textContent =
+      allOrders.length;
+
+
+  document
+    .getElementById(
+      "pendingOrders"
+    )
+    .textContent =
+      allOrders.filter(
+        order =>
+          String(
+            order.status || ""
+          ).toLowerCase()
+          .includes("pending")
+      ).length;
+
+}
+
+
+/* ======================================================
+   TRANSACTIONS
+====================================================== */
+
+async function loadTransactions() {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("transactions")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Transactions error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const table =
+    document.getElementById(
+      "transactionsTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  (data || []).forEach(
+    transaction => {
+
+      const customer =
+        customerMap[
+          transaction.user_id
+        ];
+
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            customer?.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            transaction.type ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${Number(
+            transaction.amount ||
+            0
+          ).toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits: 2
+            }
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            transaction.status ||
+            "pending"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            transaction.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* ======================================================
+   DASHBOARD UPDATE
+====================================================== */
+
+function updateDashboard() {
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      allCustomers.length;
+
+
+  document
+    .getElementById(
+      "totalOrders"
+    )
+    .textContent =
+      allOrders.length;
+
+
+  document
+    .getElementById(
+      "pendingOrders"
+    )
+    .textContent =
+      allOrders.filter(
+        order =>
+          String(
+            order.status || ""
+          )
+          .toLowerCase()
+          .includes("pending")
+      ).length;
+
+}
+
+
+/* ======================================================
+   CUSTOMER SEARCH
+====================================================== */
+
+document
+  .getElementById(
+    "customerSearch"
+  )
+  .addEventListener(
+    "input",
+    function() {
+
+      const search =
+        this.value
+          .toLowerCase()
+          .trim();
+
+
+      const filtered =
+        allCustomers.filter(
+          customer => {
+
+            const text =
+              (
+                (customer.full_name || "") +
+                " " +
+                (customer.email || "") +
+                " " +
+                (customer.phone || "")
+              ).toLowerCase();
+
+
+            return text.includes(
+              search
+            );
+
+          }
+        );
+
+
+      renderCustomers(
+        filtered
+      );
+
+    }
+  );
+
+
+/* ======================================================
+   STATUS BADGE
+====================================================== */
+
+function statusBadge(
+  status
+) {
+
+  const value =
+    String(
+      status || "pending"
+    );
+
+
+  const lower =
+    value.toLowerCase();
+
+
+  let className =
+    "status-pending";
+
+
+  if (
+    lower.includes("completed") ||
+    lower.includes("success")
+  ) {
+
+    className =
+      "status-completed";
+
+  }
+  else if (
+    lower.includes("failed") ||
+    lower.includes("cancel")
+  ) {
+
+    className =
+      "status-failed";
+
+  }
+  else if (
+    lower.includes("processing")
+  ) {
+
+    className =
+      "status-processing";
+
+  }
+
+
+  return `
+    <span class="status ${className}">
+      ${escapeHTML(value)}
+    </span>
+  `;
+
+}
+
+
+/* ======================================================
+   HELPERS
+====================================================== */
+
+function escapeHTML(
+  value
+) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function formatDate(
+  date
+) {
+
+  if (!date) {
+    return "-";
+  }
+
+
+  return new Date(
+    date
+  ).toLocaleString(
+    "en-NG"
+  );
+
+}
+
+
+/* ======================================================
+   START
+====================================================== */
+
+checkSession();
+
+</script>
+
+</body>
+</html>
