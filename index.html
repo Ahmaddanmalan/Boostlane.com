@@ -1,511 +1,1397 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Boostlane Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boostlane</title>
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#f3f8ff;color:#172554}
-button,input,select{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-header{
-  background:#061b4f;color:white;padding:18px 6%;
-  display:flex;justify-content:space-between;align-items:center;
-  position:sticky;top:0;z-index:100
-}
-.logo{font-size:27px;font-weight:bold}
-.logo span{color:#38bdf8}
-.menu-btn{background:#2563eb;color:white;border:0;padding:10px 14px;border-radius:9px;font-size:22px}
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
-.layout{display:flex;min-height:calc(100vh - 75px)}
+    body {
+      background: #f5f7fb;
+      color: #222;
+    }
 
-.sidebar{
-  width:250px;background:#dff2ff;padding:25px 15px;
-  border-right:1px solid #c7e5f8
-}
-.sidebar button{
-  width:100%;border:0;background:transparent;text-align:left;
-  padding:17px 15px;border-radius:10px;margin-bottom:7px;
-  color:#334155;font-weight:bold
-}
-.sidebar button.active,.sidebar button:hover{
-  background:#c8defb;color:#1d4ed8
-}
+    button {
+      cursor: pointer;
+    }
 
-.main{flex:1;padding:30px;max-width:1250px;margin:auto}
+    /* ================= AUTH ================= */
 
-.welcome{
-  background:linear-gradient(135deg,#061b4f,#1769c2);
-  color:white;padding:28px;border-radius:18px;margin-bottom:25px
-}
-.welcome h1{font-size:28px;margin-bottom:5px}
-.welcome p{color:#dbeafe}
+    #authScreen {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #111827, #2563eb);
+      padding: 20px;
+    }
 
-.stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:25px
-}
-.card{
-  background:white;border-radius:17px;padding:25px;
-  box-shadow:0 8px 25px rgba(6,27,79,.08)
-}
-.stat-title{color:#64748b;margin-bottom:8px}
-.balance{font-size:30px;font-weight:bold;color:#061b4f}
+    .auth-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 35px 25px;
+      border-radius: 18px;
+      box-shadow: 0 15px 50px rgba(0,0,0,.2);
+    }
 
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .auth-logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #2563eb;
+    }
 
-.card h2{font-size:21px;margin-bottom:20px;color:#061b4f}
+    .auth-title {
+      text-align: center;
+      font-size: 25px;
+      margin-bottom: 25px;
+    }
 
-.form-group{margin-bottom:15px}
-.form-group label{display:block;font-weight:bold;margin-bottom:6px}
-.form-group input,.form-group select{
-  width:100%;padding:13px;border:1px solid #cbd5e1;
-  border-radius:9px;background:white;outline:none
-}
-.form-group input:focus,.form-group select:focus{border-color:#2563eb}
+    .auth-box input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+    }
 
-.primary{
-  background:#2563eb;color:white;border:0;border-radius:9px;
-  padding:13px 20px;font-weight:bold
-}
-.primary:hover{background:#1d4ed8}
+    .auth-box input:focus {
+      border-color: #2563eb;
+    }
 
-.green{background:#22c55e}
-.red{background:#ef4444}
+    .primary-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
 
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{
-  padding:12px 8px;text-align:left;border-bottom:1px solid #e2e8f0
-}
-.table th{color:#64748b;font-size:13px}
+    .primary-btn:hover {
+      background: #1d4ed8;
+    }
 
-.badge{
-  padding:5px 9px;border-radius:20px;font-size:12px;
-  background:#e0f2fe;color:#0369a1
-}
+    .auth-link {
+      text-align: center;
+      margin-top: 16px;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-.page{display:none}
-.page.active{display:block}
+    .auth-message {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
 
-.profile-row{
-  padding:15px 0;border-bottom:1px solid #e2e8f0
-}
-.profile-row span{display:block;color:#64748b;font-size:13px}
-.profile-row strong{display:block;margin-top:4px}
+    .error {
+      color: #dc2626;
+    }
 
-.message{
-  margin-top:12px;padding:12px;border-radius:8px;
-  display:none
-}
-.message.show{display:block}
-.success{background:#dcfce7;color:#166534}
-.error{background:#fee2e2;color:#991b1b}
+    .success {
+      color: #16a34a;
+    }
 
-.mobile-menu{display:none}
+    /* ================= APP ================= */
 
-@media(max-width:850px){
-  .sidebar{display:none;position:fixed;left:0;top:75px;bottom:0;z-index:99}
-  .sidebar.open{display:block}
-  .mobile-menu{display:block}
-  .stats{grid-template-columns:1fr}
-  .grid{grid-template-columns:1fr}
-  .main{padding:18px}
-}
+    #app {
+      display: none;
+      min-height: 100vh;
+    }
 
-@media(min-width:851px){
-  .menu-btn{display:none}
-}
-</style>
+    .topbar {
+      height: 65px;
+      background: #111827;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .logout-btn {
+      background: #ef4444;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 65px);
+    }
+
+    .sidebar {
+      width: 230px;
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      padding: 20px 10px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .content {
+      flex: 1;
+      padding: 25px;
+      overflow-x: auto;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-title {
+      font-size: 27px;
+      margin-bottom: 20px;
+    }
+
+    /* ================= CARDS ================= */
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    }
+
+    .card-label {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    /* ================= SERVICES ================= */
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .service-card {
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    }
+
+    .service-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .service-card p {
+      color: #6b7280;
+      margin-bottom: 15px;
+    }
+
+    /* ================= FORMS ================= */
+
+    .form-box {
+      max-width: 650px;
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    }
+
+    .form-box label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .form-box input,
+    .form-box textarea,
+    .form-box select {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 18px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      outline: none;
+    }
+
+    .form-box textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* ================= TABLE ================= */
+
+    .table-box {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 13px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media(max-width: 900px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .sidebar {
+        width: 190px;
+      }
+    }
+
+    @media(max-width: 650px) {
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        overflow-x: auto;
+        padding: 8px;
+      }
+
+      .nav-btn {
+        min-width: 120px;
+        margin-right: 5px;
+        margin-bottom: 0;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .services {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        padding: 0 15px;
+      }
+
+      .logo {
+        font-size: 19px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">🚀 Boost<span>lane</span></div>
-  <button class="menu-btn" id="menuBtn">☰</button>
-</header>
+<!-- =========================================================
+     LOGIN / SIGNUP SCREEN
+========================================================= -->
 
-<div class="layout">
+<div id="authScreen">
 
-<aside class="sidebar" id="sidebar">
+  <div class="auth-box">
 
-  <button class="active" data-page="dashboard">📊 Dashboard</button>
-  <button data-page="services">🛍️ Services</button>
-  <button data-page="orders">📋 Orders</button>
-  <button data-page="transactions">💳 Transactions</button>
-  <button data-page="wallet">💰 Fund Account</button>
-  <button data-page="support">💬 Support</button>
-  <button data-page="account">👤 Account</button>
-  <button id="logoutBtn">🚪 Logout</button>
+    <div class="auth-logo">🚀 Boostlane</div>
 
-</aside>
+    <!-- LOGIN -->
 
-<main class="main">
+    <div id="loginBox">
 
-<!-- DASHBOARD -->
+      <h2 class="auth-title">Welcome Back</h2>
 
-<section class="page active" id="dashboard">
+      <div id="loginMessage" class="auth-message"></div>
 
-  <div class="welcome">
-    <h1>Welcome, <span id="customerName">Customer</span> 👋</h1>
-    <p id="customerEmail"></p>
-  </div>
+      <input
+        type="email"
+        id="loginEmail"
+        placeholder="Email"
+      >
 
-  <div class="stats">
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Password"
+      >
 
-    <div class="card">
-      <div class="stat-title">Account Balance</div>
-      <div class="balance">₦<span id="balance">0.00</span></div>
-    </div>
-
-    <div class="card">
-      <div class="stat-title">Total Orders</div>
-      <div class="balance" id="totalOrders">0</div>
-    </div>
-
-    <div class="card">
-      <div class="stat-title">Completed Orders</div>
-      <div class="balance" id="completedOrders">0</div>
-    </div>
-
-  </div>
-
-  <div class="grid">
-
-    <div class="card">
-      <h2>🚀 Quick Order</h2>
-
-      <form id="orderForm">
-
-        <div class="form-group">
-          <label>Service</label>
-          <select id="service" required>
-            <option value="">Choose service</option>
-            <option>Instagram Followers</option>
-            <option>Instagram Likes</option>
-            <option>TikTok Followers</option>
-            <option>TikTok Likes</option>
-            <option>YouTube Views</option>
-            <option>YouTube Subscribers</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Account / Post Link</label>
-          <input id="link" type="url" placeholder="https://..." required>
-        </div>
-
-        <div class="form-group">
-          <label>Package</label>
-          <input id="package" placeholder="Example: 1,000 followers" required>
-        </div>
-
-        <button class="primary" type="submit">
-          Submit Order
-        </button>
-
-        <div id="orderMessage" class="message"></div>
-
-      </form>
-    </div>
-
-    <div class="card">
-      <h2>📦 Recent Orders</h2>
-      <div id="recentOrders">Loading...</div>
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- SERVICES -->
-
-<section class="page" id="services">
-
-  <div class="card">
-    <h2>🛍️ Boostlane Services</h2>
-
-    <div class="grid">
-
-      <div class="card">
-        <h2>📸 Instagram</h2>
-        <p>Followers, likes and engagement.</p>
-      </div>
-
-      <div class="card">
-        <h2>🎵 TikTok</h2>
-        <p>Followers, likes and engagement.</p>
-      </div>
-
-      <div class="card">
-        <h2>▶️ YouTube</h2>
-        <p>Views and subscribers.</p>
-      </div>
-
-      <div class="card">
-        <h2>💬 Engagement</h2>
-        <p>Grow interaction around your content.</p>
-      </div>
-
-    </div>
-  </div>
-
-</section>
-
-
-<!-- ORDERS -->
-
-<section class="page" id="orders">
-
-  <div class="card">
-    <h2>📋 My Orders</h2>
-
-    <div style="overflow-x:auto">
-      <table class="table">
-
-        <thead>
-          <tr>
-            <th>Service</th>
-            <th>Package</th>
-            <th>Status</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-
-        <tbody id="ordersTable"></tbody>
-
-      </table>
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- TRANSACTIONS -->
-
-<section class="page" id="transactions">
-
-  <div class="card">
-    <h2>💳 Transactions</h2>
-
-    <div style="overflow-x:auto">
-      <table class="table">
-
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-
-        <tbody id="transactionsTable"></tbody>
-
-      </table>
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- WALLET -->
-
-<section class="page" id="wallet">
-
-  <div class="card">
-
-    <h2>💰 Fund Your Account</h2>
-
-    <p style="margin-bottom:20px;color:#64748b">
-      Add money to your Boostlane wallet.
-    </p>
-
-    <form id="fundForm">
-
-      <div class="form-group">
-        <label>Amount (₦)</label>
-        <input
-          id="fundAmount"
-          type="number"
-          min="100"
-          placeholder="Example: 5000"
-          required
-        >
-      </div>
-
-      <button class="primary green" type="submit">
-        Request Funding
+      <button
+        class="primary-btn"
+        id="loginBtn"
+      >
+        Login
       </button>
 
-      <div id="fundMessage" class="message"></div>
+      <div
+        class="auth-link"
+        id="forgotBtn"
+      >
+        Forgot Password?
+      </div>
 
-    </form>
+      <div
+        class="auth-link"
+        id="showSignup"
+      >
+        Don't have an account? Register here
+      </div>
 
-    <p style="margin-top:20px;color:#64748b;font-size:14px">
-      Your funding request will appear in your transactions.
-    </p>
-
-  </div>
-
-</section>
+    </div>
 
 
-<!-- SUPPORT -->
+    <!-- SIGNUP -->
 
-<section class="page" id="support">
+    <div id="signupBox" style="display:none;">
 
-  <div class="card">
+      <h2 class="auth-title">Create Account</h2>
 
-    <h2>💬 Customer Support</h2>
+      <div id="signupMessage" class="auth-message"></div>
 
-    <p style="margin-bottom:20px">
-      Need help with an order, payment or account?
-    </p>
+      <input
+        type="text"
+        id="signupName"
+        placeholder="Full Name"
+      >
 
-    <a
-      href="https://wa.me/2349064527157"
-      target="_blank"
-    >
-      <button class="primary green">
-        Chat With Boostlane Support
+      <input
+        type="tel"
+        id="signupPhone"
+        placeholder="Phone Number"
+      >
+
+      <input
+        type="email"
+        id="signupEmail"
+        placeholder="Email"
+      >
+
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Password"
+      >
+
+      <input
+        type="password"
+        id="signupConfirm"
+        placeholder="Confirm Password"
+      >
+
+      <button
+        class="primary-btn"
+        id="signupBtn"
+      >
+        Create Account
       </button>
-    </a>
+
+      <div
+        class="auth-link"
+        id="showLogin"
+      >
+        Already have an account? Login
+      </div>
+
+    </div>
+
+
+    <!-- FORGOT PASSWORD -->
+
+    <div id="forgotBox" style="display:none;">
+
+      <h2 class="auth-title">Reset Password</h2>
+
+      <div id="forgotMessage" class="auth-message"></div>
+
+      <input
+        type="email"
+        id="forgotEmail"
+        placeholder="Enter your email"
+      >
+
+      <button
+        class="primary-btn"
+        id="resetBtn"
+      >
+        Send Reset Link
+      </button>
+
+      <div
+        class="auth-link"
+        id="backToLogin"
+      >
+        Back to Login
+      </div>
+
+    </div>
 
   </div>
 
-</section>
-
-
-<!-- ACCOUNT -->
-
-<section class="page" id="account">
-
-  <div class="card">
-
-    <h2>👤 My Account</h2>
-
-    <div class="profile-row">
-      <span>Name</span>
-      <strong id="profileName">—</strong>
-    </div>
-
-    <div class="profile-row">
-      <span>Email</span>
-      <strong id="profileEmail">—</strong>
-    </div>
-
-    <div class="profile-row">
-      <span>User ID</span>
-      <strong id="profileId">—</strong>
-    </div>
-
-  </div>
-
-</section>
-
-</main>
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- =========================================================
+     MAIN DASHBOARD
+========================================================= -->
+
+<div id="app">
+
+  <div class="topbar">
+
+    <div class="logo">
+      🚀 Boostlane
+    </div>
+
+    <button
+      class="logout-btn"
+      id="logoutBtn"
+    >
+      Logout
+    </button>
+
+  </div>
+
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+      <button
+        class="nav-btn active"
+        data-page="dashboard"
+      >
+        🏠 Dashboard
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="services"
+      >
+        📦 Services
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="orders"
+      >
+        🛒 Orders
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="transactions"
+      >
+        💳 Transactions
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="fund"
+      >
+        💰 Fund Account
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="support"
+      >
+        💬 Support
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="account"
+      >
+        👤 Account
+      </button>
+
+    </div>
+
+
+    <!-- CONTENT -->
+
+    <div class="content">
+
+
+      <!-- DASHBOARD -->
+
+      <section
+        class="page active"
+        id="dashboard"
+      >
+
+        <h1 class="page-title">
+          Dashboard
+        </h1>
+
+        <div class="cards">
+
+          <div class="card">
+            <div class="card-label">
+              Account Balance
+            </div>
+
+            <div
+              class="card-value"
+              id="balance"
+            >
+              ₦0.00
+            </div>
+          </div>
+
+
+          <div class="card">
+
+            <div class="card-label">
+              Total Orders
+            </div>
+
+            <div
+              class="card-value"
+              id="totalOrders"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="card-label">
+              Completed Orders
+            </div>
+
+            <div
+              class="card-value"
+              id="completedOrders"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="card-label">
+              Account
+            </div>
+
+            <div
+              class="card-value"
+              id="userName"
+            >
+              User
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h2 style="margin-bottom:15px;">
+            Quick Order
+          </h2>
+
+          <div class="services">
+
+            <div class="service-card">
+
+              <h3>📸 Instagram</h3>
+
+              <p>
+                Grow your Instagram account.
+              </p>
+
+              <button
+                class="primary-btn"
+                onclick="goToServices()"
+              >
+                Order Now
+              </button>
+
+            </div>
+
+
+            <div class="service-card">
+
+              <h3>🎵 TikTok</h3>
+
+              <p>
+                Increase your TikTok growth.
+              </p>
+
+              <button
+                class="primary-btn"
+                onclick="goToServices()"
+              >
+                Order Now
+              </button>
+
+            </div>
+
+
+            <div class="service-card">
+
+              <h3>▶️ YouTube</h3>
+
+              <p>
+                Grow your YouTube channel.
+              </p>
+
+              <button
+                class="primary-btn"
+                onclick="goToServices()"
+              >
+                Order Now
+              </button>
+
+            </div>
+
+
+            <div class="service-card">
+
+              <h3>❤️ Engagement</h3>
+
+              <p>
+                Improve social engagement.
+              </p>
+
+              <button
+                class="primary-btn"
+                onclick="goToServices()"
+              >
+                Order Now
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- SERVICES -->
+
+      <section
+        class="page"
+        id="services"
+      >
+
+        <h1 class="page-title">
+          Services
+        </h1>
+
+
+        <div class="services">
+
+          <div class="service-card">
+
+            <h3>📸 Instagram Growth</h3>
+
+            <p>
+              Instagram followers, likes and engagement.
+            </p>
+
+            <button
+              class="primary-btn"
+              onclick="showOrderForm('Instagram Growth')"
+            >
+              Order
+            </button>
+
+          </div>
+
+
+          <div class="service-card">
+
+            <h3>🎵 TikTok Growth</h3>
+
+            <p>
+              TikTok followers, views and engagement.
+            </p>
+
+            <button
+              class="primary-btn"
+              onclick="showOrderForm('TikTok Growth')"
+            >
+              Order
+            </button>
+
+          </div>
+
+
+          <div class="service-card">
+
+            <h3>▶️ YouTube Growth</h3>
+
+            <p>
+              YouTube views, subscribers and engagement.
+            </p>
+
+            <button
+              class="primary-btn"
+              onclick="showOrderForm('YouTube Growth')"
+            >
+              Order
+            </button>
+
+          </div>
+
+
+          <div class="service-card">
+
+            <h3>❤️ Engagement</h3>
+
+            <p>
+              Improve your social media engagement.
+            </p>
+
+            <button
+              class="primary-btn"
+              onclick="showOrderForm('Social Engagement')"
+            >
+              Order
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="orderFormContainer"
+          style="margin-top:25px;"
+        ></div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+
+      <section
+        class="page"
+        id="orders"
+      >
+
+        <h1 class="page-title">
+          Orders
+        </h1>
+
+        <div class="table-box">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Service</th>
+                <th>Package</th>
+                <th>Link</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="ordersTable">
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+
+      <!-- TRANSACTIONS -->
+
+      <section
+        class="page"
+        id="transactions"
+      >
+
+        <h1 class="page-title">
+          Transactions
+        </h1>
+
+        <div class="table-box">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="transactionsTable">
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+
+      <!-- FUND ACCOUNT -->
+
+      <section
+        class="page"
+        id="fund"
+      >
+
+        <h1 class="page-title">
+          Fund Account
+        </h1>
+
+        <div class="form-box">
+
+          <h2 style="margin-bottom:20px;">
+            Request Account Funding
+          </h2>
+
+          <label>
+            Amount
+          </label>
+
+          <input
+            type="number"
+            id="fundAmount"
+            placeholder="Enter amount"
+          >
+
+          <label>
+            Payment Reference
+          </label>
+
+          <input
+            type="text"
+            id="fundReference"
+            placeholder="Payment reference"
+          >
+
+          <button
+            class="primary-btn"
+            id="fundBtn"
+          >
+            Submit Funding Request
+          </button>
+
+          <div
+            id="fundMessage"
+            class="auth-message"
+            style="margin-top:15px;"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- SUPPORT -->
+
+      <section
+        class="page"
+        id="support"
+      >
+
+        <h1 class="page-title">
+          Support
+        </h1>
+
+        <div class="card">
+
+          <h2 style="margin-bottom:12px;">
+            Need Help?
+          </h2>
+
+          <p style="margin-bottom:20px;color:#666;">
+            Contact Boostlane support on WhatsApp.
+          </p>
+
+          <a
+            href="https://wa.me/2349064527157"
+            target="_blank"
+            style="text-decoration:none;"
+          >
+
+            <button class="primary-btn">
+              Chat on WhatsApp
+            </button>
+
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <!-- ACCOUNT -->
+
+      <section
+        class="page"
+        id="account"
+      >
+
+        <h1 class="page-title">
+          Account
+        </h1>
+
+        <div class="form-box">
+
+          <h2 style="margin-bottom:20px;">
+            Profile
+          </h2>
+
+          <label>
+            Full Name
+          </label>
+
+          <input
+            type="text"
+            id="profileName"
+            readonly
+          >
+
+          <label>
+            Email
+          </label>
+
+          <input
+            type="email"
+            id="profileEmail"
+            readonly
+          >
+
+          <label>
+            Phone Number
+          </label>
+
+          <input
+            type="text"
+            id="profilePhone"
+            readonly
+          >
+
+        </div>
+
+      </section>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
 
 <script>
 
 /* =========================================================
-   SUPABASE
+   SUPABASE CONNECTION
 ========================================================= */
 
 const SUPABASE_URL =
-"https://whseefadqutdrsachypc.supabase.co";
+  "https://whseefadqutdrsachypc.supabase.co";
 
 const SUPABASE_ANON_KEY =
-"PASTE_YOUR_EXISTING_ANON_KEY_HERE";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
 
-const db =
-window.supabase.createClient(
+const db = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
 
 /* =========================================================
-   STATE
+   GLOBAL USER
 ========================================================= */
 
 let currentUser = null;
 
 
 /* =========================================================
-   NAVIGATION
+   AUTH SCREEN
 ========================================================= */
 
-document.querySelectorAll(".sidebar button[data-page]")
-.forEach(button => {
+function showLogin() {
 
-  button.addEventListener("click", () => {
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("signupBox").style.display = "none";
+  document.getElementById("forgotBox").style.display = "none";
 
-    const page = button.dataset.page;
-
-    document.querySelectorAll(".page")
-    .forEach(p => p.classList.remove("active"));
-
-    document.getElementById(page)
-    .classList.add("active");
-
-    document.querySelectorAll(".sidebar button")
-    .forEach(b => b.classList.remove("active"));
-
-    button.classList.add("active");
-
-    document.getElementById("sidebar")
-    .classList.remove("open");
-
-    if(page === "orders") loadOrders();
-    if(page === "transactions") loadTransactions();
-
-  });
-
-});
+}
 
 
-document.getElementById("menuBtn")
-.addEventListener("click", () => {
+function showSignup() {
 
-  document.getElementById("sidebar")
-  .classList.toggle("open");
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("signupBox").style.display = "block";
+  document.getElementById("forgotBox").style.display = "none";
 
-});
+}
+
+
+function showForgot() {
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("signupBox").style.display = "none";
+  document.getElementById("forgotBox").style.display = "block";
+
+}
 
 
 /* =========================================================
-   AUTH
+   LOGIN
 ========================================================= */
 
-async function startApp(){
+document.getElementById("loginBtn").onclick = async function() {
 
-  const {
-    data:{
-      session
-    }
-  } = await db.auth.getSession();
+  const email =
+    document.getElementById("loginEmail").value.trim();
 
-  if(!session){
+  const password =
+    document.getElementById("loginPassword").value;
 
-    window.location.href = "index.html";
+  const message =
+    document.getElementById("loginMessage");
+
+  message.className = "auth-message";
+
+  if (!email || !password) {
+
+    message.textContent =
+      "Please enter your email and password.";
+
+    message.classList.add("error");
 
     return;
   }
 
-  currentUser = session.user;
+  message.textContent = "Logging in...";
 
-  await loadCustomer();
+  const { data, error } =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+
+    message.textContent = error.message;
+    message.classList.add("error");
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  openDashboard();
+
+};
+
+
+/* =========================================================
+   SIGNUP
+========================================================= */
+
+document.getElementById("signupBtn").onclick = async function() {
+
+  const name =
+    document.getElementById("signupName").value.trim();
+
+  const phone =
+    document.getElementById("signupPhone").value.trim();
+
+  const email =
+    document.getElementById("signupEmail").value.trim();
+
+  const password =
+    document.getElementById("signupPassword").value;
+
+  const confirm =
+    document.getElementById("signupConfirm").value;
+
+  const message =
+    document.getElementById("signupMessage");
+
+  message.className = "auth-message";
+
+  if (!name || !phone || !email || !password || !confirm) {
+
+    message.textContent =
+      "Please fill in all fields.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+  if (password !== confirm) {
+
+    message.textContent =
+      "Passwords do not match.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+  if (password.length < 6) {
+
+    message.textContent =
+      "Password must be at least 6 characters.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+  message.textContent =
+    "Creating account...";
+
+  const { data, error } =
+    await db.auth.signUp({
+
+      email,
+      password,
+
+      options: {
+
+        data: {
+          full_name: name,
+          phone: phone
+        }
+
+      }
+
+    });
+
+
+  if (error) {
+
+    message.textContent =
+      error.message;
+
+    message.classList.add("error");
+
+    return;
+  }
+
+
+  if (data.session) {
+
+    currentUser = data.user;
+
+    openDashboard();
+
+  } else {
+
+    message.textContent =
+      "Account created. Please check your email to confirm your account.";
+
+    message.classList.add("success");
+
+  }
+
+};
+
+
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
+
+document.getElementById("resetBtn").onclick = async function() {
+
+  const email =
+    document.getElementById("forgotEmail").value.trim();
+
+  const message =
+    document.getElementById("forgotMessage");
+
+  message.className = "auth-message";
+
+  if (!email) {
+
+    message.textContent =
+      "Enter your email address.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+  message.textContent =
+    "Sending reset link...";
+
+  const { error } =
+    await db.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo:
+          window.location.origin +
+          window.location.pathname
+      }
+    );
+
+
+  if (error) {
+
+    message.textContent =
+      error.message;
+
+    message.classList.add("error");
+
+    return;
+  }
+
+  message.textContent =
+    "Password reset link sent. Check your email.";
+
+  message.classList.add("success");
+
+};
+
+
+/* =========================================================
+   SESSION CHECK
+========================================================= */
+
+async function checkSession() {
+
+  const {
+    data: { session }
+  } = await db.auth.getSession();
+
+
+  if (session) {
+
+    currentUser =
+      session.user;
+
+    openDashboard();
+
+  } else {
+
+    document.getElementById("authScreen").style.display =
+      "flex";
+
+    document.getElementById("app").style.display =
+      "none";
+
+    showLogin();
+
+  }
+
+}
+
+
+/* =========================================================
+   OPEN DASHBOARD
+========================================================= */
+
+async function openDashboard() {
+
+  document.getElementById("authScreen").style.display =
+    "none";
+
+  document.getElementById("app").style.display =
+    "block";
+
+
+  await loadProfile();
+
+  await loadBalance();
 
   await loadOrders();
 
@@ -514,83 +1400,221 @@ async function startApp(){
 }
 
 
-db.auth.onAuthStateChange(
-  (event,session)=>{
+/* =========================================================
+   LOGOUT
+========================================================= */
 
-    if(!session){
+document.getElementById("logoutBtn").onclick =
+async function() {
 
-      window.location.href = "index.html";
+  await db.auth.signOut();
 
-    }
+  currentUser = null;
 
-  }
-);
+  document.getElementById("app").style.display =
+    "none";
+
+  document.getElementById("authScreen").style.display =
+    "flex";
+
+  showLogin();
+
+};
 
 
 /* =========================================================
-   CUSTOMER PROFILE
+   AUTH BUTTONS
 ========================================================= */
 
-async function loadCustomer(){
+document.getElementById("showSignup").onclick =
+function() {
 
-  const {
-    data:profile
-  } = await db
-    .from("profiles")
-    .select("*")
-    .eq("id",currentUser.id)
-    .maybeSingle();
+  document.getElementById("signupMessage").textContent = "";
 
+  showSignup();
 
-  const name =
-    profile?.full_name ||
-    currentUser.user_metadata?.full_name ||
-    "Customer";
+};
 
 
-  document.getElementById("customerName")
-  .textContent = name;
+document.getElementById("showLogin").onclick =
+function() {
 
-  document.getElementById("customerEmail")
-  .textContent = currentUser.email;
+  document.getElementById("loginMessage").textContent = "";
 
-  document.getElementById("profileName")
-  .textContent = name;
+  showLogin();
 
-  document.getElementById("profileEmail")
-  .textContent = currentUser.email;
-
-  document.getElementById("profileId")
-  .textContent = currentUser.id;
+};
 
 
-  const {
-    data:wallet
-  } = await db
-    .from("wallets")
-    .select("balance")
-    .eq("user_id",currentUser.id)
-    .maybeSingle();
+document.getElementById("forgotBtn").onclick =
+function() {
+
+  document.getElementById("forgotMessage").textContent = "";
+
+  showForgot();
+
+};
 
 
-  document.getElementById("balance")
-  .textContent =
-    Number(wallet?.balance || 0)
-    .toLocaleString(
-      "en-NG",
-      {
-        minimumFractionDigits:2
-      }
-    );
+document.getElementById("backToLogin").onclick =
+function() {
+
+  showLogin();
+
+};
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+document.querySelectorAll(".nav-btn")
+.forEach(button => {
+
+  button.addEventListener("click", function() {
+
+    const page =
+      this.dataset.page;
+
+
+    document.querySelectorAll(".nav-btn")
+    .forEach(btn => {
+
+      btn.classList.remove("active");
+
+    });
+
+
+    this.classList.add("active");
+
+
+    document.querySelectorAll(".page")
+    .forEach(section => {
+
+      section.classList.remove("active");
+
+    });
+
+
+    document.getElementById(page)
+      .classList.add("active");
+
+  });
+
+});
+
+
+/* =========================================================
+   GO TO SERVICES
+========================================================= */
+
+function goToServices() {
+
+  document.querySelector('[data-page="services"]').click();
 
 }
 
 
 /* =========================================================
-   ORDERS
+   PROFILE
 ========================================================= */
 
-async function loadOrders(){
+async function loadProfile() {
+
+  if (!currentUser) return;
+
+
+  document.getElementById("profileEmail").value =
+    currentUser.email || "";
+
+
+  const {
+    data,
+    error
+  } = await db
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+
+  if (!error && data) {
+
+    document.getElementById("profileName").value =
+      data.full_name || "";
+
+    document.getElementById("profilePhone").value =
+      data.phone || "";
+
+    document.getElementById("userName").textContent =
+      data.full_name || "User";
+
+  } else {
+
+    document.getElementById("profileName").value =
+      currentUser.user_metadata?.full_name || "";
+
+    document.getElementById("profilePhone").value =
+      currentUser.user_metadata?.phone || "";
+
+    document.getElementById("userName").textContent =
+      currentUser.user_metadata?.full_name || "User";
+
+  }
+
+}
+
+
+/* =========================================================
+   BALANCE
+========================================================= */
+
+async function loadBalance() {
+
+  if (!currentUser) return;
+
+
+  const {
+    data,
+    error
+  } = await db
+    .from("wallets")
+    .select("balance")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+
+  if (!error && data) {
+
+    const balance =
+      Number(data.balance || 0);
+
+    document.getElementById("balance").textContent =
+      "₦" + balance.toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits: 2
+        }
+      );
+
+  } else {
+
+    document.getElementById("balance").textContent =
+      "₦0.00";
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD ORDERS
+========================================================= */
+
+async function loadOrders() {
+
+  if (!currentUser) return;
+
 
   const {
     data,
@@ -598,33 +1622,10 @@ async function loadOrders(){
   } = await db
     .from("orders")
     .select("*")
-    .eq("user_id",currentUser.id)
-    .order(
-      "created_at",
-      {ascending:false}
-    );
-
-
-  if(error){
-
-    console.error(error);
-
-    return;
-  }
-
-
-  document.getElementById("totalOrders")
-  .textContent = data.length;
-
-
-  document.getElementById("completedOrders")
-  .textContent =
-    data.filter(
-      o =>
-        String(o.status)
-        .toLowerCase()
-        .includes("complete")
-    ).length;
+    .eq("user_id", currentUser.id)
+    .order("created_at", {
+      ascending: false
+    });
 
 
   const table =
@@ -633,65 +1634,66 @@ async function loadOrders(){
   table.innerHTML = "";
 
 
-  data.forEach(order=>{
+  if (error || !data) {
 
-    const row =
-      document.createElement("tr");
+    document.getElementById("totalOrders").textContent =
+      "0";
 
-    row.innerHTML = `
-      <td>${safe(order.service || "Service")}</td>
-      <td>${safe(order.package || "")}</td>
-      <td>
-        <span class="badge">
-          ${safe(order.status || "pending")}
-        </span>
-      </td>
-      <td>
-        ${new Date(order.created_at)
-        .toLocaleDateString()}
-      </td>
-    `;
-
-    table.appendChild(row);
-
-  });
-
-
-  const recent =
-    document.getElementById("recentOrders");
-
-  recent.innerHTML = "";
-
-
-  if(!data.length){
-
-    recent.innerHTML =
-      "<p>No orders yet.</p>";
+    document.getElementById("completedOrders").textContent =
+      "0";
 
     return;
   }
 
 
-  data.slice(0,5).forEach(order=>{
+  document.getElementById("totalOrders").textContent =
+    data.length;
 
-    const div =
-      document.createElement("div");
 
-    div.style.padding="12px 0";
-    div.style.borderBottom=
-      "1px solid #e2e8f0";
+  const completed =
+    data.filter(order =>
+      String(order.status || "")
+        .toLowerCase()
+        .includes("completed")
+    ).length;
 
-    div.innerHTML=`
-      <strong>${safe(order.service || "Service")}</strong>
-      <br>
-      <small>
-        ${safe(order.package || "")}
-        ·
-        ${safe(order.status || "pending")}
-      </small>
+
+  document.getElementById("completedOrders").textContent =
+    completed;
+
+
+  data.forEach(order => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td>${escapeHTML(
+        order.service || "-"
+      )}</td>
+
+      <td>${escapeHTML(
+        order.package || "-"
+      )}</td>
+
+      <td>${escapeHTML(
+        order.account_link || "-"
+      )}</td>
+
+      <td>${escapeHTML(
+        order.status || "pending"
+      )}</td>
+
+      <td>${formatDate(
+        order.created_at
+      )}</td>
+
     `;
 
-    recent.appendChild(div);
+
+    table.appendChild(row);
 
   });
 
@@ -699,79 +1701,13 @@ async function loadOrders(){
 
 
 /* =========================================================
-   CREATE ORDER
+   LOAD TRANSACTIONS
 ========================================================= */
 
-document.getElementById("orderForm")
-.addEventListener("submit",async e=>{
+async function loadTransactions() {
 
-  e.preventDefault();
+  if (!currentUser) return;
 
-
-  const service =
-    document.getElementById("service").value;
-
-  const link =
-    document.getElementById("link").value;
-
-  const packageName =
-    document.getElementById("package").value;
-
-
-  const {
-    error
-  } = await db
-    .from("orders")
-    .insert({
-
-      user_id:currentUser.id,
-
-      service:service,
-
-      account_link:link,
-
-      package:packageName,
-
-      status:"pending"
-
-    });
-
-
-  const msg =
-    document.getElementById("orderMessage");
-
-
-  if(error){
-
-    msg.textContent =
-      error.message;
-
-    msg.className =
-      "message show error";
-
-    return;
-  }
-
-
-  msg.textContent =
-    "Order submitted successfully.";
-
-  msg.className =
-    "message show success";
-
-
-  e.target.reset();
-
-  await loadOrders();
-
-});
-
-
-/* =========================================================
-   TRANSACTIONS
-========================================================= */
-
-async function loadTransactions(){
 
   const {
     data,
@@ -779,51 +1715,223 @@ async function loadTransactions(){
   } = await db
     .from("transactions")
     .select("*")
-    .eq("user_id",currentUser.id)
-    .order(
-      "created_at",
-      {ascending:false}
-    );
-
-
-  if(error){
-
-    console.error(error);
-
-    return;
-  }
+    .eq("user_id", currentUser.id)
+    .order("created_at", {
+      ascending: false
+    });
 
 
   const table =
-    document.getElementById(
-      "transactionsTable"
-    );
+    document.getElementById("transactionsTable");
 
   table.innerHTML = "";
 
 
-  data.forEach(transaction=>{
+  if (error || !data) return;
+
+
+  data.forEach(transaction => {
 
     const row =
       document.createElement("tr");
 
-    row.innerHTML=`
-      <td>${safe(transaction.type)}</td>
-      <td>₦${Number(transaction.amount || 0).toLocaleString()}</td>
-      <td>
-        <span class="badge">
-          ${safe(transaction.status)}
-        </span>
-      </td>
-      <td>
-        ${new Date(transaction.created_at)
-        .toLocaleDateString()}
-      </td>
+
+    row.innerHTML = `
+
+      <td>${escapeHTML(
+        transaction.type || "-"
+      )}</td>
+
+      <td>₦${Number(
+        transaction.amount || 0
+      ).toLocaleString("en-NG", {
+        minimumFractionDigits: 2
+      })}</td>
+
+      <td>${escapeHTML(
+        transaction.status || "-"
+      )}</td>
+
+      <td>${formatDate(
+        transaction.created_at
+      )}</td>
+
     `;
+
 
     table.appendChild(row);
 
   });
+
+}
+
+
+/* =========================================================
+   ORDER FORM
+========================================================= */
+
+function showOrderForm(service) {
+
+  const container =
+    document.getElementById(
+      "orderFormContainer"
+    );
+
+
+  container.innerHTML = `
+
+    <div class="form-box">
+
+      <h2 style="margin-bottom:20px;">
+        Order ${escapeHTML(service)}
+      </h2>
+
+      <label>
+        Package
+      </label>
+
+      <input
+        type="text"
+        id="orderPackage"
+        placeholder="Enter package"
+      >
+
+      <label>
+        Account / Post Link
+      </label>
+
+      <input
+        type="text"
+        id="orderLink"
+        placeholder="https://..."
+      >
+
+      <label>
+        Instructions
+      </label>
+
+      <textarea
+        id="orderInstructions"
+        placeholder="Additional instructions"
+      ></textarea>
+
+      <button
+        class="primary-btn"
+        onclick="submitOrder('${escapeHTML(service)}')"
+      >
+        Submit Order
+      </button>
+
+      <div
+        id="orderMessage"
+        class="auth-message"
+        style="margin-top:15px;"
+      ></div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   SUBMIT ORDER
+========================================================= */
+
+async function submitOrder(service) {
+
+  if (!currentUser) return;
+
+
+  const packageName =
+    document.getElementById(
+      "orderPackage"
+    ).value.trim();
+
+
+  const link =
+    document.getElementById(
+      "orderLink"
+    ).value.trim();
+
+
+  const instructions =
+    document.getElementById(
+      "orderInstructions"
+    ).value.trim();
+
+
+  const message =
+    document.getElementById(
+      "orderMessage"
+    );
+
+
+  if (!packageName || !link) {
+
+    message.textContent =
+      "Please enter the package and link.";
+
+    message.className =
+      "auth-message error";
+
+    return;
+
+  }
+
+
+  message.textContent =
+    "Submitting order...";
+
+
+  const { error } =
+    await db
+      .from("orders")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        service:
+          service,
+
+        package:
+          packageName,
+
+        account_link:
+          link,
+
+        instructions:
+          instructions,
+
+        status:
+          "pending"
+
+      });
+
+
+  if (error) {
+
+    message.textContent =
+      error.message;
+
+    message.className =
+      "auth-message error";
+
+    return;
+
+  }
+
+
+  message.textContent =
+    "Order submitted successfully.";
+
+  message.className =
+    "auth-message success";
+
+
+  await loadOrders();
 
 }
 
@@ -832,101 +1940,195 @@ async function loadTransactions(){
    FUND ACCOUNT
 ========================================================= */
 
-document.getElementById("fundForm")
-.addEventListener("submit",async e=>{
+document.getElementById("fundBtn").onclick =
+async function() {
 
-  e.preventDefault();
+  if (!currentUser) return;
 
 
   const amount =
     Number(
-      document.getElementById("fundAmount").value
+      document.getElementById(
+        "fundAmount"
+      ).value
     );
 
 
-  const {
-    error
-  } = await db
-    .from("transactions")
-    .insert({
-
-      user_id:currentUser.id,
-
-      type:"deposit",
-
-      amount:amount,
-
-      status:"pending"
-
-    });
+  const reference =
+    document.getElementById(
+      "fundReference"
+    ).value.trim();
 
 
-  const msg =
-    document.getElementById("fundMessage");
+  const message =
+    document.getElementById(
+      "fundMessage"
+    );
 
 
-  if(error){
+  if (!amount || amount <= 0) {
 
-    msg.textContent =
-      error.message;
+    message.textContent =
+      "Enter a valid amount.";
 
-    msg.className =
-      "message show error";
+    message.className =
+      "auth-message error";
 
     return;
+
   }
 
 
-  msg.textContent =
-    "Funding request submitted.";
+  if (!reference) {
 
-  msg.className =
-    "message show success";
+    message.textContent =
+      "Enter your payment reference.";
+
+    message.className =
+      "auth-message error";
+
+    return;
+
+  }
 
 
-  e.target.reset();
+  message.textContent =
+    "Submitting request...";
+
+
+  const { error } =
+    await db
+      .from("transactions")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        type:
+          "funding",
+
+        amount:
+          amount,
+
+        status:
+          "pending"
+
+      });
+
+
+  if (error) {
+
+    message.textContent =
+      error.message;
+
+    message.className =
+      "auth-message error";
+
+    return;
+
+  }
+
+
+  message.textContent =
+    "Funding request submitted successfully.";
+
+  message.className =
+    "auth-message success";
+
+
+  document.getElementById(
+    "fundAmount"
+  ).value = "";
+
+  document.getElementById(
+    "fundReference"
+  ).value = "";
+
 
   await loadTransactions();
 
-});
+};
 
 
 /* =========================================================
-   LOGOUT
+   HELPERS
 ========================================================= */
 
-document.getElementById("logoutBtn")
-.addEventListener("click",async()=>{
+function escapeHTML(value) {
 
-  await db.auth.signOut();
+  if (value === null ||
+      value === undefined) {
 
-  window.location.href="index.html";
+    return "";
 
-});
+  }
 
 
-/* =========================================================
-   SECURITY
-========================================================= */
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
-function safe(value){
+}
 
-  const div =
-    document.createElement("div");
 
-  div.textContent =
-    value ?? "";
+function formatDate(date) {
 
-  return div.innerHTML;
+  if (!date) return "-";
+
+  return new Date(date)
+    .toLocaleString("en-NG");
 
 }
 
 
 /* =========================================================
-   START
+   AUTH STATE LISTENER
 ========================================================= */
 
-startApp();
+db.auth.onAuthStateChange(
+  async (event, session) => {
+
+    if (session) {
+
+      currentUser =
+        session.user;
+
+      document.getElementById(
+        "authScreen"
+      ).style.display = "none";
+
+      document.getElementById(
+        "app"
+      ).style.display = "block";
+
+    } else {
+
+      currentUser = null;
+
+      document.getElementById(
+        "app"
+      ).style.display = "none";
+
+      document.getElementById(
+        "authScreen"
+      ).style.display = "flex";
+
+      showLogin();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START APP
+========================================================= */
+
+checkSession();
 
 </script>
 
