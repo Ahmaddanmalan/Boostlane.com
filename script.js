@@ -239,161 +239,112 @@ loginTab.addEventListener(
 
 signupTab.addEventListener(
   "click",
-  showSignupForm
+  
+  
+ showSignupForm
 );
 
+/* ======================================================
+   LOGIN
+====================================================== */
 
-/* ==================================================
-   LOGIN FORM
-================================================== */
+const adminLoginBtn =
+  document.getElementById("adminLoginBtn");
 
-function showLoginForm() {
+adminLoginBtn.addEventListener("click", async function () {
 
-  signupForm.innerHTML = `
+  const email =
+    document.getElementById("adminEmail").value.trim();
 
-    <label for="login-email">
-      Email
-    </label>
+  const password =
+    document.getElementById("adminPassword").value;
 
-    <input
-      type="email"
-      id="login-email"
-      placeholder="Enter your email"
-      required
-    >
+  const message =
+    document.getElementById("loginMessage");
 
-    <label for="login-password">
-      Password
-    </label>
+  message.className = "message";
+  message.textContent = "";
 
-    <input
-      type="password"
-      id="login-password"
-      placeholder="Enter your password"
-      required
-    >
+  if (!email || !password) {
+    message.textContent =
+      "Enter your email and password.";
+    message.classList.add("error");
+    return;
+  }
 
-    <button
-      type="submit"
-      class="main-button account-button"
-    >
-      Login
-    </button>
+  adminLoginBtn.disabled = true;
+  adminLoginBtn.textContent = "Logging in...";
 
-  `;
+  try {
 
+    const { data, error } =
+      await db.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
 
-  signupForm.onsubmit =
-    async function(event) {
+    if (error) {
+      throw error;
+    }
 
-      event.preventDefault();
+    if (!data.user) {
+      throw new Error("Login failed. No user was returned.");
+    }
 
+    currentUser = data.user;
 
-      showMessage(
-        "Logging you in..."
+    /* Check administrator status */
+
+    const { data: profile, error: profileError } =
+      await db
+        .from("profiles")
+        .select("role")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (profileError) {
+      console.error(profileError);
+      await db.auth.signOut();
+      currentUser = null;
+      throw new Error(
+        "Could not verify administrator account."
       );
+    }
 
+    if (!profile || profile.role !== "admin") {
 
-      const email =
-        document
-          .getElementById("login-email")
-          .value
-          .trim();
+      await db.auth.signOut();
+      currentUser = null;
 
+      throw new Error(
+        "This account is not an administrator."
+      );
+    }
 
-      const password =
-        document
-          .getElementById("login-password")
-          .value;
+    /* Login successful */
 
+    message.textContent = "Login successful!";
+    message.classList.add("success");
 
-      try {
+    await openAdmin();
 
-        const response =
-          await fetch(
-            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
-            {
+  } catch (error) {
 
-              method: "POST",
+    console.error("Admin login error:", error);
 
-              headers: {
+    message.textContent =
+      error.message || "Login failed.";
 
-                "Content-Type":
-                  "application/json",
+    message.classList.add("error");
 
-                "apikey":
-                  SUPABASE_KEY
+  } finally {
 
-              },
+    adminLoginBtn.disabled = false;
+    adminLoginBtn.textContent = "Login";
 
-              body: JSON.stringify({
+  }
 
-                email: email,
-
-                password: password
-
-              })
-
-            }
-          );
-
-
-        const result =
-          await response.json();
-
-
-        console.log(
-          "Login response:",
-          result
-        );
-
-
-        if (!response.ok) {
-
-          showMessage(
-            result.msg ||
-            result.message ||
-            "Login failed.",
-            true
-          );
-
-          return;
-
-        }
-
-
-        localStorage.setItem(
-          "boostlane_access_token",
-          result.access_token
-        );
-
-
-        localStorage.setItem(
-          "boostlane_user",
-          JSON.stringify(result.user)
-        );
-
-
-        showDashboard(
-          result.user
-        );
-
-
-      } catch (error) {
-
-        console.error(error);
-
-        showMessage(
-          "Connection error. Please try again.",
-          true
-        );
-
-      }
-
-    };
-
-}
-
+});
 
 /* ==================================================
    DASHBOARD
