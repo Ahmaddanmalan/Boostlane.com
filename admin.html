@@ -1,398 +1,533 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Boostlane Admin</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-e
-      color: #111827;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    /* ================= LOGIN ================= */
-
-    #loginScreen {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #111827, #2563eb);
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 420px;
-      background: white;
-      padding: 35px 25px;
-      border-radius: 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.2);
-    }
-
-    .logo {
-      text-align: center;
-      color: #2563eb;
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .login-title {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #374151;
-    }
-
-    .login-box input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border: 1px solid #d1d5db;
-      border-radius: 9px;
-      outline: none;
-    }
-
-    .login-box input:focus {
-      border-color: #2563eb;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 9px;
-      padding: 13px 18px;
-      font-weight: bold;
-      color: white;
-      background: #2563eb;
-    }
-
-    .btn:hover {
-      background: #1d4ed8;
-    }
-
-    .full-btn {
-      width: 100%;
-    }
-
-    .message {
-      text-align: center;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    .error {
-      color: #dc2626;
-    }
-
-    .success {
-      color: #16a34a;
-    }
-
-    /* ================= ADMIN ================= */
-
-    #adminApp {
-      display: none;
-      min-height: 100vh;
-    }
-
-    .topbar {
-      height: 65px;
-      background: #111827;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 25px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .topbar-logo {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .admin-label {
-      font-size: 13px;
-      opacity: .8;
-      margin-right: 15px;
-    }
-
-    .logout-btn {
-      background: #ef4444;
-      border: none;
-      color: white;
-      padding: 9px 15px;
-      border-radius: 8px;
-    }
-
-    .layout {
-      display: flex;
-      min-height: calc(100vh - 65px);
-    }
-
-    .sidebar {
-      width: 230px;
-      background: green;
-      border-right: 1px solid #e5e7eb;
-      padding: 18px 10px;
-    }
-
-    .nav-btn {
-      width: 100%;
-      border: none;
-      background: transparent;
-      text-align: left;
-      padding: 13px;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      font-size: 15px;
-    }
-
-    .nav-btn:hover,
-    .nav-btn.active {
-      background: #eff6ff;
-      color: #2563eb;
-    }
-
-    .content {
-      flex: 1;
-      padding: 25px;
-      overflow-x: auto;
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    .page-title {
-      font-size: 28px;
-      margin-bottom: 22px;
-    }
-
-    /* ================= STAT CARDS ================= */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-bottom: 25px;
-    }
-
-    .stat-card {
-      background: green;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 3px 15px rgba(0,0,0,.05);
-    }
-
-    .stat-label {
-      color: #6b7280;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 27px;
-      font-weight: bold;
-    }
-
-    /* ================= PANELS ================= */
-
-    .panel {
-      background: white;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 25px;
-      box-shadow: 0 3px 15px rgba(0,0,0,.05);
-    }
-
-    .panel-title {
-      font-size: 19px;
-      margin-bottom: 18px;
-    }
-
-    /* ================= TABLE ================= */
-
-    .table-wrapper {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 700px;
-    }
-
-    th,
-    td {
-      text-align: left;
-      padding: 13px;
-      border-bottom: 1px solid #edf0f3;
-      white-space: nowrap;
-    }
-
-    th {
-      background: #f8fafc;
-      font-size: 13px;
-      color: #4b5563;
-    }
-
-    td {
-      font-size: 14px;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .status-pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-completed {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status-failed {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .status-processing {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    /* ================= SEARCH ================= */
-
-    .search-box {
-      width: 100%;
-      max-width: 400px;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 9px;
-      margin-bottom: 18px;
-      outline: none;
-    }
-
-    /* ================= ACTIONS ================= */
-
-    .small-btn {
-      border: none;
-      padding: 7px 10px;
-      border-radius: 6px;
-      background: #2563eb;
-      color: white;
-      font-size: 12px;
-    }
-
-    .small-btn.red {
-      background: #ef4444;
-    }
-
-    .small-btn.green {
-      background: #16a34a;
-    }
-
-    /* ================= MOBILE ================= */
-
-    @media(max-width: 900px) {
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .sidebar {
-        width: 190px;
-      }
-    }
-
-    @media(max-width: 650px) {
-
-      .topbar {
-        padding: 0 12px;
-      }
-
-      .topbar-logo {
-        font-size: 18px;
-      }
-
-      .admin-label {
-        display: none;
-      }
-
-      .layout {
-        display: block;
-      }
-
-      .sidebar {
-        width: 100%;
-        display: flex;
-        overflow-x: auto;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-        padding: 8px;
-      }
-
-      .nav-btn {
-        min-width: 125px;
-        margin-right: 5px;
-        margin-bottom: 0;
-      }
-
-      .content {
-        padding: 15px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-
-      .stat-card {
-        padding: 15px;
-      }
-
-      .stat-value {
-        font-size: 21px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Boostlane Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:#f7f9fc;
+  color:#172554;
+}
+
+/* ================= LOGIN ================= */
+
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(135deg,#111827,#2563eb);
+}
+
+.login-box{
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:35px 25px;
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  font-size:30px;
+  font-weight:800;
+  color:#4f46e5;
+  margin-bottom:8px;
+}
+
+.login-title{
+  text-align:center;
+  color:#374151;
+  margin-bottom:25px;
+}
+
+.login-box input{
+  width:100%;
+  padding:15px;
+  margin-bottom:15px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  outline:none;
+  font-size:15px;
+}
+
+.login-box input:focus{
+  border-color:#4f46e5;
+}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:14px 18px;
+  font-weight:bold;
+  color:white;
+  background:#4f46e5;
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:#4338ca;
+}
+
+.btn:disabled{
+  opacity:.7;
+  cursor:not-allowed;
+}
+
+.full-btn{
+  width:100%;
+}
+
+.message{
+  text-align:center;
+  font-size:14px;
+  margin-bottom:15px;
+}
+
+.error{
+  color:#dc2626;
+}
+
+.success{
+  color:#16a34a;
+}
+
+/* ================= ADMIN APP ================= */
+
+#adminApp{
+  display:none;
+  min-height:100vh;
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+  height:70px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+  border-bottom:1px solid #e5e7eb;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.menu-btn{
+  width:50px;
+  height:50px;
+  border:0;
+  border-radius:14px;
+  background:#4f46e5;
+  color:white;
+  font-size:25px;
+  cursor:pointer;
+  display:none;
+}
+
+.topbar-logo{
+  font-size:23px;
+  font-weight:800;
+  color:#4f46e5;
+}
+
+.topbar-logo span{
+  color:#172554;
+}
+
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.admin-label{
+  color:#64748b;
+  font-size:14px;
+}
+
+.logout-top{
+  border:0;
+  background:#ef4444;
+  color:white;
+  padding:10px 16px;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+  position:fixed;
+  top:70px;
+  left:0;
+  bottom:0;
+  width:255px;
+  background:linear-gradient(180deg,#dbeafe,#c7d9f7);
+  padding:22px 12px;
+  z-index:900;
+  overflow-y:auto;
+  transition:.3s ease;
+}
+
+.sidebar-title{
+  padding:8px 14px 18px;
+  color:#4f46e5;
+  font-size:13px;
+  font-weight:bold;
+  text-transform:uppercase;
+}
+
+.nav-btn{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#475569;
+  text-align:left;
+  padding:15px 18px;
+  border-radius:12px;
+  margin-bottom:7px;
+  font-size:16px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.nav-btn:hover{
+  background:rgba(255,255,255,.55);
+  color:#4338ca;
+}
+
+.nav-btn.active{
+  background:rgba(255,255,255,.55);
+  color:#4338ca;
+  font-weight:bold;
+  border-left:5px solid #4f46e5;
+}
+
+.nav-icon{
+  display:inline-block;
+  width:32px;
+  font-size:20px;
+}
+
+.sidebar-bottom{
+  margin-top:25px;
+  padding-top:15px;
+  border-top:1px solid rgba(71,85,105,.15);
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+  margin-left:255px;
+  padding:100px 30px 30px;
+  min-height:100vh;
+  transition:.3s ease;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-title{
+  font-size:30px;
+  font-weight:800;
+  margin-bottom:25px;
+  color:#172554;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-bottom:25px;
+}
+
+.stat-card{
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 4px 20px rgba(15,23,42,.06);
+  border:1px solid #eef2f7;
+}
+
+.stat-label{
+  color:#64748b;
+  font-size:14px;
+  margin-bottom:10px;
+}
+
+.stat-value{
+  font-size:28px;
+  font-weight:800;
+  color:#172554;
+}
+
+/* ================= PANELS ================= */
+
+.panel{
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:25px;
+  box-shadow:0 4px 20px rgba(15,23,42,.06);
+  border:1px solid #eef2f7;
+}
+
+.panel-title{
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:18px;
+  color:#172554;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrapper{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th{
+  text-align:left;
+  padding:14px;
+  background:#f8fafc;
+  color:#475569;
+  font-size:13px;
+}
+
+td{
+  padding:14px;
+  border-bottom:1px solid #eef2f7;
+  font-size:14px;
+  color:#334155;
+}
+
+tr:hover td{
+  background:#fafcff;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.status-pending{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.status-completed{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.status-failed{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.status-processing{
+  background:#dbeafe;
+  color:#1e40af;
+}
+
+/* ================= SEARCH ================= */
+
+.search-box{
+  width:100%;
+  max-width:400px;
+  padding:13px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  outline:none;
+  margin-bottom:18px;
+}
+
+.search-box:focus{
+  border-color:#4f46e5;
+}
+
+/* ================= EMPTY PAGES ================= */
+
+.empty-box{
+  text-align:center;
+  padding:60px 20px;
+  color:#64748b;
+}
+
+.empty-icon{
+  font-size:50px;
+  margin-bottom:15px;
+}
+
+/* ================= OVERLAY ================= */
+
+.sidebar-overlay{
+  display:none;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:1000px){
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:700px){
+
+  .topbar{
+    height:70px;
+    padding:0 15px;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
+  .topbar-logo{
+    font-size:19px;
+  }
+
+  .admin-label{
+    display:none;
+  }
+
+  .logout-top{
+    padding:9px 12px;
+    font-size:12px;
+  }
+
+  .sidebar{
+    top:70px;
+    width:280px;
+    left:-300px;
+    box-shadow:10px 0 30px rgba(0,0,0,.15);
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .sidebar-overlay{
+    position:fixed;
+    top:70px;
+    left:0;
+    right:0;
+    bottom:0;
+    background:rgba(0,0,0,.35);
+    z-index:800;
+  }
+
+  .sidebar-overlay.show{
+    display:block;
+  }
+
+  .content{
+    margin-left:0;
+    padding:95px 15px 25px;
+  }
+
+  .page-title{
+    font-size:25px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .stat-card{
+    padding:16px;
+  }
+
+  .stat-value{
+    font-size:21px;
+  }
+
+  .panel{
+    padding:16px;
+  }
+
+}
+
+/* ================= SMALL PHONE ================= */
+
+@media(max-width:420px){
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .stat-label{
+    font-size:12px;
+  }
+
+  .stat-value{
+    font-size:19px;
+  }
+
+  .topbar-logo{
+    font-size:17px;
+  }
+
+  .menu-btn{
+    width:46px;
+    height:46px;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
-
-<!-- ======================================================
-     ADMIN LOGIN
-====================================================== -->
+<!-- =====================================================
+     LOGIN
+===================================================== -->
 
 <div id="loginScreen">
 
@@ -406,24 +541,24 @@ e
       Admin Dashboard
     </h2>
 
-    <div
-      id="loginMessage"
-      class="message"
-    ></div>
+    <div id="loginMessage" class="message"></div>
 
     <input
       type="email"
       id="adminEmail"
       placeholder="Admin Email"
+      autocomplete="email"
     >
 
     <input
       type="password"
       id="adminPassword"
       placeholder="Password"
+      autocomplete="current-password"
     >
 
     <button
+      type="button"
       class="btn full-btn"
       id="adminLoginBtn"
     >
@@ -435,22 +570,33 @@ e
 </div>
 
 
-<!-- ======================================================
+<!-- =====================================================
      ADMIN APPLICATION
-====================================================== -->
+===================================================== -->
 
 <div id="adminApp">
-
 
   <!-- TOP BAR -->
 
   <div class="topbar">
 
-    <div class="topbar-logo">
-      🚀 Boostlane Admin
+    <div class="topbar-left">
+
+      <button
+        class="menu-btn"
+        id="menuBtn"
+        type="button"
+      >
+        ☰
+      </button>
+
+      <div class="topbar-logo">
+        🚀 Boost<span>lane</span> Admin
+      </div>
+
     </div>
 
-    <div>
+    <div class="topbar-right">
 
       <span
         class="admin-label"
@@ -460,8 +606,9 @@ e
       </span>
 
       <button
-        class="logout-btn"
-        id="logoutBtn"
+        class="logout-top"
+        id="topLogoutBtn"
+        type="button"
       >
         Logout
       </button>
@@ -471,1627 +618,316 @@ e
   </div>
 
 
-  <div class="layout">
+  <!-- SIDEBAR OVERLAY -->
+
+  <div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+  ></div>
 
 
-    <!-- SIDEBAR -->
+  <!-- SIDEBAR -->
 
-    <div class="sidebar">
+  <aside
+    class="sidebar"
+    id="sidebar"
+  >
 
-      <button
-        class="nav-btn active"
-        data-page="dashboard"
-      >
-        📊 Dashboard
-      </button>
+    <div class="sidebar-title">
+      Admin Panel
+    </div>
+
+    <button
+      class="nav-btn active"
+      data-page="dashboard"
+    >
+      <span class="nav-icon">📊</span>
+      Dashboard
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="customers"
+    >
+      <span class="nav-icon">👥</span>
+      Users
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="orders"
+    >
+      <span class="nav-icon">📋</span>
+      Orders
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="transactions"
+    >
+      <span class="nav-icon">💳</span>
+      Transactions
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="apiServices"
+    >
+      <span class="nav-icon">🌐</span>
+      API Services
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="tickets"
+    >
+      <span class="nav-icon">🎫</span>
+      Tickets
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="settings"
+    >
+      <span class="nav-icon">⚙️</span>
+      Settings
+    </button>
+
+    <div class="sidebar-bottom">
 
       <button
         class="nav-btn"
-        data-page="customers"
+        id="sideLogoutBtn"
+        type="button"
       >
-        👥 Customers
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="orders"
-      >
-        🛒 Orders
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="transactions"
-      >
-        💳 Transactions
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="wallets"
-      >
-        💰 Wallets
+        <span class="nav-icon">🚪</span>
+        Logout
       </button>
 
     </div>
 
-
-    <!-- CONTENT -->
-
-    <div class="content">
+  </aside>
 
 
-      <!-- ==================================================
-           DASHBOARD
-      ================================================== -->
+  <!-- CONTENT -->
 
-      <section
-        class="page active"
-        id="dashboard"
-      >
+  <main class="content">
 
-        <h1 class="page-title">
-          Dashboard
-        </h1>
+    <!-- DASHBOARD -->
 
+    <section
+      class="page active"
+      id="dashboard"
+    >
 
-        <div class="stats">
+      <h1 class="page-title">
+        Dashboard
+      </h1>
 
-          <div class="stat-card">
+      <div class="stats">
 
-            <div class="stat-label">
-              Total Customers
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalCustomers"
-            >
-              0
-            </div>
-
+        <div class="stat-card">
+          <div class="stat-label">
+            Total Customers
           </div>
 
-
-          <div class="stat-card">
-
-            <div class="stat-label">
-              Total Orders
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalOrders"
-            >
-              0
-            </div>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <div class="stat-label">
-              Pending Orders
-            </div>
-
-            <div
-              class="stat-value"
-              id="pendingOrders"
-            >
-              0
-            </div>
-
-          </div>
-
-
-          <div class="stat-card">
-
-            <div class="stat-label">
-              Total Wallet Balance
-            </div>
-
-            <div
-              class="stat-value"
-              id="totalBalance"
-            >
-              ₦0.00
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="panel">
-
-          <h2 class="panel-title">
-            Recent Customers
-          </h2>
-
-          <div class="table-wrapper">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Joined</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="recentCustomersTable">
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-
-        <div class="panel">
-
-          <h2 class="panel-title">
-            Recent Orders
-          </h2>
-
-          <div class="table-wrapper">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Service</th>
-                  <th>Package</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="recentOrdersTable">
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           CUSTOMERS
-      ================================================== -->
-
-      <section
-        class="page"
-        id="customers"
-      >
-
-        <h1 class="page-title">
-          Customers
-        </h1>
-
-        <div class="panel">
-
-          <input
-            type="text"
-            id="customerSearch"
-            class="search-box"
-            placeholder="Search customers..."
+          <div
+            class="stat-value"
+            id="totalCustomers"
           >
-
-          <div class="table-wrapper">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Wallet</th>
-                  <th>Joined</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="customersTable">
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           ORDERS
-      ================================================== -->
-
-      <section
-        class="page"
-        id="orders"
-      >
-
-        <h1 class="page-title">
-          Orders
-        </h1>
-
-        <div class="panel">
-
-          <div class="table-wrapper">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Customer</th>
-                  <th>Service</th>
-                  <th>Package</th>
-                  <th>Link</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="ordersTable">
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           TRANSACTIONS
-      ================================================== -->
-
-      <section
-        class="page"
-        id="transactions"
-      >
-
-        <h1 class="page-title">
-          Transactions
-        </h1>
-
-        <div class="panel">
-
-          <div class="table-wrapper">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Customer</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="transactionsTable">
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           WALLETS
-      ================================================== -->
-
-      <section
-        class="page"
-        id="wallets"
-      >
-
-        <h1 class="page-title">
-          Customer Wallets
-        </h1>
-
-        <div class="panel">
-
-          <div class="table-wrapper">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Customer</th>
-                  <th>Balance</th>
-                  <th>Updated</th>
-                </tr>
-
-              </thead>
-
-              <tbody id="walletsTable">
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<script>
-
-/* ======================================================
-   SUPABASE
-====================================================== */
-
-const SUPABASE_URL =
-  "https://whseefadqutdrsachypc.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
-
-const db =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-/* ======================================================
-   GLOBAL DATA
-====================================================== */
-
-let currentUser = null;
-
-let allCustomers = [];
-
-let customerMap = {};
-
-
-/* ======================================================
-   LOGIN
-====================================================== */
-
-document
-  .getElementById("adminLoginBtn")
-  .onclick = async function() {
-
-    const email =
-      document
-        .getElementById("adminEmail")
-        .value
-        .trim();
-
-    const password =
-      document
-        .getElementById("adminPassword")
-        .value;
-
-    const message =
-      document.getElementById(
-        "loginMessage"
-      );
-
-    message.className =
-      "message";
-
-
-    if (!email || !password) {
-
-      message.textContent =
-        "Enter your email and password.";
-
-      message.classList.add("error");
-
-      return;
-    }
-
-
-    message.textContent =
-      "Logging in...";
-
-
-    const {
-      data,
-      error
-    } =
-      await db.auth.signInWithPassword({
-
-        email,
-        password
-
-      });
-
-
-    if (error) {
-
-      message.textContent =
-        error.message;
-
-      message.classList.add("error");
-
-      return;
-
-    }
-
-
-    currentUser =
-      data.user;
-
-
-    const isAdmin =
-      await checkAdmin();
-
-
-    if (!isAdmin) {
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      message.textContent =
-        "This account is not an administrator.";
-
-      message.classList.add("error");
-
-      return;
-
-    }
-
-
-    openAdmin();
-
-  };
-
-
-/* ======================================================
-   CHECK ADMIN
-====================================================== */
-
-async function checkAdmin() {
-
-  if (!currentUser) {
-    return false;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("profiles")
-      .select("role")
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .maybeSingle();
-
-
-  if (error || !data) {
-    return false;
-  }
-
-
-  return data.role === "admin";
-
-}
-
-
-/* ======================================================
-   OPEN ADMIN
-====================================================== */
-
-async function openAdmin() {
-
-  document
-    .getElementById("loginScreen")
-    .style.display = "none";
-
-
-  document
-    .getElementById("adminApp")
-    .style.display = "block";
-
-
-  document
-    .getElementById("adminEmailDisplay")
-    .textContent =
-      currentUser.email || "Admin";
-
-
-  await loadAllData();
-
-}
-
-
-/* ======================================================
-   SESSION CHECK
-====================================================== */
-
-async function checkSession() {
-
-  const {
-    data: {
-      session
-    }
-  } =
-    await db.auth.getSession();
-
-
-  if (!session) {
-
-    showLogin();
-
-    return;
-
-  }
-
-
-  currentUser =
-    session.user;
-
-
-  const isAdmin =
-    await checkAdmin();
-
-
-  if (isAdmin) {
-
-    openAdmin();
-
-  } else {
-
-    await db.auth.signOut();
-
-    showLogin();
-
-  }
-
-}
-
-
-/* ======================================================
-   SHOW LOGIN
-====================================================== */
-
-function showLogin() {
-
-  document
-    .getElementById("loginScreen")
-    .style.display = "flex";
-
-
-  document
-    .getElementById("adminApp")
-    .style.display = "none";
-
-}
-
-
-/* ======================================================
-   LOGOUT
-====================================================== */
-
-document
-  .getElementById("logoutBtn")
-  .onclick = async function() {
-
-    await db.auth.signOut();
-
-    currentUser = null;
-
-    showLogin();
-
-  };
-
-
-/* ======================================================
-   NAVIGATION
-====================================================== */
-
-document
-  .querySelectorAll(".nav-btn")
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      function() {
-
-        const page =
-          this.dataset.page;
-
-
-        document
-          .querySelectorAll(".nav-btn")
-          .forEach(btn => {
-
-            btn.classList.remove(
-              "active"
-            );
-
-          });
-
-
-        this.classList.add("active");
-
-
-        document
-          .querySelectorAll(".page")
-          .forEach(section => {
-
-            section.classList.remove(
-              "active"
-            );
-
-          });
-
-
-        document
-          .getElementById(page)
-          .classList.add("active");
-
-      });
-
-  });
-
-
-/* ======================================================
-   LOAD EVERYTHING
-====================================================== */
-
-async function loadAllData() {
-
-  await loadCustomers();
-
-  await loadWallets();
-
-  await loadOrders();
-
-  await loadTransactions();
-
-  updateDashboard();
-
-}
-
-
-/* ======================================================
-   LOAD CUSTOMERS
-====================================================== */
-
-async function loadCustomers() {
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("profiles")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Customers error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  allCustomers =
-    data || [];
-
-
-  customerMap = {};
-
-
-  allCustomers.forEach(
-    customer => {
-
-      customerMap[
-        customer.id
-      ] = customer;
-
-    }
-  );
-
-
-  renderCustomers(
-    allCustomers
-  );
-
-  renderRecentCustomers(
-    allCustomers.slice(
-      0,
-      5
-    )
-  );
-
-
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      allCustomers.length;
-
-}
-
-
-/* ======================================================
-   RENDER CUSTOMERS
-====================================================== */
-
-function renderCustomers(
-  customers
-) {
-
-  const table =
-    document.getElementById(
-      "customersTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  if (!customers.length) {
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="5">
-          No customers found.
-        </td>
-      </tr>
-    `;
-
-    return;
-
-  }
-
-
-  customers.forEach(
-    customer => {
-
-      const wallet =
-        walletMap[
-          customer.id
-        ];
-
-
-      const balance =
-        wallet
-          ? Number(
-              wallet.balance || 0
-            )
-          : 0;
-
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer.full_name ||
-            "No name"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.phone ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ₦${balance.toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits: 2
-            }
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            customer.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-}
-
-
-/* ======================================================
-   RECENT CUSTOMERS
-====================================================== */
-
-function renderRecentCustomers(
-  customers
-) {
-
-  const table =
-    document.getElementById(
-      "recentCustomersTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  customers.forEach(
-    customer => {
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer.full_name ||
-            "No name"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.phone ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            customer.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-}
-
-
-/* ======================================================
-   WALLETS
-====================================================== */
-
-let walletMap = {};
-
-
-async function loadWallets() {
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("wallets")
-      .select("*");
-
-
-  if (error) {
-
-    console.error(
-      "Wallet error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  walletMap = {};
-
-
-  (data || []).forEach(
-    wallet => {
-
-      walletMap[
-        wallet.user_id
-      ] = wallet;
-
-    }
-  );
-
-
-  const table =
-    document.getElementById(
-      "walletsTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  let total =
-    0;
-
-
-  (data || []).forEach(
-    wallet => {
-
-      const customer =
-        customerMap[
-          wallet.user_id
-        ];
-
-
-      const balance =
-        Number(
-          wallet.balance || 0
-        );
-
-
-      total += balance;
-
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer?.full_name ||
-            customer?.email ||
-            wallet.user_id
-          )}
-        </td>
-
-        <td>
-          ₦${balance.toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits: 2
-            }
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            wallet.updated_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-
-  document
-    .getElementById(
-      "totalBalance"
-    )
-    .textContent =
-      "₦" +
-      total.toLocaleString(
-        "en-NG",
-        {
-          minimumFractionDigits: 2
-        }
-      );
-
-}
-
-
-/* ======================================================
-   ORDERS
-====================================================== */
-
-let allOrders = [];
-
-
-async function loadOrders() {
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("orders")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Orders error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  allOrders =
-    data || [];
-
-
-  const table =
-    document.getElementById(
-      "ordersTable"
-    );
-
-
-  const recentTable =
-    document.getElementById(
-      "recentOrdersTable"
-    );
-
-
-  table.innerHTML = "";
-
-  recentTable.innerHTML = "";
-
-
-  allOrders.forEach(
-    order => {
-
-      const customer =
-        customerMap[
-          order.user_id
-        ];
-
-
-      const status =
-        order.status ||
-        "pending";
-
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer?.full_name ||
-            customer?.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            order.service ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            order.package ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            order.account_link ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${statusBadge(
-            status
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            order.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-
-  allOrders
-    .slice(0, 5)
-    .forEach(
-      order => {
-
-        const row =
-          document.createElement(
-            "tr"
-          );
-
-
-        row.innerHTML = `
-
-          <td>
-            ${escapeHTML(
-              order.service ||
-              "-"
-            )}
-          </td>
-
-          <td>
-            ${escapeHTML(
-              order.package ||
-              "-"
-            )}
-          </td>
-
-          <td>
-            ${statusBadge(
-              order.status ||
-              "pending"
-            )}
-          </td>
-
-          <td>
-            ${formatDate(
-              order.created_at
-            )}
-          </td>
-
-        `;
-
-
-        recentTable.appendChild(
-          row
-        );
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "totalOrders"
-    )
-    .textContent =
-      allOrders.length;
-
-
-  document
-    .getElementById(
-      "pendingOrders"
-    )
-    .textContent =
-      allOrders.filter(
-        order =>
-          String(
-            order.status || ""
-          ).toLowerCase()
-          .includes("pending")
-      ).length;
-
-}
-
-
-/* ======================================================
-   TRANSACTIONS
-====================================================== */
-
-async function loadTransactions() {
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("transactions")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Transactions error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  const table =
-    document.getElementById(
-      "transactionsTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  (data || []).forEach(
-    transaction => {
-
-      const customer =
-        customerMap[
-          transaction.user_id
-        ];
-
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer?.full_name ||
-            customer?.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            transaction.type ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ₦${Number(
-            transaction.amount ||
             0
-          ).toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits: 2
-            }
-          )}
-        </td>
-
-        <td>
-          ${statusBadge(
-            transaction.status ||
-            "pending"
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            transaction.created_at
-          )}
-        </td>
+          </div>
+        </div>
 
-      `;
+        <div class="stat-card">
+          <div class="stat-label">
+            Total Orders
+          </div>
 
+          <div
+            class="stat-value"
+            id="totalOrders"
+          >
+            0
+          </div>
+        </div>
 
-      table.appendChild(row);
+        <div class="stat-card">
+          <div class="stat-label">
+            Pending Orders
+          </div>
 
-    }
-  );
+          <div
+            class="stat-value"
+            id="pendingOrders"
+          >
+            0
+          </div>
+        </div>
 
-}
+        <div class="stat-card">
+          <div class="stat-label">
+            Total Wallet Balance
+          </div>
 
+          <div
+            class="stat-value"
+            id="totalBalance"
+          >
+            ₦0.00
+          </div>
+        </div>
 
-/* ======================================================
-   DASHBOARD UPDATE
-====================================================== */
+      </div>
 
-function updateDashboard() {
 
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      allCustomers.length;
+      <div class="panel">
 
+        <h2 class="panel-title">
+          Recent Customers
+        </h2>
 
-  document
-    .getElementById(
-      "totalOrders"
-    )
-    .textContent =
-      allOrders.length;
+        <div class="table-wrapper">
 
+          <table>
 
-  document
-    .getElementById(
-      "pendingOrders"
-    )
-    .textContent =
-      allOrders.filter(
-        order =>
-          String(
-            order.status || ""
-          )
-          .toLowerCase()
-          .includes("pending")
-      ).length;
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
 
-}
+            <tbody id="recentCustomersTable"></tbody>
 
+          </table>
 
-/* ======================================================
-   CUSTOMER SEARCH
-====================================================== */
+        </div>
 
-document
-  .getElementById(
-    "customerSearch"
-  )
-  .addEventListener(
-    "input",
-    function() {
+      </div>
 
-      const search =
-        this.value
-          .toLowerCase()
-          .trim();
 
+      <div class="panel">
 
-      const filtered =
-        allCustomers.filter(
-          customer => {
+        <h2 class="panel-title">
+          Recent Orders
+        </h2>
 
-            const text =
-              (
-                (customer.full_name || "") +
-                " " +
-                (customer.email || "") +
-                " " +
-                (customer.phone || "")
-              ).toLowerCase();
+        <div class="table-wrapper">
 
+          <table>
 
-            return text.includes(
-              search
-            );
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Package</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
 
-          }
-        );
+            <tbody id="recentOrdersTable"></tbody>
 
+          </table>
 
-      renderCustomers(
-        filtered
-      );
+        </div>
 
-    }
-  );
+      </div>
 
+    </section>
 
-/* ======================================================
-   STATUS BADGE
-====================================================== */
 
-function statusBadge(
-  status
-) {
+    <!-- CUSTOMERS -->
 
-  const value =
-    String(
-      status || "pending"
-    );
+    <section
+      class="page"
+      id="customers"
+    >
 
+      <h1 class="page-title">
+        Users
+      </h1>
 
-  const lower =
-    value.toLowerCase();
+      <div class="panel">
 
+        <input
+          type="text"
+          id="customerSearch"
+          class="search-box"
+          placeholder="Search users..."
+        >
 
-  let className =
-    "status-pending";
+        <div class="table-wrapper">
 
+          <table>
 
-  if (
-    lower.includes("completed") ||
-    lower.includes("success")
-  ) {
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Wallet</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
 
-    className =
-      "status-completed";
+            <tbody id="customersTable"></tbody>
 
-  }
-  else if (
-    lower.includes("failed") ||
-    lower.includes("cancel")
-  ) {
+          </table>
 
-    className =
-      "status-failed";
+        </div>
 
-  }
-  else if (
-    lower.includes("processing")
-  ) {
+      </div>
 
-    className =
-      "status-processing";
+    </section>
 
-  }
 
+    <!-- ORDERS -->
 
-  return `
-    <span class="status ${className}">
-      ${escapeHTML(value)}
-    </span>
-  `;
+    <section
+      class="page"
+      id="orders"
+    >
 
-}
+      <h1 class="page-title">
+        Orders
+      </h1>
 
+      <div class="panel">
 
-/* ======================================================
-   HELPERS
-====================================================== */
+        <div class="table-wrapper">
 
-function escapeHTML(
-  value
-) {
+          <table>
 
-  if (
-    value === null ||
-    value === undefined
-  ) {
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Service</th>
+                <th>Package</th>
+                <th>Link</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
 
-    return "";
+            <tbody id="ordersTable"></tbody>
 
-  }
+          </table>
 
+        </div>
 
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+      </div>
 
-}
+    </section>
 
 
-function formatDate(
-  date
-) {
+    <!-- TRANSACTIONS -->
 
-  if (!date) {
-    return "-";
-  }
+    <section
+      class="page"
+      id="transactions"
+    >
 
-
-  return new Date(
-    date
-  ).toLocaleString(
-    "en-NG"
-  );
-
-}
-
-
-/* ======================================================
-   START
-====================================================== */
-
-checkSession();
-
-</script>
-
-</body>
-</html>en
+      <h1 class="page-title
