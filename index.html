@@ -1,629 +1,1610 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Boostlane Admin</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-body{
-  background:#f7f9fc;
-  color:#172554;
-}
-
-/* ================= LOGIN ================= */
-
-#loginScreen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:linear-gradient(135deg,#111827,#2563eb);
-}
-
-.login-box{
-  width:100%;
-  max-width:420px;
-  background:white;
-  padding:35px 25px;
-  border-radius:20px;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-}
-
-.logo{
-  text-align:center;
-  font-size:30px;
-  font-weight:800;
-  color:#4f46e5;
-  margin-bottom:8px;
-}
-
-.login-title{
-  text-align:center;
-  color:#374151;
-  margin-bottom:25px;
-}
-
-.login-box input{
-  width:100%;
-  padding:15px;
-  margin-bottom:15px;
-  border:1px solid #d1d5db;
-  border-radius:10px;
-  outline:none;
-  font-size:15px;
-}
-
-.login-box input:focus{
-  border-color:#4f46e5;
-}
-
-.btn{
-  border:0;
-  border-radius:10px;
-  padding:14px 18px;
-  font-weight:bold;
-  color:white;
-  background:#4f46e5;
-  cursor:pointer;
-}
-
-.btn:hover{
-  background:#4338ca;
-}
-
-.btn:disabled{
-  opacity:.7;
-  cursor:not-allowed;
-}
-
-.full-btn{
-  width:100%;
-}
-
-.message{
-  text-align:center;
-  font-size:14px;
-  margin-bottom:15px;
-}
-
-.error{
-  color:#dc2626;
-}
-
-.success{
-  color:#16a34a;
-}
-
-/* ================= ADMIN APP ================= */
-
-#adminApp{
-  display:none;
-  min-height:100vh;
-}
-
-/* ================= TOPBAR ================= */
-
-.topbar{
-  height:70px;
-  background:white;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 25px;
-  border-bottom:1px solid #e5e7eb;
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:1000;
-}
-
-.topbar-left{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.menu-btn{
-  width:50px;
-  height:50px;
-  border:0;
-  border-radius:14px;
-  background:#4f46e5;
-  color:white;
-  font-size:25px;
-  cursor:pointer;
-  display:none;
-}
-
-.topbar-logo{
-  font-size:23px;
-  font-weight:800;
-  color:#4f46e5;
-}
-
-.topbar-logo span{
-  color:#172554;
-}
-
-.topbar-right{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.admin-label{
-  color:#64748b;
-  font-size:14px;
-}
-
-.logout-top{
-  border:0;
-  background:#ef4444;
-  color:white;
-  padding:10px 16px;
-  border-radius:9px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* ================= SIDEBAR ================= */
-
-.sidebar{
-  position:fixed;
-  top:70px;
-  left:0;
-  bottom:0;
-  width:255px;
-  background:linear-gradient(180deg,#dbeafe,#c7d9f7);
-  padding:22px 12px;
-  z-index:900;
-  overflow-y:auto;
-  transition:.3s ease;
-}
-
-.sidebar-title{
-  padding:8px 14px 18px;
-  color:#4f46e5;
-  font-size:13px;
-  font-weight:bold;
-  text-transform:uppercase;
-}
-
-.nav-btn{
-  width:100%;
-  border:0;
-  background:transparent;
-  color:#475569;
-  text-align:left;
-  padding:15px 18px;
-  border-radius:12px;
-  margin-bottom:7px;
-  font-size:16px;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.nav-btn:hover{
-  background:rgba(255,255,255,.55);
-  color:#4338ca;
-}
-
-.nav-btn.active{
-  background:rgba(255,255,255,.55);
-  color:#4338ca;
-  font-weight:bold;
-  border-left:5px solid #4f46e5;
-}
-
-.nav-icon{
-  display:inline-block;
-  width:32px;
-  font-size:20px;
-}
-
-.sidebar-bottom{
-  margin-top:25px;
-  padding-top:15px;
-  border-top:1px solid rgba(71,85,105,.15);
-}
-
-/* ================= CONTENT ================= */
-
-.content{
-  margin-left:255px;
-  padding:100px 30px 30px;
-  min-height:100vh;
-  transition:.3s ease;
-}
-
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
-
-.page-title{
-  font-size:30px;
-  font-weight:800;
-  margin-bottom:25px;
-  color:#172554;
-}
-
-/* ================= STATS ================= */
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:18px;
-  margin-bottom:25px;
-}
-
-.stat-card{
-  background:white;
-  border-radius:16px;
-  padding:22px;
-  box-shadow:0 4px 20px rgba(15,23,42,.06);
-  border:1px solid #eef2f7;
-}
-
-.stat-label{
-  color:#64748b;
-  font-size:14px;
-  margin-bottom:10px;
-}
-
-.stat-value{
-  font-size:28px;
-  font-weight:800;
-  color:#172554;
-}
-
-/* ================= PANELS ================= */
-
-.panel{
-  background:white;
-  border-radius:16px;
-  padding:22px;
-  margin-bottom:25px;
-  box-shadow:0 4px 20px rgba(15,23,42,.06);
-  border:1px solid #eef2f7;
-}
-
-.panel-title{
-  font-size:20px;
-  font-weight:700;
-  margin-bottom:18px;
-  color:#172554;
-}
-
-/* ================= TABLE ================= */
-
-.table-wrapper{
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:700px;
-}
-
-th{
-  text-align:left;
-  padding:14px;
-  background:#f8fafc;
-  color:#475569;
-  font-size:13px;
-}
-
-td{
-  padding:14px;
-  border-bottom:1px solid #eef2f7;
-  font-size:14px;
-  color:#334155;
-}
-
-tr:hover td{
-  background:#fafcff;
-}
-
-/* ================= STATUS ================= */
-
-.status{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:bold;
-}
-
-.status-pending{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-.status-completed{
-  background:#dcfce7;
-  color:#166534;
-}
-
-.status-failed{
-  background:#fee2e2;
-  color:#991b1b;
-}
-
-.status-processing{
-  background:#dbeafe;
-  color:#1e40af;
-}
-
-/* ================= SEARCH ================= */
-
-.search-box{
-  width:100%;
-  max-width:400px;
-  padding:13px;
-  border:1px solid #d1d5db;
-  border-radius:10px;
-  outline:none;
-  margin-bottom:18px;
-}
-
-.search-box:focus{
-  border-color:#4f46e5;
-}
-
-/* ================= EMPTY PAGES ================= */
-
-.empty-box{
-  text-align:center;
-  padding:60px 20px;
-  color:#64748b;
-}
-
-.empty-icon{
-  font-size:50px;
-  margin-bottom:15px;
-}
-
-/* ================= OVERLAY ================= */
-
-.sidebar-overlay{
-  display:none;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:1000px){
-
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-}
-
-@media(max-width:700px){
-
-  .topbar{
-    height:70px;
-    padding:0 15px;
-  }
-
-  .menu-btn{
-    display:block;
-  }
-
-  .topbar-logo{
-    font-size:19px;
-  }
-
-  .admin-label{
-    display:none;
-  }
-
-  .logout-top{
-    padding:9px 12px;
-    font-size:12px;
-  }
-
-  .sidebar{
-    top:70px;
-    width:280px;
-    left:-300px;
-    box-shadow:10px 0 30px rgba(0,0,0,.15);
-  }
-
-  .sidebar.open{
-    left:0;
-  }
-
-  .sidebar-overlay{
-    position:fixed;
-    top:70px;
-    left:0;
-    right:0;
-    bottom:0;
-    background:rgba(0,0,0,.35);
-    z-index:800;
-  }
-
-  .sidebar-overlay.show{
-    display:block;
-  }
-
-  .content{
-    margin-left:0;
-    padding:95px 15px 25px;
-  }
-
-  .page-title{
-    font-size:25px;
-  }
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-
-  .stat-card{
-    padding:16px;
-  }
-
-  .stat-value{
-    font-size:21px;
-  }
-
-  .panel{
-    padding:16px;
-  }
-
-}
-
-/* ================= SMALL PHONE ================= */
-
-@media(max-width:420px){
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .stat-label{
-    font-size:12px;
-  }
-
-  .stat-value{
-    font-size:19px;
-  }
-
-  .topbar-logo{
-    font-size:17px;
-  }
-
-  .menu-btn{
-    width:46px;
-    height:46px;
-  }
-
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Boostlane | Your growth starts here</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #5146e5;
+      --primary-light: #6659f5;
+      --dark: #15254b;
+      --text: #17264b;
+      --muted: #73809f;
+      --background: #f7f9ff;
+      --sidebar: #f4f7ff;
+      --white: #ffffff;
+      --border: #e9ecf6;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      background: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* ==========================================
+       LOADING
+    ========================================== */
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
+
+    .loading-circle {
+      width: 45px;
+      height: 45px;
+      border: 4px solid #e4e6ff;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: loading 0.8s linear infinite;
+    }
+
+    @keyframes loading {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ==========================================
+       AUTH
+    ========================================== */
+
+    #auth {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 25px;
+      background:
+        radial-gradient(
+          circle at top left,
+          #e8e6ff,
+          transparent 35%
+        ),
+        #f7f9ff;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-radius: 25px;
+      padding: 38px;
+      box-shadow:
+        0 25px 80px rgba(25, 35, 80, 0.12);
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .auth-logo-icon {
+      width: 65px;
+      height: 65px;
+      margin: auto;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      background: linear-gradient(
+        135deg,
+        #4e43df,
+        #6a5df7
+      );
+    }
+
+    .auth-logo-icon svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .auth-logo h1 {
+      margin-top: 13px;
+      font-size: 30px;
+      color: var(--dark);
+    }
+
+    .auth-logo h1 span {
+      color: #5b50eb;
+    }
+
+    .auth-logo p {
+      margin-top: 5px;
+      color: var(--muted);
+    }
+
+    .auth-title {
+      font-size: 25px;
+      margin-bottom: 7px;
+    }
+
+    .auth-subtitle {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 650;
+      margin-bottom: 7px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #dfe3ef;
+      border-radius: 11px;
+      outline: none;
+      background: #fbfcff;
+      color: var(--text);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow:
+        0 0 0 4px rgba(81, 70, 229, 0.08);
+    }
+
+    .main-button {
+      width: 100%;
+      border: none;
+      border-radius: 11px;
+      padding: 15px;
+      color: white;
+      font-weight: 700;
+      background: linear-gradient(
+        135deg,
+        #5146e5,
+        #6559f4
+      );
+    }
+
+    .main-button:hover {
+      box-shadow:
+        0 10px 25px rgba(81, 70, 229, 0.25);
+    }
+
+    .auth-link {
+      border: none;
+      background: none;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .auth-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    .forgot {
+      border: none;
+      background: none;
+      color: var(--primary);
+      font-size: 13px;
+      align-self: flex-end;
+      margin-top: -8px;
+    }
+
+    /* ==========================================
+       APP
+    ========================================== */
+
+    #app {
+      display: none;
+      min-height: 100vh;
+    }
+
+    /* ==========================================
+       TOP HEADER
+    ========================================== */
+
+    .top-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 118px;
+
+      background: white;
+
+      border-bottom: 1px solid #e9edf7;
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 30px;
+
+      z-index: 1000;
+    }
+
+    .menu-button {
+      width: 70px;
+      height: 70px;
+
+      border: none;
+      border-radius: 17px;
+
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: linear-gradient(
+        135deg,
+        #5146e5,
+        #6358f2
+      );
+
+      margin-right: 50px;
+
+      box-shadow:
+        0 8px 20px rgba(81, 70, 229, 0.18);
+    }
+
+    .menu-button svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .logo-chart {
+      width: 52px;
+      height: 52px;
+      color: #5146e5;
+    }
+
+    .logo-text {
+      font-size: 36px;
+      line-height: 1;
+      font-weight: 800;
+      color: #14234b;
+      letter-spacing: -1.3px;
+    }
+
+    .logo-text span {
+      color: #5a50e9;
+    }
+
+    .logo-subtitle {
+      color: #7a86a5;
+      font-size: 16px;
+      margin-top: 4px;
+    }
+
+    .user-area {
+      margin-left: auto;
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+
+      border-radius: 50%;
+
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: linear-gradient(
+        135deg,
+        #4d42dd,
+        #6b52f0
+      );
+
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .user-name {
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ==========================================
+       SIDEBAR
+    ========================================== */
+
+    .sidebar {
+      position: fixed;
+
+      left: 0;
+      top: 118px;
+      bottom: 0;
+
+      width: 270px;
+
+      padding: 38px 0;
+
+      background:
+        linear-gradient(
+          180deg,
+          #f5f7ff 0%,
+          #f4f7ff 100%
+        );
+
+      border-right: 1px solid #e8ecf6;
+
+      z-index: 900;
+
+      transition: 0.3s ease;
+    }
+
+    .nav-item {
+      width: calc(100% - 30px);
+
+      margin: 0 15px 8px;
+
+      border: none;
+      border-radius: 0 11px 11px 0;
+
+      background: transparent;
+
+      display: flex;
+      align-items: center;
+
+      gap: 24px;
+
+      padding: 18px 29px;
+
+      color: #17264b;
+
+      font-size: 19px;
+      font-weight: 600;
+
+      text-align: left;
+    }
+
+    .nav-item svg {
+      width: 29px;
+      height: 29px;
+      stroke-width: 1.9;
+    }
+
+    .nav-item:hover {
+      color: var(--primary);
+      background: #eeedff;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      background: #eae9ff;
+    }
+
+    .logout {
+      margin-top: 20px;
+    }
+
+    /* ==========================================
+       MAIN
+    ========================================== */
+
+    .main {
+      margin-left: 270px;
+
+      padding:
+        160px
+        38px
+        70px;
+
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 970px;
+      margin: 0 auto;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .dashboard-title {
+      font-size: 38px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 7px;
+    }
+
+    .welcome-text {
+      color: #687693;
+      font-size: 25px;
+      margin-bottom: 38px;
+    }
+
+    /* ==========================================
+       WALLET CARD
+    ========================================== */
+
+    .wallet-card {
+      position: relative;
+      overflow: hidden;
+
+      min-height: 430px;
+
+      padding: 30px;
+
+      border-radius: 21px;
+
+      color: white;
+
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(255,255,255,0.10),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 80% 90%,
+          rgba(255,255,255,0.08),
+          transparent 35%
+        ),
+        linear-gradient(
+          135deg,
+          #5a4af0 0%,
+          #5146ec 50%,
+          #4b45e5 100%
+        );
+
+      box-shadow:
+        0 18px 38px
+        rgba(78, 67, 226, 0.18);
+    }
+
+    .wallet-card::before {
+      content: "";
+
+      position: absolute;
+
+      width: 600px;
+      height: 600px;
+
+      border: 1px solid
+        rgba(255,255,255,0.07);
+
+      border-radius: 50%;
+
+      right: -280px;
+      top: -350px;
+    }
+
+    .wallet-card::after {
+      content: "";
+
+      position: absolute;
+
+      width: 450px;
+      height: 450px;
+
+      border: 1px solid
+        rgba(255,255,255,0.06);
+
+      border-radius: 50%;
+
+      right: -150px;
+      top: -250px;
+    }
+
+    .wallet-top,
+    .wallet-middle,
+    .bank-information {
+      position: relative;
+      z-index: 3;
+    }
+
+    .wallet-top {
+      display: flex;
+      align-items: center;
+      gap: 17px;
+
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .wallet-icon {
+      width: 60px;
+      height: 60px;
+
+      background:
+        rgba(255,255,255,0.25);
+
+      border-radius: 15px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wallet-icon svg {
+      width: 31px;
+      height: 31px;
+    }
+
+    .wallet-middle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-top: 34px;
+    }
+
+    .balance-label {
+      font-size: 17px;
+      letter-spacing: 0.6px;
+      opacity: 0.92;
+    }
+
+    .balance-value {
+      font-size: 43px;
+      font-weight: 800;
+      margin-top: 9px;
+      letter-spacing: -1px;
+    }
+
+    .add-funds {
+      border: none;
+
+      background: white;
+      color: #5549e7;
+
+      padding: 17px 23px;
+
+      border-radius: 16px;
+
+      font-weight: 700;
+      font-size: 16px;
+
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      box-shadow:
+        0 6px 20px rgba(0,0,0,0.06);
+    }
+
+    .add-funds svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .bank-information {
+      border-top:
+        1px solid rgba(255,255,255,0.24);
+
+      margin-top: 27px;
+      padding-top: 27px;
+    }
+
+    .bank-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      font-size: 20px;
+      font-weight: 700;
+
+      margin-bottom: 15px;
+    }
+
+    .bank-title svg {
+      width: 25px;
+      height: 25px;
+    }
+
+    .bank-details {
+      margin-left: 39px;
+
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+
+      font-size: 16px;
+    }
+
+    .bank-details strong {
+      font-weight: 800;
+    }
+
+    .account-number-line {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+
+      flex-wrap: wrap;
+    }
+
+    .copy-account {
+      border:
+        1px solid rgba(255,255,255,0.38);
+
+      background: transparent;
+
+      color: white;
+
+      border-radius: 10px;
+
+      padding: 7px 13px;
+
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      font-size: 14px;
+    }
+
+    .copy-account svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* ==========================================
+       WHITE CARDS
+    ========================================== */
+
+    .white-card {
+      background: white;
+
+      border-radius: 21px;
+
+      padding: 29px;
+
+      margin-top: 44px;
+
+      box-shadow:
+        0 10px 35px
+        rgba(67, 78, 130, 0.07);
+    }
+
+    .section-heading {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+
+    /* ==========================================
+       QUICK ACTIONS
+    ========================================== */
+
+    .quick-actions {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 20px;
+    }
+
+    .quick-action {
+      border: none;
+      background: transparent;
+
+      color: var(--text);
+
+      font-size: 16px;
+      font-weight: 600;
+
+      text-align: center;
+    }
+
+    .quick-action-icon {
+      width: 82px;
+      height: 82px;
+
+      margin: 0 auto 11px;
+
+      border-radius: 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quick-action-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .icon-purple {
+      background: #efedff;
+      color: #5b4dea;
+    }
+
+    .icon-green {
+      background: #e7faef;
+      color: #14b85a;
+    }
+
+    .icon-blue {
+      background: #e8f5ff;
+      color: #1686e5;
+    }
+
+    .icon-red {
+      background: #fff0f2;
+      color: #ef5265;
+    }
+
+    /* ==========================================
+       RECENT ACTIVITY
+    ========================================== */
+
+    .activity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .activity-header .section-heading {
+      margin-bottom: 0;
+    }
+
+    .view-all {
+      border: none;
+      background: none;
+
+      color: #5a4de7;
+
+      font-weight: 600;
+
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .view-all svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .empty-activity {
+      min-height: 255px;
+
+      display: flex;
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      color: #7a86a5;
+    }
+
+    .empty-activity-icon {
+      width: 75px;
+      height: 75px;
+
+      color: #d7d8f8;
+
+      margin-bottom: 16px;
+    }
+
+    .empty-activity h3 {
+      color: #17264b;
+
+      font-size: 20px;
+
+      margin-bottom: 8px;
+    }
+
+    .empty-activity p {
+      max-width: 430px;
+
+      line-height: 1.6;
+
+      font-size: 16px;
+    }
+
+    /* ==========================================
+       LISTS
+    ========================================== */
+
+    .data-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .data-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 18px;
+
+      border:
+        1px solid #edf0f6;
+
+      border-radius: 15px;
+    }
+
+    .data-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .data-icon {
+      width: 45px;
+      height: 45px;
+
+      background: #efedff;
+      color: var(--primary);
+
+      border-radius: 12px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .data-title {
+      font-weight: 700;
+    }
+
+    .data-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .status {
+      padding: 6px 11px;
+
+      border-radius: 20px;
+
+      font-size: 12px;
+      font-weight: 700;
+
+      text-transform: capitalize;
+    }
+
+    .status.pending {
+      color: #a66b00;
+      background: #fff5dc;
+    }
+
+    .status.completed,
+    .status.success {
+      color: #16803d;
+      background: #e7f8ed;
+    }
+
+    .status.processing {
+      color: #176eb7;
+      background: #e8f4ff;
+    }
+
+    .status.failed,
+    .status.cancelled {
+      color: #d42626;
+      background: #fff0f0;
+    }
+
+    /* ==========================================
+       ACCOUNT
+    ========================================== */
+
+    .account-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .account-box {
+      padding: 20px;
+      background: #fafbff;
+      border: 1px solid #edf0f5;
+      border-radius: 14px;
+    }
+
+    .account-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .account-value {
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    /* ==========================================
+       MODAL
+    ========================================== */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+
+      background:
+        rgba(15, 23, 42, 0.55);
+
+      display: none;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      z-index: 5000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 500px;
+
+      max-height: 90vh;
+      overflow-y: auto;
+
+      background: white;
+
+      border-radius: 22px;
+
+      padding: 28px;
+
+      box-shadow:
+        0 25px 80px rgba(15,23,42,0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 22px;
+    }
+
+    .modal-header h2 {
+      font-size: 24px;
+    }
+
+    .close-modal {
+      width: 39px;
+      height: 39px;
+
+      border: none;
+      border-radius: 50%;
+
+      background: #f0f2f7;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .cancel-button {
+      flex: 1;
+
+      border: none;
+      border-radius: 11px;
+
+      padding: 14px;
+
+      background: #edf0f6;
+
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .modal-buttons .main-button {
+      flex: 1;
+    }
+
+    .payment-info {
+      background: #f5f6ff;
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 4px;
+      line-height: 1.9;
+      font-size: 14px;
+    }
+
+    /* ==========================================
+       FOOTER
+    ========================================== */
+
+    .footer {
+      border-top: 1px solid #dfe4f1;
+
+      margin-top: 100px;
+
+      padding: 30px 10px;
+
+      text-align: center;
+
+      color: #7b87a5;
+
+      font-size: 15px;
+    }
+
+    /* ==========================================
+       TOAST
+    ========================================== */
+
+    #toast {
+      position: fixed;
+
+      right: 25px;
+      bottom: 25px;
+
+      background: #17264b;
+      color: white;
+
+      padding: 14px 19px;
+
+      border-radius: 12px;
+
+      opacity: 0;
+      transform: translateY(100px);
+
+      transition: 0.3s;
+
+      z-index: 99999;
+
+      max-width: 350px;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #toast.success {
+      background: #15803d;
+    }
+
+    #toast.error {
+      background: #dc2626;
+    }
+
+    /* ==========================================
+       MOBILE
+    ========================================== */
+
+    @media (max-width: 850px) {
+
+      .top-header {
+        height: 85px;
+        padding: 0 15px;
+      }
+
+      .menu-button {
+        width: 54px;
+        height: 54px;
+
+        margin-right: 15px;
+      }
+
+      .logo-chart {
+        width: 39px;
+        height: 39px;
+      }
+
+      .logo-text {
+        font-size: 24px;
+      }
+
+      .logo-subtitle {
+        font-size: 10px;
+      }
+
+      .avatar {
+        width: 43px;
+        height: 43px;
+      }
+
+      .user-name {
+        display: none;
+      }
+
+      .sidebar {
+        top: 85px;
+
+        transform: translateX(-100%);
+
+        box-shadow:
+          10px 0 30px rgba(20,30,70,0.12);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+
+        padding:
+          115px
+          15px
+          50px;
+      }
+
+      .dashboard-title {
+        font-size: 31px;
+      }
+
+      .welcome-text {
+        font-size: 20px;
+        margin-bottom: 25px;
+      }
+
+      .wallet-card {
+        min-height: auto;
+        padding: 23px;
+      }
+
+      .wallet-middle {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .add-funds {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .bank-details {
+        margin-left: 0;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 25px 10px;
+      }
+
+      .white-card {
+        padding: 22px;
+        margin-top: 25px;
+      }
+
+      .account-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      .logo-chart {
+        display: none;
+      }
+
+      .logo-text {
+        font-size: 21px;
+      }
+
+      .logo-subtitle {
+        font-size: 9px;
+      }
+
+      .wallet-card {
+        border-radius: 18px;
+      }
+
+      .wallet-top {
+        font-size: 18px;
+      }
+
+      .wallet-icon {
+        width: 49px;
+        height: 49px;
+      }
+
+      .balance-value {
+        font-size: 34px;
+      }
+
+      .quick-action-icon {
+        width: 67px;
+        height: 67px;
+      }
+
+      .quick-action {
+        font-size: 14px;
+      }
+
+      .activity-header {
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- =====================================================
-     LOGIN
-===================================================== -->
+<!-- ==========================================
+     LOADING
+========================================== -->
 
-<div id="loginScreen">
-
-  <div class="login-box">
-
-    <div class="logo">
-      🚀 Boostlane
-    </div>
-
-    <h2 class="login-title">
-      Admin Dashboard
-    </h2>
-
-    <div id="loginMessage" class="message"></div>
-
-    <input
-      type="email"
-      id="adminEmail"
-      placeholder="Admin Email"
-      autocomplete="email"
-    >
-
-    <input
-      type="password"
-      id="adminPassword"
-      placeholder="Password"
-      autocomplete="current-password"
-    >
-
-    <button
-      type="button"
-      class="btn full-btn"
-      id="adminLoginBtn"
-    >
-      Login
-    </button>
-
-  </div>
-
+<div id="loading">
+  <div class="loading-circle"></div>
 </div>
 
 
-<!-- =====================================================
-     ADMIN APPLICATION
-===================================================== -->
+<!-- ==========================================
+     AUTH
+========================================== -->
 
-<div id="adminApp">
+<section id="auth">
 
-  <!-- TOP BAR -->
+  <div class="auth-card">
 
-  <div class="topbar">
+    <div class="auth-logo">
 
-    <div class="topbar-left">
+      <div class="auth-logo-icon">
+        <i data-lucide="bar-chart-3"></i>
+      </div>
 
-      <button
-        class="menu-btn"
-        id="menuBtn"
-        type="button"
+      <h1>
+        Boost<span>lane</span>
+      </h1>
+
+      <p>
+        Your growth starts here
+      </p>
+
+    </div>
+
+
+    <!-- LOGIN -->
+
+    <div id="loginBox">
+
+      <h2 class="auth-title">
+        Welcome Back
+      </h2>
+
+      <p class="auth-subtitle">
+        Login to your Boostlane account.
+      </p>
+
+      <form
+        id="loginForm"
+        class="auth-form"
       >
-        ☰
-      </button>
 
-      <div class="topbar-logo">
-        🚀 Boost<span>lane</span> Admin
+        <div class="form-group">
+
+          <label>Email</label>
+
+          <input
+            id="loginEmail"
+            type="email"
+            placeholder="you@example.com"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Password</label>
+
+          <input
+            id="loginPassword"
+            type="password"
+            placeholder="••••••••"
+            required
+          >
+
+        </div>
+
+
+        <button
+          type="button"
+          id="forgotPassword"
+          class="forgot"
+        >
+          Forgot password?
+        </button>
+
+
+        <button
+          type="submit"
+          class="main-button"
+        >
+          Login
+        </button>
+
+      </form>
+
+
+      <div class="auth-footer">
+
+        Don't have an account?
+
+        <button
+          id="showSignup"
+          class="auth-link"
+        >
+          Register here
+        </button>
+
       </div>
 
     </div>
 
-    <div class="topbar-right">
 
-      <span
-        class="admin-label"
-        id="adminEmailDisplay"
-      >
-        Admin
-      </span>
+    <!-- SIGNUP -->
 
-      <button
-        class="logout-top"
-        id="topLogoutBtn"
-        type="button"
+    <div
+      id="signupBox"
+      style="display:none;"
+    >
+
+      <h2 class="auth-title">
+        Create Account
+      </h2>
+
+      <p class="auth-subtitle">
+        Start growing with Boostlane.
+      </p>
+
+      <form
+        id="signupForm"
+        class="auth-form"
       >
-        Logout
-      </button>
+
+        <div class="form-group">
+
+          <label>Full Name</label>
+
+          <input
+            id="signupName"
+            type="text"
+            placeholder="Your full name"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Phone Number</label>
+
+          <input
+            id="signupPhone"
+            type="tel"
+            placeholder="08012345678"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Email</label>
+
+          <input
+            id="signupEmail"
+            type="email"
+            placeholder="you@example.com"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Password</label>
+
+          <input
+            id="signupPassword"
+            type="password"
+            minlength="6"
+            placeholder="Minimum 6 characters"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Confirm Password</label>
+
+          <input
+            id="signupConfirm"
+            type="password"
+            minlength="6"
+            placeholder="Repeat password"
+            required
+          >
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="main-button"
+        >
+          Create Account
+        </button>
+
+      </form>
+
+
+      <div class="auth-footer">
+
+        Already have an account?
+
+        <button
+          id="showLogin"
+          class="auth-link"
+        >
+          Login
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
+</section>
 
-  <!-- SIDEBAR OVERLAY -->
 
-  <div
-    class="sidebar-overlay"
-    id="sidebarOverlay"
-  ></div>
+<!-- ==========================================
+     CUSTOMER APP
+========================================== -->
+
+<section id="app">
+
+
+  <!-- HEADER -->
+
+  <header class="top-header">
+
+    <button
+      class="menu-button"
+      id="menuButton"
+    >
+      <i data-lucide="menu"></i>
+    </button>
+
+
+    <div class="logo-area">
+
+      <i
+        data-lucide="bar-chart-3"
+        class="logo-chart"
+      ></i>
+
+      <div>
+
+        <div class="logo-text">
+          Boost<span>lane</span>
+        </div>
+
+        <div class="logo-subtitle">
+          Your growth starts here
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="user-area">
+
+      <div
+        class="avatar"
+        id="avatar"
+      >
+        A
+      </div>
+
+      <span
+        class="user-name"
+        id="headerName"
+      >
+        Aymon
+      </span>
+
+      <i data-lucide="chevron-down"></i>
+
+    </div>
+
+  </header>
 
 
   <!-- SIDEBAR -->
@@ -633,577 +1614,1386 @@ tr:hover td{
     id="sidebar"
   >
 
-    <div class="sidebar-title">
-      Admin Panel
-    </div>
-
     <button
-      class="nav-btn active"
+      class="nav-item active"
       data-page="dashboard"
     >
-      <span class="nav-icon">📊</span>
+      <i data-lucide="layout-dashboard"></i>
       Dashboard
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="customers"
-    >
-      <span class="nav-icon">👥</span>
-      Users
-    </button>
 
     <button
-      class="nav-btn"
+      class="nav-item"
       data-page="orders"
     >
-      <span class="nav-icon">📋</span>
+      <i data-lucide="clipboard-list"></i>
       Orders
     </button>
 
+
     <button
-      class="nav-btn"
+      class="nav-item"
       data-page="transactions"
     >
-      <span class="nav-icon">💳</span>
+      <i data-lucide="credit-card"></i>
       Transactions
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="apiServices"
-    >
-      <span class="nav-icon">🌐</span>
-      API Services
-    </button>
 
     <button
-      class="nav-btn"
-      data-page="tickets"
+      class="nav-item"
+      data-page="support"
     >
-      <span class="nav-icon">🎫</span>
-      Tickets
+      <i data-lucide="headphones"></i>
+      Support
     </button>
+
 
     <button
-      class="nav-btn"
-      data-page="settings"
+      class="nav-item"
+      data-page="account"
     >
-      <span class="nav-icon">⚙️</span>
-      Settings
+      <i data-lucide="user"></i>
+      Account
     </button>
 
-    <div class="sidebar-bottom">
 
-      <button
-        class="nav-btn"
-        id="sideLogoutBtn"
-        type="button"
-      >
-        <span class="nav-icon">🚪</span>
-        Logout
-      </button>
-
-    </div>
+    <button
+      class="nav-item logout"
+      id="logoutButton"
+    >
+      <i data-lucide="log-out"></i>
+      Logout
+    </button>
 
   </aside>
 
 
-  <!-- CONTENT -->
+  <!-- MAIN -->
 
-  <main class="content">
+  <main class="main">
 
-    <!-- DASHBOARD -->
+    <div class="container">
 
-    <section
-      class="page active"
-      id="dashboard"
-    >
 
-      <h1 class="page-title">
-        Dashboard
-      </h1>
+      <!-- ========================================
+           DASHBOARD PAGE
+      ========================================= -->
 
-      <div class="stats">
+      <section
+        id="dashboardPage"
+        class="page active"
+      >
 
-        <div class="stat-card">
-          <div class="stat-label">
-            Total Customers
+        <h1 class="dashboard-title">
+          Dashboard
+        </h1>
+
+        <p class="welcome-text">
+          Welcome back,
+          <span id="welcomeName">
+            Aymon
+          </span>!
+        </p>
+
+
+        <!-- WALLET -->
+
+        <div class="wallet-card">
+
+          <div class="wallet-top">
+
+            <div class="wallet-icon">
+
+              <i data-lucide="wallet"></i>
+
+            </div>
+
+            <span>
+              Fund Wallet
+            </span>
+
           </div>
 
-          <div
-            class="stat-value"
-            id="totalCustomers"
-          >
-            0
-          </div>
-        </div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            Total Orders
-          </div>
+          <div class="wallet-middle">
 
-          <div
-            class="stat-value"
-            id="totalOrders"
-          >
-            0
-          </div>
-        </div>
+            <div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            Pending Orders
-          </div>
+              <div class="balance-label">
+                YOUR BALANCE
+              </div>
 
-          <div
-            class="stat-value"
-            id="pendingOrders"
-          >
-            0
-          </div>
-        </div>
+              <div class="balance-value">
+                ₦<span id="balance">
+                  0.00
+                </span>
+              </div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            Total Wallet Balance
+            </div>
+
+
+            <button
+              class="add-funds"
+              id="addFundsButton"
+            >
+
+              <i data-lucide="circle-plus"></i>
+
+              Add Funds
+
+            </button>
+
           </div>
 
-          <div
-            class="stat-value"
-            id="totalBalance"
-          >
-            ₦0.00
+
+          <div class="bank-information">
+
+            <div class="bank-title">
+
+              <i data-lucide="wallet"></i>
+
+              KatPay Account
+
+            </div>
+
+
+            <div class="bank-details">
+
+              <div>
+
+                <strong>
+                  Bank:
+                </strong>
+
+                <span id="bankName">
+                  PalmPay
+                </span>
+
+              </div>
+
+
+              <div class="account-number-line">
+
+                <div>
+
+                  <strong>
+                    Account Number:
+                  </strong>
+
+                  <span id="accountNumber">
+                    6665297907
+                  </span>
+
+                </div>
+
+
+                <button
+                  class="copy-account"
+                  id="copyAccount"
+                >
+
+                  <i data-lucide="copy"></i>
+
+                  Copy
+
+                </button>
+
+              </div>
+
+
+              <div>
+
+                <strong>
+                  Account Name:
+                </strong>
+
+                <span id="accountName">
+                  Boostlane Customer
+                </span>
+
+              </div>
+
+            </div>
+
           </div>
-        </div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <h2 class="panel-title">
-          Recent Customers
-        </h2>
-
-        <div class="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Joined</th>
-              </tr>
-            </thead>
-
-            <tbody id="recentCustomersTable"></tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <div class="panel">
-
-        <h2 class="panel-title">
-          Recent Orders
-        </h2>
-
-        <div class="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Service</th>
-                <th>Package</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-
-            <tbody id="recentOrdersTable"></tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- CUSTOMERS -->
-
-    <section
-      class="page"
-      id="customers"
-    >
-
-      <h1 class="page-title">
-        Users
-      </h1>
-
-      <div class="panel">
-
-        <input
-          type="text"
-          id="customerSearch"
-          class="search-box"
-          placeholder="Search users..."
-        >
-
-        <div class="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Wallet</th>
-                <th>Joined</th>
-              </tr>
-            </thead>
-
-            <tbody id="customersTable"></tbody>
-
-          </table>
 
         </div>
 
-      </div>
 
-    </section>
+        <!-- QUICK ACTIONS -->
 
+        <div class="white-card">
 
-    <!-- ORDERS -->
-
-    <section
-      class="page"
-      id="orders"
-    >
-
-      <h1 class="page-title">
-        Orders
-      </h1>
-
-      <div class="panel">
-
-        <div class="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Service</th>
-                <th>Package</th>
-                <th>Link</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-
-            <tbody id="ordersTable"></tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- TRANSACTIONS -->
-
-    <section
-      class="page"
-      id="transactions"
-    >
-
-      <h1 class="page-title">
-        Transactions
-      </h1>
-
-      <div class="panel">
-
-        <div class="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-
-            <tbody id="transactionsTable"></tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- API SERVICES -->
-
-    <section
-      class="page"
-      id="apiServices"
-    >
-
-      <h1 class="page-title">
-        API Services
-      </h1>
-
-      <div class="panel">
-
-        <div class="empty-box">
-
-          <div class="empty-icon">
-            🌐
-          </div>
-
-          <h2>
-            API Services
+          <h2 class="section-heading">
+            Quick Actions
           </h2>
 
-          <p style="margin-top:10px;">
-            Your social-media services will appear here.
-          </p>
 
-        </div>
-
-      </div>
-
-    </section>
+          <div class="quick-actions">
 
 
-    <!-- TICKETS -->
+            <button
+              class="quick-action"
+              id="buySocial"
+            >
 
-    <section
-      class="page"
-      id="tickets"
-    >
+              <div
+                class="quick-action-icon icon-purple"
+              >
 
-      <h1 class="page-title">
-        Tickets
-      </h1>
+                <i data-lucide="send"></i>
 
-      <div class="panel">
+              </div>
 
-        <div class="empty-box">
+              Buy
+              <br>
+              Social Media
 
-          <div class="empty-icon">
-            🎫
+            </button>
+
+
+            <button
+              class="quick-action"
+              data-open-page="orders"
+            >
+
+              <div
+                class="quick-action-icon icon-green"
+              >
+
+                <i data-lucide="list"></i>
+
+              </div>
+
+              View
+              <br>
+              Orders
+
+            </button>
+
+
+            <button
+              class="quick-action"
+              data-open-page="transactions"
+            >
+
+              <div
+                class="quick-action-icon icon-blue"
+              >
+
+                <i data-lucide="wallet-cards"></i>
+
+              </div>
+
+              Transactions
+
+            </button>
+
+
+            <button
+              class="quick-action"
+              data-open-page="support"
+            >
+
+              <div
+                class="quick-action-icon icon-red"
+              >
+
+                <i data-lucide="headphones"></i>
+
+              </div>
+
+              Support
+
+            </button>
+
           </div>
 
-          <h2>
-            Support Tickets
-          </h2>
-
-          <p style="margin-top:10px;">
-            Customer support tickets will appear here.
-          </p>
-
         </div>
 
-      </div>
 
-    </section>
+        <!-- RECENT ACTIVITY -->
+
+        <div class="white-card">
+
+          <div class="activity-header">
+
+            <h2 class="section-heading">
+              Recent Activity
+            </h2>
 
 
-    <!-- SETTINGS -->
+            <button
+              class="view-all"
+              data-open-page="orders"
+            >
 
-    <section
-      class="page"
-      id="settings"
-    >
+              View All
 
-      <h1 class="page-title">
-        Settings
-      </h1>
+              <i data-lucide="chevron-right"></i>
 
-      <div class="panel">
+            </button>
 
-        <div class="empty-box">
-
-          <div class="empty-icon">
-            ⚙️
           </div>
 
-          <h2>
-            Admin Settings
-          </h2>
 
-          <p style="margin-top:10px;">
-            Settings will be added here.
-          </p>
+          <div
+            id="recentActivity"
+            class="empty-activity"
+          >
+
+            <i
+              data-lucide="file-clock"
+              class="empty-activity-icon"
+            ></i>
+
+            <h3>
+              No recent activity yet
+            </h3>
+
+            <p>
+              Your orders and transactions will appear here
+              once you start using our services.
+            </p>
+
+          </div>
 
         </div>
 
-      </div>
 
-    </section>
+      </section>
+
+
+      <!-- ========================================
+           ORDERS
+      ========================================= -->
+
+      <section
+        id="ordersPage"
+        class="page"
+      >
+
+        <h1 class="dashboard-title">
+          Orders
+        </h1>
+
+        <p class="welcome-text">
+          Your social media orders.
+        </p>
+
+
+        <div class="white-card">
+
+          <div
+            id="ordersList"
+            class="data-list"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ========================================
+           TRANSACTIONS
+      ========================================= -->
+
+      <section
+        id="transactionsPage"
+        class="page"
+      >
+
+        <h1 class="dashboard-title">
+          Transactions
+        </h1>
+
+        <p class="welcome-text">
+          Your wallet transactions.
+        </p>
+
+
+        <div class="white-card">
+
+          <div
+            id="transactionsList"
+            class="data-list"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ========================================
+           SUPPORT
+      ========================================= -->
+
+      <section
+        id="supportPage"
+        class="page"
+      >
+
+        <h1 class="dashboard-title">
+          Support
+        </h1>
+
+        <p class="welcome-text">
+          Get help from Boostlane.
+        </p>
+
+
+        <div class="white-card">
+
+          <h2 class="section-heading">
+            Need help?
+          </h2>
+
+          <p
+            style="
+              color:#73809f;
+              line-height:1.7;
+              margin-bottom:25px;
+            "
+          >
+            Contact Boostlane support if you have
+            an issue with an order, account or payment.
+          </p>
+
+
+          <button
+            class="main-button"
+            id="whatsappButton"
+          >
+            Contact Support on WhatsApp
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ========================================
+           ACCOUNT
+      ========================================= -->
+
+      <section
+        id="accountPage"
+        class="page"
+      >
+
+        <h1 class="dashboard-title">
+          Account
+        </h1>
+
+        <p class="welcome-text">
+          Your account information.
+        </p>
+
+
+        <div class="white-card">
+
+          <div class="account-grid">
+
+            <div class="account-box">
+
+              <div class="account-label">
+                Full Name
+              </div>
+
+              <div
+                class="account-value"
+                id="profileName"
+              >
+                -
+              </div>
+
+            </div>
+
+
+            <div class="account-box">
+
+              <div class="account-label">
+                Email
+              </div>
+
+              <div
+                class="account-value"
+                id="profileEmail"
+              >
+                -
+              </div>
+
+            </div>
+
+
+            <div class="account-box">
+
+              <div class="account-label">
+                Phone
+              </div>
+
+              <div
+                class="account-value"
+                id="profilePhone"
+              >
+                -
+              </div>
+
+            </div>
+
+
+            <div class="account-box">
+
+              <div class="account-label">
+                User ID
+              </div>
+
+              <div
+                class="account-value"
+                id="profileId"
+              >
+                -
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- FOOTER -->
+
+      <footer class="footer">
+
+        Boostlane
+
+        <span style="margin:0 8px;">
+          •
+        </span>
+
+        Your growth starts here
+
+      </footer>
+
+    </div>
 
   </main>
+
+</section>
+
+
+<!-- ==========================================
+     FUND MODAL
+========================================== -->
+
+<div
+  class="modal"
+  id="fundModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>
+        Fund Wallet
+      </h2>
+
+      <button
+        class="close-modal"
+        data-close="fundModal"
+      >
+        <i data-lucide="x"></i>
+      </button>
+
+    </div>
+
+
+    <div class="payment-info">
+
+      <strong>
+        Transfer to:
+      </strong>
+
+      <br>
+
+      Bank:
+      <strong id="modalBank">
+        PalmPay
+      </strong>
+
+      <br>
+
+      Account Number:
+      <strong id="modalNumber">
+        6665297907
+      </strong>
+
+      <br>
+
+      Account Name:
+      <strong id="modalName">
+        Boostlane
+      </strong>
+
+    </div>
+
+
+    <form
+      id="fundForm"
+      class="modal-form"
+    >
+
+      <div class="form-group">
+
+        <label>
+          Amount
+        </label>
+
+        <input
+          id="fundAmount"
+          type="number"
+          min="100"
+          placeholder="Enter amount"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Transfer Reference
+        </label>
+
+        <input
+          id="fundReference"
+          type="text"
+          placeholder="Optional reference"
+        >
+
+      </div>
+
+
+      <div class="modal-buttons">
+
+        <button
+          type="button"
+          class="cancel-button"
+          data-close="fundModal"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="main-button"
+        >
+          Submit Funding
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
 
 </div>
 
 
+<!-- ==========================================
+     ORDER MODAL
+========================================== -->
+
+<div
+  class="modal"
+  id="orderModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>
+        Buy Social Media
+      </h2>
+
+      <button
+        class="close-modal"
+        data-close="orderModal"
+      >
+        <i data-lucide="x"></i>
+      </button>
+
+    </div>
+
+
+    <form
+      id="orderForm"
+      class="modal-form"
+    >
+
+      <div class="form-group">
+
+        <label>
+          Service
+        </label>
+
+        <select
+          id="service"
+          required
+        >
+
+          <option value="">
+            Select service
+          </option>
+
+          <option value="Instagram Followers">
+            Instagram Followers
+          </option>
+
+          <option value="Instagram Likes">
+            Instagram Likes
+          </option>
+
+          <option value="Instagram Views">
+            Instagram Views
+          </option>
+
+          <option value="TikTok Followers">
+            TikTok Followers
+          </option>
+
+          <option value="TikTok Likes">
+            TikTok Likes
+          </option>
+
+          <option value="TikTok Views">
+            TikTok Views
+          </option>
+
+          <option value="YouTube Views">
+            YouTube Views
+          </option>
+
+          <option value="YouTube Subscribers">
+            YouTube Subscribers
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Package / Quantity
+        </label>
+
+        <input
+          id="package"
+          type="text"
+          placeholder="Example: 1000 Followers"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Account / Post Link
+        </label>
+
+        <input
+          id="accountLink"
+          type="url"
+          placeholder="https://..."
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Instructions
+        </label>
+
+        <textarea
+          id="instructions"
+          rows="4"
+          placeholder="Additional instructions..."
+        ></textarea>
+
+      </div>
+
+
+      <div class="modal-buttons">
+
+        <button
+          type="button"
+          class="cancel-button"
+          data-close="orderModal"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="main-button"
+        >
+          Place Order
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div id="toast"></div>
+
+
 <script>
 
-/* =====================================================
-   SUPABASE
-===================================================== */
+  /* =========================================================
+     BOOSTLANE CONFIG
+  ========================================================= */
 
-const SUPABASE_URL =
-  "https://whseefadqutdrsachypc.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
-
-const db =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  const SUPABASE_URL =
+    "https://whseefadqutdrsachypc.supabase.co";
 
 
-/* =====================================================
-   GLOBAL DATA
-===================================================== */
+  /*
+    IMPORTANT:
 
-let currentUser = null;
-let allCustomers = [];
-let allOrders = [];
-let walletMap = {};
-let customerMap = {};
+    Paste your EXISTING Supabase publishable/anon key here.
 
+    DO NOT put your service_role key here.
+    DO NOT put your ReallySimpleSocial API key here.
+  */
 
-/* =====================================================
-   LOGIN
-===================================================== */
-
-document
-  .getElementById("adminLoginBtn")
-  .addEventListener("click", adminLogin);
+  const SUPABASE_ANON_KEY =
+    "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
 
 
-document
-  .getElementById("adminPassword")
-  .addEventListener("keydown", function(event){
+  /*
+    PAYMENT ACCOUNT
+  */
 
-    if(event.key === "Enter"){
-      adminLogin();
-    }
+  const PAYMENT_BANK =
+    "PalmPay";
 
-  });
+  const PAYMENT_ACCOUNT_NUMBER =
+    "6665297907";
 
-
-document
-  .getElementById("adminEmail")
-  .addEventListener("keydown", function(event){
-
-    if(event.key === "Enter"){
-      adminLogin();
-    }
-
-  });
+  const PAYMENT_ACCOUNT_NAME =
+    "Boostlane";
 
 
-async function adminLogin(){
+  /*
+    WHATSAPP SUPPORT
 
-  const email =
-    document
-      .getElementById("adminEmail")
-      .value
-      .trim();
+    Example:
+    2348012345678
+  */
 
-  const password =
-    document
-      .getElementById("adminPassword")
-      .value;
-
-  const message =
-    document.getElementById("loginMessage");
-
-  const button =
-    document.getElementById("adminLoginBtn");
+  const WHATSAPP_NUMBER =
+    "YOUR_WHATSAPP_NUMBER";
 
 
-  message.className = "message";
-  message.textContent = "";
+  /* =========================================================
+     SUPABASE
+  ========================================================= */
+
+  const db =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
 
 
-  if(!email || !password){
+  let currentUser = null;
+  let currentProfile = null;
 
-    message.textContent =
-      "Enter your email and password.";
 
-    message.classList.add("error");
+  /* =========================================================
+     HELPERS
+  ========================================================= */
 
-    return;
+  function $(id) {
+    return document.getElementById(id);
   }
 
 
-  button.disabled = true;
-  button.textContent = "Logging in...";
+  function icons() {
 
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-      await db.auth.signInWithPassword({
-        email:email,
-        password:password
-      });
-
-
-    if(error){
-      throw error;
+    if (
+      window.lucide &&
+      typeof lucide.createIcons === "function"
+    ) {
+      lucide.createIcons();
     }
 
+  }
 
-    if(!data || !data.user){
 
-      throw new Error(
-        "Login failed."
+  function escapeHTML(value) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+      return "";
+    }
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+
+  function money(value) {
+
+    return Number(value || 0)
+      .toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
       );
 
+  }
+
+
+  function dateFormat(value) {
+
+    if (!value) return "-";
+
+    return new Date(value)
+      .toLocaleString(
+        "en-NG",
+        {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }
+      );
+
+  }
+
+
+  function statusClass(status) {
+
+    const s =
+      String(status || "pending")
+        .toLowerCase();
+
+    if (
+      s === "completed" ||
+      s === "success" ||
+      s === "successful"
+    ) {
+      return "completed";
     }
 
+    if (
+      s === "processing" ||
+      s === "in progress"
+    ) {
+      return "processing";
+    }
 
-    currentUser =
-      data.user;
+    if (
+      s === "failed" ||
+      s === "cancelled" ||
+      s === "canceled"
+    ) {
+      return "failed";
+    }
+
+    return "pending";
+  }
+
+
+  function toast(
+    message,
+    type = ""
+  ) {
+
+    const element =
+      $("toast");
+
+    element.textContent =
+      message;
+
+    element.className = "";
+
+    element.id = "toast";
+
+    if (type) {
+      element.classList.add(type);
+    }
+
+    setTimeout(() => {
+      element.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+      element.classList.remove("show");
+    }, 3500);
+
+  }
+
+
+  /* =========================================================
+     AUTH DISPLAY
+  ========================================================= */
+
+  function showAuth() {
+
+    $("loading").style.display =
+      "none";
+
+    $("app").style.display =
+      "none";
+
+    $("auth").style.display =
+      "flex";
+
+    icons();
+
+  }
+
+
+  function showApp() {
+
+    $("loading").style.display =
+      "none";
+
+    $("auth").style.display =
+      "none";
+
+    $("app").style.display =
+      "block";
+
+    icons();
+
+  }
+
+
+  /* =========================================================
+     LOGIN / SIGNUP SWITCH
+  ========================================================= */
+
+  $("showSignup").onclick =
+    () => {
+
+      $("loginBox").style.display =
+        "none";
+
+      $("signupBox").style.display =
+        "block";
+
+    };
+
+
+  $("showLogin").onclick =
+    () => {
+
+      $("signupBox").style.display =
+        "none";
+
+      $("loginBox").style.display =
+        "block";
+
+    };
+
+
+  /* =========================================================
+     LOGIN
+  ========================================================= */
+
+  $("loginForm").addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+      const email =
+        $("loginEmail").value.trim();
+
+      const password =
+        $("loginPassword").value;
+
+
+      const button =
+        event.submitter;
+
+      button.disabled = true;
+
+      button.textContent =
+        "Logging in...";
+
+
+      const {
+        data,
+        error
+      } =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+
+      button.disabled = false;
+
+      button.textContent =
+        "Login";
+
+
+      if (error) {
+
+        toast(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      currentUser =
+        data.user;
+
+
+      await launchDashboard();
+
+    }
+  );
+
+
+  /* =========================================================
+     SIGNUP
+  ========================================================= */
+
+  $("signupForm").addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      const name =
+        $("signupName").value.trim();
+
+      const phone =
+        $("signupPhone").value.trim();
+
+      const email =
+        $("signupEmail").value.trim();
+
+      const password =
+        $("signupPassword").value;
+
+      const confirm =
+        $("signupConfirm").value;
+
+
+      if (password !== confirm) {
+
+        toast(
+          "Passwords do not match.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const button =
+        event.submitter;
+
+      button.disabled = true;
+
+      button.textContent =
+        "Creating account...";
+
+
+      const {
+        data,
+        error
+      } =
+        await db.auth.signUp({
+
+          email,
+
+          password,
+
+          options: {
+            data: {
+              full_name: name,
+              phone: phone
+            }
+          }
+
+        });
+
+
+      button.disabled = false;
+
+      button.textContent =
+        "Create Account";
+
+
+      if (error) {
+
+        toast(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (data.session) {
+
+        currentUser =
+          data.user;
+
+
+        /*
+          Create customer profile.
+        */
+
+        await db
+          .from("profiles")
+          .upsert(
+            {
+              id: currentUser.id,
+              full_name: name,
+              phone: phone,
+              role: "customer"
+            },
+            {
+              onConflict: "id"
+            }
+          );
+
+
+        await launchDashboard();
+
+      } else {
+
+        toast(
+          "Account created. Check your email to confirm your account.",
+          "success"
+        );
+
+
+        $("signupForm").reset();
+
+        $("signupBox").style.display =
+          "none";
+
+        $("loginBox").style.display =
+          "block";
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     FORGOT PASSWORD
+  ========================================================= */
+
+  $("forgotPassword").onclick =
+    async () => {
+
+      const email =
+        $("loginEmail").value.trim();
+
+
+      if (!email) {
+
+        toast(
+          "Enter your email first.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const {
+        error
+      } =
+        await db.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo:
+              window.location.href
+          }
+        );
+
+
+      if (error) {
+
+        toast(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      toast(
+        "Password reset email sent.",
+        "success"
+      );
+
+    };
+
+
+  /* =========================================================
+     LOAD PROFILE
+  ========================================================= */
+
+  async function loadProfile() {
+
+    if (!currentUser) return;
 
 
     const {
-      data:profile,
-      error:profileError
+      data
     } =
       await db
         .from("profiles")
-        .select("role")
+        .select(
+          "id, full_name, phone, role"
+        )
         .eq(
           "id",
           currentUser.id
@@ -1211,1138 +3001,1040 @@ async function adminLogin(){
         .maybeSingle();
 
 
-    if(profileError){
-
-      console.error(profileError);
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      throw new Error(
-        "Could not verify administrator account."
-      );
-
-    }
+    currentProfile =
+      data || {};
 
 
-    if(!profile || profile.role !== "admin"){
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      throw new Error(
-        "This account is not an administrator."
-      );
-
-    }
+    const fullName =
+      currentProfile.full_name ||
+      currentUser.user_metadata?.full_name ||
+      "Customer";
 
 
-    message.textContent =
-      "Login successful!";
-
-    message.classList.add("success");
-
-
-    await openAdmin();
+    const firstName =
+      fullName.split(" ")[0] ||
+      "Customer";
 
 
-  }catch(error){
+    $("welcomeName").textContent =
+      firstName;
 
-    console.error(
-      "Admin login error:",
+    $("headerName").textContent =
+      firstName;
+
+
+    $("avatar").textContent =
+      firstName
+        .charAt(0)
+        .toUpperCase();
+
+
+    $("profileName").textContent =
+      fullName;
+
+    $("profileEmail").textContent =
+      currentUser.email || "-";
+
+    $("profilePhone").textContent =
+      currentProfile.phone ||
+      currentUser.user_metadata?.phone ||
+      "-";
+
+    $("profileId").textContent =
+      currentUser.id;
+
+
+    $("accountName").textContent =
+      PAYMENT_ACCOUNT_NAME;
+
+  }
+
+
+  /* =========================================================
+     LOAD WALLET
+  ========================================================= */
+
+  async function loadWallet() {
+
+    if (!currentUser) return;
+
+
+    const {
+      data,
       error
-    );
+    } =
+      await db
+        .from("wallets")
+        .select("balance")
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .maybeSingle();
 
-    message.textContent =
-      error.message ||
-      "Login failed.";
 
-    message.classList.add("error");
+    if (error) {
+
+      console.error(error);
+
+      $("balance").textContent =
+        "0.00";
+
+      return;
+    }
 
 
-  }finally{
-
-    button.disabled = false;
-    button.textContent = "Login";
+    $("balance").textContent =
+      money(data?.balance || 0);
 
   }
 
-}
 
+  /* =========================================================
+     LOAD ORDERS
+  ========================================================= */
 
-/* =====================================================
-   CHECK ADMIN
-===================================================== */
+  async function loadOrders() {
 
-async function checkAdmin(){
-
-  if(!currentUser){
-    return false;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("profiles")
-      .select("role")
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .maybeSingle();
-
-
-  if(error){
-
-    console.error(
-      "Admin check error:",
+    const {
+      data,
       error
-    );
-
-    return false;
-
-  }
-
-
-  return data &&
-         data.role === "admin";
-
-}
-
-
-/* =====================================================
-   OPEN ADMIN
-===================================================== */
-
-async function openAdmin(){
-
-  document
-    .getElementById("loginScreen")
-    .style.display = "none";
-
-
-  document
-    .getElementById("adminApp")
-    .style.display = "block";
-
-
-  document
-    .getElementById("adminEmailDisplay")
-    .textContent =
-      currentUser?.email || "Admin";
-
-
-  await loadAllData();
-
-}
-
-
-/* =====================================================
-   SESSION
-===================================================== */
-
-async function checkSession(){
-
-  const {
-    data:{
-      session
-    }
-  } =
-    await db.auth.getSession();
-
-
-  if(!session){
-
-    showLogin();
-
-    return;
-
-  }
-
-
-  currentUser =
-    session.user;
-
-
-  const isAdmin =
-    await checkAdmin();
-
-
-  if(isAdmin){
-
-    await openAdmin();
-
-  }else{
-
-    await db.auth.signOut();
-
-    currentUser = null;
-
-    showLogin();
-
-  }
-
-}
-
-
-/* =====================================================
-   SHOW LOGIN
-===================================================== */
-
-function showLogin(){
-
-  document
-    .getElementById("loginScreen")
-    .style.display = "flex";
-
-
-  document
-    .getElementById("adminApp")
-    .style.display = "none";
-
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-async function logout(){
-
-  await db.auth.signOut();
-
-  currentUser = null;
-
-  closeSidebar();
-
-  showLogin();
-
-}
-
-
-document
-  .getElementById("topLogoutBtn")
-  .addEventListener(
-    "click",
-    logout
-  );
-
-
-document
-  .getElementById("sideLogoutBtn")
-  .addEventListener(
-    "click",
-    logout
-  );
-
-
-/* =====================================================
-   MOBILE SIDEBAR
-===================================================== */
-
-const sidebar =
-  document.getElementById("sidebar");
-
-const menuBtn =
-  document.getElementById("menuBtn");
-
-const sidebarOverlay =
-  document.getElementById("sidebarOverlay");
-
-
-menuBtn.addEventListener(
-  "click",
-  function(){
-
-    sidebar.classList.toggle("open");
-
-    sidebarOverlay.classList.toggle("show");
-
-  }
-);
-
-
-sidebarOverlay.addEventListener(
-  "click",
-  closeSidebar
-);
-
-
-function closeSidebar(){
-
-  sidebar.classList.remove("open");
-
-  sidebarOverlay.classList.remove("show");
-
-}
-
-
-/* =====================================================
-   NAVIGATION
-===================================================== */
-
-document
-  .querySelectorAll(".nav-btn[data-page]")
-  .forEach(function(button){
-
-    button.addEventListener(
-      "click",
-      function(){
-
-        const page =
-          this.dataset.page;
-
-
-        document
-          .querySelectorAll(".nav-btn[data-page]")
-          .forEach(function(btn){
-
-            btn.classList.remove(
-              "active"
-            );
-
-          });
-
-
-        this.classList.add("active");
-
-
-        document
-          .querySelectorAll(".page")
-          .forEach(function(section){
-
-            section.classList.remove(
-              "active"
-            );
-
-          });
-
-
-        const target =
-          document.getElementById(page);
-
-
-        if(target){
-
-          target.classList.add("active");
-
-        }
-
-
-        closeSidebar();
-
-      }
-    );
-
-  });
-
-
-/* =====================================================
-   LOAD ALL DATA
-===================================================== */
-
-async function loadAllData(){
-
-  await loadCustomers();
-
-  await loadWallets();
-
-  await loadOrders();
-
-  await loadTransactions();
-
-  updateDashboard();
-
-}
-
-
-/* =====================================================
-   LOAD CUSTOMERS
-===================================================== */
-
-async function loadCustomers(){
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("profiles")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(error){
-
-    console.error(
-      "Customers error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  allCustomers =
-    data || [];
-
-
-  customerMap = {};
-
-
-  allCustomers.forEach(
-    function(customer){
-
-      customerMap[
-        customer.id
-      ] = customer;
-
-    }
-  );
-
-
-  renderCustomers(
-    allCustomers
-  );
-
-
-  renderRecentCustomers(
-    allCustomers.slice(
-      0,
-      5
-    )
-  );
-
-
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      allCustomers.length;
-
-}
-
-
-/* =====================================================
-   RENDER CUSTOMERS
-===================================================== */
-
-function renderCustomers(customers){
-
-  const table =
-    document.getElementById(
-      "customersTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  if(!customers.length){
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="5">
-          No customers found.
-        </td>
-      </tr>
-    `;
-
-    return;
-
-  }
-
-
-  customers.forEach(
-    function(customer){
-
-      const wallet =
-        walletMap[
-          customer.id
-        ];
-
-
-      const balance =
-        wallet
-          ? Number(wallet.balance || 0)
-          : 0;
-
-
-      const row =
-        document.createElement("tr");
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer.full_name ||
-            "No name"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.phone ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ₦${balance.toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits:2
-            }
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            customer.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   RECENT CUSTOMERS
-===================================================== */
-
-function renderRecentCustomers(customers){
-
-  const table =
-    document.getElementById(
-      "recentCustomersTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  if(!customers.length){
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="4">
-          No customers yet.
-        </td>
-      </tr>
-    `;
-
-    return;
-
-  }
-
-
-  customers.forEach(
-    function(customer){
-
-      const row =
-        document.createElement("tr");
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer.full_name ||
-            "No name"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            customer.phone ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            customer.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   WALLETS
-===================================================== */
-
-async function loadWallets(){
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("wallets")
-      .select("*");
-
-
-  if(error){
-
-    console.error(
-      "Wallet error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  walletMap = {};
-
-  let total = 0;
-
-
-  (data || []).forEach(
-    function(wallet){
-
-      walletMap[
-        wallet.user_id
-      ] = wallet;
-
-
-      total += Number(
-        wallet.balance || 0
-      );
-
-    }
-  );
-
-
-  document
-    .getElementById("totalBalance")
-    .textContent =
-      "₦" +
-      total.toLocaleString(
-        "en-NG",
-        {
-          minimumFractionDigits:2
-        }
-      );
-
-}
-
-
-/* =====================================================
-   ORDERS
-===================================================== */
-
-async function loadOrders(){
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("orders")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(error){
-
-    console.error(
-      "Orders error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  allOrders =
-    data || [];
-
-
-  const table =
-    document.getElementById(
-      "ordersTable"
-    );
-
-
-  const recentTable =
-    document.getElementById(
-      "recentOrdersTable"
-    );
-
-
-  table.innerHTML = "";
-
-  recentTable.innerHTML = "";
-
-
-  allOrders.forEach(
-    function(order){
-
-      const customer =
-        customerMap[
-          order.user_id
-        ];
-
-
-      const row =
-        document.createElement("tr");
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer?.full_name ||
-            customer?.email ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            order.service ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            order.package ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            order.account_link ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${statusBadge(
-            order.status ||
-            "pending"
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            order.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-
-  allOrders
-    .slice(0,5)
-    .forEach(
-      function(order){
-
-        const row =
-          document.createElement("tr");
-
-
-        row.innerHTML = `
-
-          <td>
-            ${escapeHTML(
-              order.service ||
-              "-"
-            )}
-          </td>
-
-          <td>
-            ${escapeHTML(
-              order.package ||
-              "-"
-            )}
-          </td>
-
-          <td>
-            ${statusBadge(
-              order.status ||
-              "pending"
-            )}
-          </td>
-
-          <td>
-            ${formatDate(
-              order.created_at
-            )}
-          </td>
-
-        `;
-
-
-        recentTable.appendChild(row);
-
-      }
-    );
-
-}
-
-
-/* =====================================================
-   TRANSACTIONS
-===================================================== */
-
-async function loadTransactions(){
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from("transactions")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(error){
-
-    console.error(
-      "Transactions error:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  const table =
-    document.getElementById(
-      "transactionsTable"
-    );
-
-
-  table.innerHTML = "";
-
-
-  (data || []).forEach(
-    function(transaction){
-
-      const customer =
-        customerMap[
-          transaction.user_id
-        ];
-
-
-      const row =
-        document.createElement("tr");
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(
-            customer?.full_name ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ${escapeHTML(
-            transaction.type ||
-            "-"
-          )}
-        </td>
-
-        <td>
-          ₦${Number(
-            transaction.amount || 0
-          ).toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits:2
-            }
-          )}
-        </td>
-
-        <td>
-          ${statusBadge(
-            transaction.status ||
-            "pending"
-          )}
-        </td>
-
-        <td>
-          ${formatDate(
-            transaction.created_at
-          )}
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   DASHBOARD UPDATE
-===================================================== */
-
-function updateDashboard(){
-
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      allCustomers.length;
-
-
-  document
-    .getElementById(
-      "totalOrders"
-    )
-    .textContent =
-      allOrders.length;
-
-
-  document
-    .getElementById(
-      "pendingOrders"
-    )
-    .textContent =
-      allOrders.filter(
-        function(order){
-
-          return String(
-            order.status || ""
-          )
-          .toLowerCase()
-          .includes("pending");
-
-        }
-      ).length;
-
-}
-
-
-/* =====================================================
-   CUSTOMER SEARCH
-===================================================== */
-
-document
-  .getElementById(
-    "customerSearch"
-  )
-  .addEventListener(
-    "input",
-    function(){
-
-      const search =
-        this.value
-          .toLowerCase()
-          .trim();
-
-
-      const filtered =
-        allCustomers.filter(
-          function(customer){
-
-            const text =
-              (
-                (customer.full_name || "") +
-                " " +
-                (customer.email || "") +
-                " " +
-                (customer.phone || "")
-              )
-              .toLowerCase();
-
-
-            return text.includes(
-              search
-            );
-
+    } =
+      await db
+        .from("orders")
+        .select("*")
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
           }
         );
 
 
-      renderCustomers(
-        filtered
+    if (error) {
+
+      console.error(error);
+
+      return [];
+
+    }
+
+
+    const orders =
+      data || [];
+
+
+    const list =
+      $("ordersList");
+
+
+    if (!orders.length) {
+
+      list.innerHTML = `
+
+        <div class="empty-activity">
+
+          <i
+            data-lucide="clipboard-list"
+            class="empty-activity-icon"
+          ></i>
+
+          <h3>
+            No orders yet
+          </h3>
+
+          <p>
+            Your orders will appear here.
+          </p>
+
+        </div>
+
+      `;
+
+      icons();
+
+      return orders;
+    }
+
+
+    list.innerHTML =
+      orders.map(order => `
+
+        <div class="data-item">
+
+          <div class="data-left">
+
+            <div class="data-icon">
+              <i data-lucide="send"></i>
+            </div>
+
+            <div>
+
+              <div class="data-title">
+                ${escapeHTML(order.service)}
+              </div>
+
+              <div class="data-subtitle">
+                ${escapeHTML(order.package || "")}
+                •
+                ${dateFormat(order.created_at)}
+              </div>
+
+            </div>
+
+          </div>
+
+          <span
+            class="status ${statusClass(order.status)}"
+          >
+            ${escapeHTML(order.status || "pending")}
+          </span>
+
+        </div>
+
+      `).join("");
+
+
+    icons();
+
+
+    return orders;
+
+  }
+
+
+  /* =========================================================
+     LOAD TRANSACTIONS
+  ========================================================= */
+
+  async function loadTransactions() {
+
+    const {
+      data,
+      error
+    } =
+      await db
+        .from("transactions")
+        .select("*")
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+
+    }
+
+
+    const transactions =
+      data || [];
+
+
+    const list =
+      $("transactionsList");
+
+
+    if (!transactions.length) {
+
+      list.innerHTML = `
+
+        <div class="empty-activity">
+
+          <i
+            data-lucide="credit-card"
+            class="empty-activity-icon"
+          ></i>
+
+          <h3>
+            No transactions yet
+          </h3>
+
+          <p>
+            Your wallet transactions will appear here.
+          </p>
+
+        </div>
+
+      `;
+
+      icons();
+
+      return;
+    }
+
+
+    list.innerHTML =
+      transactions.map(transaction => `
+
+        <div class="data-item">
+
+          <div class="data-left">
+
+            <div class="data-icon">
+              <i data-lucide="wallet"></i>
+            </div>
+
+            <div>
+
+              <div class="data-title">
+                ${escapeHTML(
+                  transaction.type ||
+                  "Transaction"
+                )}
+              </div>
+
+              <div class="data-subtitle">
+                ${dateFormat(
+                  transaction.created_at
+                )}
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div style="text-align:right;">
+
+            <strong>
+              ₦${money(transaction.amount)}
+            </strong>
+
+            <br>
+
+            <span
+              class="status ${statusClass(transaction.status)}"
+            >
+              ${escapeHTML(
+                transaction.status ||
+                "pending"
+              )}
+            </span>
+
+          </div>
+
+        </div>
+
+      `).join("");
+
+
+    icons();
+
+  }
+
+
+  /* =========================================================
+     RECENT ACTIVITY
+  ========================================================= */
+
+  async function loadRecentActivity() {
+
+    const {
+      data,
+      error
+    } =
+      await db
+        .from("orders")
+        .select("*")
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        )
+        .limit(5);
+
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+
+    const orders =
+      data || [];
+
+
+    const area =
+      $("recentActivity");
+
+
+    if (!orders.length) {
+
+      area.className =
+        "empty-activity";
+
+
+      area.innerHTML = `
+
+        <i
+          data-lucide="file-clock"
+          class="empty-activity-icon"
+        ></i>
+
+        <h3>
+          No recent activity yet
+        </h3>
+
+        <p>
+          Your orders and transactions will appear here
+          once you start using our services.
+        </p>
+
+      `;
+
+      icons();
+
+      return;
+    }
+
+
+    area.className =
+      "data-list";
+
+
+    area.innerHTML =
+      orders.map(order => `
+
+        <div class="data-item">
+
+          <div class="data-left">
+
+            <div class="data-icon">
+              <i data-lucide="send"></i>
+            </div>
+
+            <div>
+
+              <div class="data-title">
+                ${escapeHTML(order.service)}
+              </div>
+
+              <div class="data-subtitle">
+                ${escapeHTML(order.package || "")}
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <span
+            class="status ${statusClass(order.status)}"
+          >
+            ${escapeHTML(order.status || "pending")}
+          </span>
+
+        </div>
+
+      `).join("");
+
+
+    icons();
+
+  }
+
+
+  /* =========================================================
+     NAVIGATION
+  ========================================================= */
+
+  function openPage(page) {
+
+    document
+      .querySelectorAll(".page")
+      .forEach(section => {
+
+        section.classList.remove(
+          "active"
+        );
+
+      });
+
+
+    const selected =
+      $(page + "Page");
+
+
+    if (selected) {
+
+      selected.classList.add(
+        "active"
       );
+
+    }
+
+
+    document
+      .querySelectorAll(".nav-item")
+      .forEach(button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.page === page
+        );
+
+      });
+
+
+    $("sidebar")
+      .classList.remove("open");
+
+
+    if (page === "orders") {
+      loadOrders();
+    }
+
+    if (page === "transactions") {
+      loadTransactions();
+    }
+
+    icons();
+
+  }
+
+
+  document
+    .querySelectorAll(".nav-item[data-page]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          openPage(
+            button.dataset.page
+          );
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll("[data-open-page]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          openPage(
+            button.dataset.openPage
+          );
+
+        }
+      );
+
+    });
+
+
+  /* =========================================================
+     MOBILE MENU
+  ========================================================= */
+
+  $("menuButton").onclick =
+    () => {
+
+      $("sidebar")
+        .classList.toggle("open");
+
+    };
+
+
+  /* =========================================================
+     PAYMENT ACCOUNT
+  ========================================================= */
+
+  $("bankName").textContent =
+    PAYMENT_BANK;
+
+  $("accountNumber").textContent =
+    PAYMENT_ACCOUNT_NUMBER;
+
+  $("accountName").textContent =
+    PAYMENT_ACCOUNT_NAME;
+
+  $("modalBank").textContent =
+    PAYMENT_BANK;
+
+  $("modalNumber").textContent =
+    PAYMENT_ACCOUNT_NUMBER;
+
+  $("modalName").textContent =
+    PAYMENT_ACCOUNT_NAME;
+
+
+  /* =========================================================
+     COPY ACCOUNT
+  ========================================================= */
+
+  $("copyAccount").onclick =
+    async () => {
+
+      try {
+
+        await navigator.clipboard.writeText(
+          PAYMENT_ACCOUNT_NUMBER
+        );
+
+        toast(
+          "Account number copied.",
+          "success"
+        );
+
+      } catch {
+
+        toast(
+          "Unable to copy account number.",
+          "error"
+        );
+
+      }
+
+    };
+
+
+  /* =========================================================
+     FUND WALLET
+  ========================================================= */
+
+  $("addFundsButton").onclick =
+    () => {
+
+      $("fundModal")
+        .classList.add("show");
+
+      icons();
+
+    };
+
+
+  $("fundForm").addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      const amount =
+        Number(
+          $("fundAmount").value
+        );
+
+
+      if (
+        !amount ||
+        amount < 100
+      ) {
+
+        toast(
+          "Minimum funding amount is ₦100.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const button =
+        event.submitter;
+
+      button.disabled = true;
+
+      button.textContent =
+        "Submitting...";
+
+
+      const {
+        error
+      } =
+        await db
+          .from("transactions")
+          .insert({
+
+            user_id:
+              currentUser.id,
+
+            type:
+              "wallet funding",
+
+            amount:
+              amount,
+
+            status:
+              "pending"
+
+          });
+
+
+      button.disabled = false;
+
+      button.textContent =
+        "Submit Funding";
+
+
+      if (error) {
+
+        toast(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      $("fundModal")
+        .classList.remove("show");
+
+      $("fundForm").reset();
+
+
+      toast(
+        "Funding request submitted.",
+        "success"
+      );
+
+
+      loadTransactions();
 
     }
   );
 
 
-/* =====================================================
-   STATUS BADGE
-===================================================== */
+  /* =========================================================
+     BUY SOCIAL MEDIA
+  ========================================================= */
 
-function statusBadge(status){
+  $("buySocial").onclick =
+    () => {
 
-  const value =
-    String(
-      status ||
-      "pending"
-    );
+      $("orderModal")
+        .classList.add("show");
 
+      icons();
 
-  const lower =
-    value.toLowerCase();
+    };
 
 
-  let className =
-    "status-pending";
+  $("orderForm").addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
 
 
-  if(
-    lower.includes("completed") ||
-    lower.includes("success")
-  ){
+      const service =
+        $("service").value;
 
-    className =
-      "status-completed";
+      const packageValue =
+        $("package").value.trim();
 
-  }
-  else if(
-    lower.includes("failed") ||
-    lower.includes("cancel")
-  ){
+      const accountLink =
+        $("accountLink").value.trim();
 
-    className =
-      "status-failed";
-
-  }
-  else if(
-    lower.includes("processing")
-  ){
-
-    className =
-      "status-processing";
-
-  }
+      const instructions =
+        $("instructions").value.trim();
 
 
-  return `
-    <span class="status ${className}">
-      ${escapeHTML(value)}
-    </span>
-  `;
+      const button =
+        event.submitter;
 
-}
+      button.disabled = true;
 
-
-/* =====================================================
-   HELPERS
-===================================================== */
-
-function escapeHTML(value){
-
-  if(
-    value === null ||
-    value === undefined
-  ){
-
-    return "";
-
-  }
+      button.textContent =
+        "Placing order...";
 
 
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+      const {
+        error
+      } =
+        await db
+          .from("orders")
+          .insert({
 
-}
+            user_id:
+              currentUser.id,
+
+            service:
+              service,
+
+            package:
+              packageValue,
+
+            account_link:
+              accountLink,
+
+            instructions:
+              instructions,
+
+            status:
+              "pending"
+
+          });
 
 
-function formatDate(date){
+      button.disabled = false;
 
-  if(!date){
-    return "-";
-  }
+      button.textContent =
+        "Place Order";
 
 
-  return new Date(
-    date
-  ).toLocaleString(
-    "en-NG"
+      if (error) {
+
+        toast(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      $("orderModal")
+        .classList.remove("show");
+
+
+      $("orderForm").reset();
+
+
+      toast(
+        "Order placed successfully.",
+        "success"
+      );
+
+
+      await loadRecentActivity();
+
+    }
   );
 
-}
+
+  /* =========================================================
+     WHATSAPP
+  ========================================================= */
+
+  $("whatsappButton").onclick =
+    () => {
+
+      if (
+        !WHATSAPP_NUMBER ||
+        WHATSAPP_NUMBER.includes(
+          "YOUR_"
+        )
+      ) {
+
+        toast(
+          "Add your WhatsApp number in the code.",
+          "error"
+        );
+
+        return;
+      }
 
 
-/* =====================================================
-   START
-===================================================== */
+      const message =
+        encodeURIComponent(
+          "Hello Boostlane Support, I need help with my account."
+        );
 
-checkSession();
+
+      window.open(
+        "https://wa.me/" +
+        WHATSAPP_NUMBER +
+        "?text=" +
+        message,
+        "_blank"
+      );
+
+    };
+
+
+  /* =========================================================
+     CLOSE MODALS
+  ========================================================= */
+
+  document
+    .querySelectorAll("[data-close]")
+    .forEach(button => {
+
+      button.onclick =
+        () => {
+
+          const modal =
+            $(button.dataset.close);
+
+          if (modal) {
+
+            modal.classList.remove(
+              "show"
+            );
+
+          }
+
+        };
+
+    });
+
+
+  document
+    .querySelectorAll(".modal")
+    .forEach(modal => {
+
+      modal.addEventListener(
+        "click",
+        event => {
+
+          if (
+            event.target === modal
+          ) {
+
+            modal.classList.remove(
+              "show"
+            );
+
+          }
+
+        }
+      );
+
+    });
+
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  $("logoutButton").onclick =
+    async () => {
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      currentProfile = null;
+
+      showAuth();
+
+    };
+
+
+  /* =========================================================
+     LAUNCH DASHBOARD
+  ========================================================= */
+
+  async function launchDashboard() {
+
+    showApp();
+
+    await loadProfile();
+
+    await loadWallet();
+
+    await loadRecentActivity();
+
+    icons();
+
+  }
+
+
+  /* =========================================================
+     AUTH STATE
+  ========================================================= */
+
+  db.auth.onAuthStateChange(
+    (event, session) => {
+
+      if (session?.user) {
+
+        currentUser =
+          session.user;
+
+      } else {
+
+        currentUser = null;
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     INITIALIZE
+  ========================================================= */
+
+  async function initialize() {
+
+    try {
+
+      const {
+        data,
+        error
+      } =
+        await db.auth.getSession();
+
+
+      if (error) {
+
+        console.error(error);
+
+        showAuth();
+
+        return;
+      }
+
+
+      if (data.session?.user) {
+
+        currentUser =
+          data.session.user;
+
+        await launchDashboard();
+
+      } else {
+
+        showAuth();
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      showAuth();
+
+    }
+
+  }
+
+
+  initialize();
+
+  icons();
 
 </script>
 
