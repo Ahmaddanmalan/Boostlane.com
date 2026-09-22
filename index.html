@@ -1,3781 +1,2350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Boostlane | Your growth starts here</title>
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #4f46e5;
-      --primary-dark: #4338ca;
-      --purple: #6366f1;
-      --text: #172554;
-      --muted: #64748b;
-      --bg: #f7f9ff;
-      --white: #ffffff;
-      --border: #e8eaff;
-      --success: #16a34a;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --shadow: 0 10px 35px rgba(79, 70, 229, 0.08);
-    }
-
-    body {
-      font-family:
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    /* =========================
-       LOADING
-    ========================= */
-
-    #loadingScreen {
-      position: fixed;
-      inset: 0;
-      background: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    .loader {
-      width: 45px;
-      height: 45px;
-      border: 4px solid #e0e7ff;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* =========================
-       AUTH
-    ========================= */
-
-    #authScreen {
-      min-height: 100vh;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
-      background:
-        radial-gradient(circle at top left, #e0e7ff, transparent 35%),
-        #f7f9ff;
-    }
-
-    .auth-box {
-      width: 100%;
-      max-width: 450px;
-      background: white;
-      padding: 40px;
-      border-radius: 28px;
-      box-shadow: 0 25px 70px rgba(30, 41, 59, 0.12);
-    }
-
-    .auth-logo {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    .auth-logo-icon {
-      width: 65px;
-      height: 65px;
-      border-radius: 18px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-    }
-
-    .auth-logo h1 {
-      margin-top: 15px;
-      font-size: 30px;
-    }
-
-    .auth-logo h1 span {
-      color: #6366f1;
-    }
-
-    .auth-logo p {
-      color: var(--muted);
-      margin-top: 5px;
-    }
-
-    .auth-title {
-      font-size: 25px;
-      margin-bottom: 8px;
-    }
-
-    .auth-description {
-      color: var(--muted);
-      margin-bottom: 25px;
-    }
-
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 17px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .input-group input,
-    .input-group select,
-    .input-group textarea {
-      width: 100%;
-      padding: 14px 15px;
-      border: 1px solid #dfe3f0;
-      border-radius: 12px;
-      outline: none;
-      background: #fbfcff;
-      color: var(--text);
-      transition: 0.2s;
-    }
-
-    .input-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .input-group input:focus,
-    .input-group select:focus,
-    .input-group textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
-    }
-
-    .primary-btn {
-      width: 100%;
-      border: none;
-      padding: 15px;
-      border-radius: 12px;
-      color: white;
-      font-weight: 700;
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      transition: 0.2s;
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
-    }
-
-    .auth-switch {
-      text-align: center;
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .auth-switch button {
-      border: none;
-      background: none;
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    .forgot-btn {
-      border: none;
-      background: none;
-      color: var(--primary);
-      font-size: 13px;
-      align-self: flex-end;
-      margin-top: -8px;
-    }
-
-    /* =========================
-       APP
-    ========================= */
-
-    #app {
-      display: none;
-      min-height: 100vh;
-    }
-
-    .topbar {
-      height: 118px;
-      background: white;
-      border-bottom: 1px solid #edf0f8;
-      display: flex;
-      align-items: center;
-      padding: 0 30px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-    }
-
-    .menu-btn {
-      width: 72px;
-      height: 72px;
-      border: none;
-      border-radius: 17px;
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 55px;
-      box-shadow: 0 8px 22px rgba(79, 70, 229, 0.2);
-    }
-
-    .menu-btn svg {
-      width: 29px;
-      height: 29px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-icon {
-      color: var(--primary);
-      width: 50px;
-      height: 50px;
-    }
-
-    .brand-name {
-      font-size: 37px;
-      line-height: 1;
-      font-weight: 800;
-      color: #172554;
-    }
-
-    .brand-name span {
-      color: #5b5bf0;
-    }
-
-    .brand-tagline {
-      color: #7c89aa;
-      font-size: 17px;
-      margin-top: 5px;
-    }
-
-    .user-area {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #4f46e5, #6d4ff5);
-      font-size: 21px;
-      font-weight: 700;
-    }
-
-    .user-name {
-      max-width: 160px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* =========================
-       SIDEBAR
-    ========================= */
-
-    .sidebar {
-      position: fixed;
-      top: 118px;
-      left: 0;
-      bottom: 0;
-      width: 270px;
-      background: linear-gradient(180deg, #f7f9ff, #f2f5ff);
-      border-right: 1px solid #e8ecf8;
-      padding: 38px 20px;
-      z-index: 900;
-      transition: 0.3s;
-    }
-
-    .nav-list {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-    }
-
-    .nav-btn {
-      width: 100%;
-      border: none;
-      background: transparent;
-      color: #172554;
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      padding: 20px 25px;
-      border-radius: 11px;
-      font-size: 20px;
-      font-weight: 600;
-      text-align: left;
-      transition: 0.2s;
-    }
-
-    .nav-btn svg {
-      width: 30px;
-      height: 30px;
-    }
-
-    .nav-btn:hover {
-      background: #eef0ff;
-      color: var(--primary);
-    }
-
-    .nav-btn.active {
-      background: #e9e8ff;
-      color: var(--primary);
-    }
-
-    .logout-nav {
-      margin-top: 20px;
-      color: #172554;
-    }
-
-    /* =========================
-       MAIN
-    ========================= */
-
-    .main {
-      margin-left: 270px;
-      padding: 160px 38px 70px;
-      min-height: 100vh;
-    }
-
-    .content {
-      max-width: 970px;
-      margin: 0 auto;
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    .page-title {
-      font-size: 38px;
-      line-height: 1.2;
-      font-weight: 800;
-      margin-bottom: 7px;
-    }
-
-    .welcome {
-      font-size: 26px;
-      color: #64748b;
-      margin-bottom: 42px;
-    }
-
-    /* =========================
-       WALLET
-    ========================= */
-
-    .wallet-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 22px;
-      padding: 30px;
-      color: white;
-      min-height: 430px;
-      background:
-        radial-gradient(circle at 90% 15%, rgba(255,255,255,0.12), transparent 30%),
-        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08), transparent 35%),
-        linear-gradient(135deg, #5845ed, #5147f6 55%, #4746df);
-      box-shadow: 0 18px 40px rgba(79, 70, 229, 0.18);
-    }
-
-    .wallet-card::before {
-      content: "";
-      position: absolute;
-      width: 550px;
-      height: 550px;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 50%;
-      right: -200px;
-      top: -280px;
-    }
-
-    .wallet-card::after {
-      content: "";
-      position: absolute;
-      width: 450px;
-      height: 450px;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 50%;
-      right: -120px;
-      top: -180px;
-    }
-
-    .wallet-header,
-    .wallet-content,
-    .bank-section {
-      position: relative;
-      z-index: 2;
-    }
-
-    .wallet-header {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      font-size: 23px;
-      font-weight: 700;
-    }
-
-    .wallet-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba(255,255,255,0.27);
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .wallet-icon svg {
-      width: 31px;
-      height: 31px;
-    }
-
-    .wallet-content {
-      margin-top: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 25px;
-    }
-
-    .balance-label {
-      font-size: 18px;
-      letter-spacing: 0.5px;
-      opacity: 0.9;
-    }
-
-    .balance {
-      font-size: 43px;
-      font-weight: 800;
-      margin-top: 10px;
-    }
-
-    .fund-btn {
-      border: none;
-      background: white;
-      color: var(--primary);
-      padding: 17px 25px;
-      border-radius: 17px;
-      font-weight: 700;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .bank-section {
-      margin-top: 28px;
-      padding-top: 28px;
-      border-top: 1px solid rgba(255,255,255,0.25);
-    }
-
-    .bank-title {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    .bank-details {
-      margin-left: 47px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      font-size: 17px;
-    }
-
-    .bank-details strong {
-      font-weight: 800;
-    }
-
-    .account-number-row {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      flex-wrap: wrap;
-    }
-
-    .copy-btn {
-      border: 1px solid rgba(255,255,255,0.4);
-      color: white;
-      background: transparent;
-      padding: 8px 13px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    /* =========================
-       QUICK ACTIONS
-    ========================= */
-
-    .white-card {
-      background: white;
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      margin-top: 45px;
-      padding: 30px;
-    }
-
-    .section-title {
-      font-size: 25px;
-      font-weight: 800;
-      margin-bottom: 30px;
-    }
-
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 25px;
-    }
-
-    .quick-action {
-      border: none;
-      background: transparent;
-      text-align: center;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 16px;
-    }
-
-    .quick-icon {
-      width: 82px;
-      height: 82px;
-      border-radius: 18px;
-      margin: auto auto 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .quick-icon svg {
-      width: 37px;
-      height: 37px;
-    }
-
-    .purple-icon {
-      background: #efedff;
-      color: #5b4ff0;
-    }
-
-    .green-icon {
-      background: #e9fbf0;
-      color: #16b65a;
-    }
-
-    .blue-icon {
-      background: #e9f5ff;
-      color: #1683df;
-    }
-
-    .red-icon {
-      background: #fff0f2;
-      color: #ef4e61;
-    }
-
-    /* =========================
-       ACTIVITY
-    ========================= */
-
-    .activity-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .view-all {
-      color: #5b4ff0;
-      font-weight: 600;
-      border: none;
-      background: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .empty-state {
-      min-height: 250px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #7c89aa;
-    }
-
-    .empty-icon {
-      width: 80px;
-      height: 80px;
-      color: #d3d5f8;
-      margin-bottom: 18px;
-    }
-
-    .empty-state h3 {
-      color: var(--text);
-      font-size: 20px;
-      margin-bottom: 9px;
-    }
-
-    .empty-state p {
-      max-width: 430px;
-      line-height: 1.6;
-    }
-
-    /* =========================
-       LISTS / TABLES
-    ========================= */
-
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .list-item {
-      padding: 18px;
-      border: 1px solid #edf0f7;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .list-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .list-icon {
-      width: 45px;
-      height: 45px;
-      border-radius: 12px;
-      background: #efedff;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .list-title {
-      font-weight: 700;
-    }
-
-    .list-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .status {
-      padding: 6px 11px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: capitalize;
-    }
-
-    .status.pending {
-      background: #fff7df;
-      color: #b77900;
-    }
-
-    .status.completed,
-    .status.success {
-      background: #e8faef;
-      color: #15803d;
-    }
-
-    .status.processing {
-      background: #e9f4ff;
-      color: #1671c5;
-    }
-
-    .status.cancelled,
-    .status.failed {
-      background: #fff0f0;
-      color: #dc2626;
-    }
-
-    /* =========================
-       ACCOUNT
-    ========================= */
-
-    .account-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .account-box {
-      padding: 22px;
-      background: #fafbff;
-      border: 1px solid #edf0f7;
-      border-radius: 16px;
-    }
-
-    .account-label {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .account-value {
-      font-weight: 700;
-      word-break: break-word;
-    }
-
-    /* =========================
-       MODAL
-    ========================= */
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.55);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 5000;
-    }
-
-    .modal-overlay.show {
-      display: flex;
-    }
-
-    .modal {
-      background: white;
-      width: 100%;
-      max-width: 520px;
-      max-height: 90vh;
-      overflow-y: auto;
-      border-radius: 22px;
-      padding: 30px;
-      box-shadow: 0 25px 70px rgba(15,23,42,0.25);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .modal-header h2 {
-      font-size: 24px;
-    }
-
-    .close-btn {
-      border: none;
-      background: #f1f3f9;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-form {
-      display: flex;
-      flex-direction: column;
-      gap: 17px;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 5px;
-    }
-
-    .secondary-btn {
-      flex: 1;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      background: #eef0f6;
-      color: #334155;
-      font-weight: 700;
-    }
-
-    .modal-buttons .primary-btn {
-      flex: 1;
-    }
-
-    /* =========================
-       TOAST
-    ========================= */
-
-    #toast {
-      position: fixed;
-      right: 25px;
-      bottom: 25px;
-      background: #172554;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(15,23,42,.2);
-      transform: translateY(120px);
-      opacity: 0;
-      transition: .3s;
-      z-index: 9999;
-      max-width: 360px;
-    }
-
-    #toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    #toast.success {
-      background: #15803d;
-    }
-
-    #toast.error {
-      background: #dc2626;
-    }
-
-    /* =========================
-       FOOTER
-    ========================= */
-
-    .footer {
-      margin-top: 100px;
-      border-top: 1px solid #dfe4f2;
-      padding: 30px;
-      text-align: center;
-      color: #7c89aa;
-    }
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media (max-width: 850px) {
-
-      .topbar {
-        height: 85px;
-        padding: 0 15px;
-      }
-
-      .menu-btn {
-        width: 55px;
-        height: 55px;
-        margin-right: 15px;
-      }
-
-      .brand-icon {
-        width: 38px;
-        height: 38px;
-      }
-
-      .brand-name {
-        font-size: 25px;
-      }
-
-      .brand-tagline {
-        font-size: 11px;
-      }
-
-      .user-area {
-        gap: 7px;
-        font-size: 14px;
-      }
-
-      .avatar {
-        width: 43px;
-        height: 43px;
-      }
-
-      .user-name {
-        display: none;
-      }
-
-      .sidebar {
-        top: 85px;
-        width: 270px;
-        transform: translateX(-100%);
-        box-shadow: 10px 0 30px rgba(15,23,42,.1);
-      }
-
-      .sidebar.open {
-        transform: translateX(0);
-      }
-
-      .main {
-        margin-left: 0;
-        padding: 115px 15px 50px;
-      }
-
-      .page-title {
-        font-size: 31px;
-      }
-
-      .welcome {
-        font-size: 20px;
-        margin-bottom: 25px;
-      }
-
-      .wallet-card {
-        padding: 22px;
-        min-height: auto;
-      }
-
-      .wallet-content {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .balance {
-        font-size: 37px;
-      }
-
-      .fund-btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .bank-details {
-        margin-left: 0;
-      }
-
-      .quick-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 25px 10px;
-      }
-
-      .white-card {
-        padding: 22px;
-        margin-top: 25px;
-      }
-
-      .account-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .footer {
-        margin-top: 60px;
-      }
-    }
-
-    @media (max-width: 450px) {
-
-      .brand-icon {
-        display: none;
-      }
-
-      .brand-name {
-        font-size: 22px;
-      }
-
-      .brand-tagline {
-        font-size: 10px;
-      }
-
-      .wallet-card {
-        border-radius: 18px;
-      }
-
-      .wallet-header {
-        font-size: 18px;
-      }
-
-      .wallet-icon {
-        width: 48px;
-        height: 48px;
-      }
-
-      .balance {
-        font-size: 32px;
-      }
-
-      .quick-icon {
-        width: 67px;
-        height: 67px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Boostlane Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:#f7f9fc;
+  color:#172554;
+}
+
+/* ================= LOGIN ================= */
+
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(135deg,#111827,#2563eb);
+}
+
+.login-box{
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:35px 25px;
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  font-size:30px;
+  font-weight:800;
+  color:#4f46e5;
+  margin-bottom:8px;
+}
+
+.login-title{
+  text-align:center;
+  color:#374151;
+  margin-bottom:25px;
+}
+
+.login-box input{
+  width:100%;
+  padding:15px;
+  margin-bottom:15px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  outline:none;
+  font-size:15px;
+}
+
+.login-box input:focus{
+  border-color:#4f46e5;
+}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:14px 18px;
+  font-weight:bold;
+  color:white;
+  background:#4f46e5;
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:#4338ca;
+}
+
+.btn:disabled{
+  opacity:.7;
+  cursor:not-allowed;
+}
+
+.full-btn{
+  width:100%;
+}
+
+.message{
+  text-align:center;
+  font-size:14px;
+  margin-bottom:15px;
+}
+
+.error{
+  color:#dc2626;
+}
+
+.success{
+  color:#16a34a;
+}
+
+/* ================= ADMIN APP ================= */
+
+#adminApp{
+  display:none;
+  min-height:100vh;
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+  height:70px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+  border-bottom:1px solid #e5e7eb;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.menu-btn{
+  width:50px;
+  height:50px;
+  border:0;
+  border-radius:14px;
+  background:#4f46e5;
+  color:white;
+  font-size:25px;
+  cursor:pointer;
+  display:none;
+}
+
+.topbar-logo{
+  font-size:23px;
+  font-weight:800;
+  color:#4f46e5;
+}
+
+.topbar-logo span{
+  color:#172554;
+}
+
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.admin-label{
+  color:#64748b;
+  font-size:14px;
+}
+
+.logout-top{
+  border:0;
+  background:#ef4444;
+  color:white;
+  padding:10px 16px;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+  position:fixed;
+  top:70px;
+  left:0;
+  bottom:0;
+  width:255px;
+  background:linear-gradient(180deg,#dbeafe,#c7d9f7);
+  padding:22px 12px;
+  z-index:900;
+  overflow-y:auto;
+  transition:.3s ease;
+}
+
+.sidebar-title{
+  padding:8px 14px 18px;
+  color:#4f46e5;
+  font-size:13px;
+  font-weight:bold;
+  text-transform:uppercase;
+}
+
+.nav-btn{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#475569;
+  text-align:left;
+  padding:15px 18px;
+  border-radius:12px;
+  margin-bottom:7px;
+  font-size:16px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.nav-btn:hover{
+  background:rgba(255,255,255,.55);
+  color:#4338ca;
+}
+
+.nav-btn.active{
+  background:rgba(255,255,255,.55);
+  color:#4338ca;
+  font-weight:bold;
+  border-left:5px solid #4f46e5;
+}
+
+.nav-icon{
+  display:inline-block;
+  width:32px;
+  font-size:20px;
+}
+
+.sidebar-bottom{
+  margin-top:25px;
+  padding-top:15px;
+  border-top:1px solid rgba(71,85,105,.15);
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+  margin-left:255px;
+  padding:100px 30px 30px;
+  min-height:100vh;
+  transition:.3s ease;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-title{
+  font-size:30px;
+  font-weight:800;
+  margin-bottom:25px;
+  color:#172554;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-bottom:25px;
+}
+
+.stat-card{
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 4px 20px rgba(15,23,42,.06);
+  border:1px solid #eef2f7;
+}
+
+.stat-label{
+  color:#64748b;
+  font-size:14px;
+  margin-bottom:10px;
+}
+
+.stat-value{
+  font-size:28px;
+  font-weight:800;
+  color:#172554;
+}
+
+/* ================= PANELS ================= */
+
+.panel{
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:25px;
+  box-shadow:0 4px 20px rgba(15,23,42,.06);
+  border:1px solid #eef2f7;
+}
+
+.panel-title{
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:18px;
+  color:#172554;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrapper{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th{
+  text-align:left;
+  padding:14px;
+  background:#f8fafc;
+  color:#475569;
+  font-size:13px;
+}
+
+td{
+  padding:14px;
+  border-bottom:1px solid #eef2f7;
+  font-size:14px;
+  color:#334155;
+}
+
+tr:hover td{
+  background:#fafcff;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.status-pending{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.status-completed{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.status-failed{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.status-processing{
+  background:#dbeafe;
+  color:#1e40af;
+}
+
+/* ================= SEARCH ================= */
+
+.search-box{
+  width:100%;
+  max-width:400px;
+  padding:13px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  outline:none;
+  margin-bottom:18px;
+}
+
+.search-box:focus{
+  border-color:#4f46e5;
+}
+
+/* ================= EMPTY PAGES ================= */
+
+.empty-box{
+  text-align:center;
+  padding:60px 20px;
+  color:#64748b;
+}
+
+.empty-icon{
+  font-size:50px;
+  margin-bottom:15px;
+}
+
+/* ================= OVERLAY ================= */
+
+.sidebar-overlay{
+  display:none;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:1000px){
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:700px){
+
+  .topbar{
+    height:70px;
+    padding:0 15px;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
+  .topbar-logo{
+    font-size:19px;
+  }
+
+  .admin-label{
+    display:none;
+  }
+
+  .logout-top{
+    padding:9px 12px;
+    font-size:12px;
+  }
+
+  .sidebar{
+    top:70px;
+    width:280px;
+    left:-300px;
+    box-shadow:10px 0 30px rgba(0,0,0,.15);
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .sidebar-overlay{
+    position:fixed;
+    top:70px;
+    left:0;
+    right:0;
+    bottom:0;
+    background:rgba(0,0,0,.35);
+    z-index:800;
+  }
+
+  .sidebar-overlay.show{
+    display:block;
+  }
+
+  .content{
+    margin-left:0;
+    padding:95px 15px 25px;
+  }
+
+  .page-title{
+    font-size:25px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .stat-card{
+    padding:16px;
+  }
+
+  .stat-value{
+    font-size:21px;
+  }
+
+  .panel{
+    padding:16px;
+  }
+
+}
+
+/* ================= SMALL PHONE ================= */
+
+@media(max-width:420px){
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .stat-label{
+    font-size:12px;
+  }
+
+  .stat-value{
+    font-size:19px;
+  }
+
+  .topbar-logo{
+    font-size:17px;
+  }
+
+  .menu-btn{
+    width:46px;
+    height:46px;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
-  <!-- =========================
-       LOADING
-  ========================== -->
+<!-- =====================================================
+     LOGIN
+===================================================== -->
 
-  <div id="loadingScreen">
-    <div class="loader"></div>
-  </div>
+<div id="loginScreen">
 
+  <div class="login-box">
 
-  <!-- =========================
-       AUTH SCREEN
-  ========================== -->
-
-  <section id="authScreen">
-
-    <div class="auth-box">
-
-      <div class="auth-logo">
-
-        <div class="auth-logo-icon">
-          <i data-lucide="bar-chart-3"></i>
-        </div>
-
-        <h1>
-          Boost<span>lane</span>
-        </h1>
-
-        <p>Your growth starts here</p>
-
-      </div>
-
-
-      <!-- LOGIN -->
-
-      <div id="loginFormBox">
-
-        <h2 class="auth-title">
-          Welcome Back
-        </h2>
-
-        <p class="auth-description">
-          Login to continue to your Boostlane account.
-        </p>
-
-        <form id="loginForm" class="auth-form">
-
-          <div class="input-group">
-            <label>Email</label>
-            <input
-              id="loginEmail"
-              type="email"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>Password</label>
-            <input
-              id="loginPassword"
-              type="password"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button
-            type="button"
-            class="forgot-btn"
-            id="forgotPasswordBtn"
-          >
-            Forgot password?
-          </button>
-
-          <button
-            type="submit"
-            class="primary-btn"
-          >
-            Login
-          </button>
-
-        </form>
-
-        <div class="auth-switch">
-          Don't have an account?
-          <button id="showSignup">
-            Register here
-          </button>
-        </div>
-
-      </div>
-
-
-      <!-- SIGNUP -->
-
-      <div id="signupFormBox" style="display:none;">
-
-        <h2 class="auth-title">
-          Create Account
-        </h2>
-
-        <p class="auth-description">
-          Start growing your social media today.
-        </p>
-
-        <form id="signupForm" class="auth-form">
-
-          <div class="input-group">
-            <label>Full Name</label>
-            <input
-              id="signupName"
-              type="text"
-              placeholder="Your full name"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>Phone Number</label>
-            <input
-              id="signupPhone"
-              type="tel"
-              placeholder="08012345678"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>Email</label>
-            <input
-              id="signupEmail"
-              type="email"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>Password</label>
-            <input
-              id="signupPassword"
-              type="password"
-              placeholder="Minimum 6 characters"
-              minlength="6"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>Confirm Password</label>
-            <input
-              id="signupConfirm"
-              type="password"
-              placeholder="Repeat password"
-              minlength="6"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            class="primary-btn"
-          >
-            Create Account
-          </button>
-
-        </form>
-
-        <div class="auth-switch">
-          Already have an account?
-          <button id="showLogin">
-            Login
-          </button>
-        </div>
-
-      </div>
-
+    <div class="logo">
+      🚀 Boostlane
     </div>
 
-  </section>
+    <h2 class="login-title">
+      Admin Dashboard
+    </h2>
+
+    <div id="loginMessage" class="message"></div>
+
+    <input
+      type="email"
+      id="adminEmail"
+      placeholder="Admin Email"
+      autocomplete="email"
+    >
+
+    <input
+      type="password"
+      id="adminPassword"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+    <button
+      type="button"
+      class="btn full-btn"
+      id="adminLoginBtn"
+    >
+      Login
+    </button>
+
+  </div>
+
+</div>
 
 
-  <!-- =========================
-       APP
-  ========================== -->
+<!-- =====================================================
+     ADMIN APPLICATION
+===================================================== -->
 
-  <section id="app">
+<div id="adminApp">
 
-    <!-- TOPBAR -->
+  <!-- TOP BAR -->
 
-    <header class="topbar">
+  <div class="topbar">
+
+    <div class="topbar-left">
 
       <button
         class="menu-btn"
         id="menuBtn"
+        type="button"
       >
-        <i data-lucide="menu"></i>
+        ☰
       </button>
 
-      <div class="brand">
-
-        <i
-          data-lucide="bar-chart-3"
-          class="brand-icon"
-        ></i>
-
-        <div>
-          <div class="brand-name">
-            Boost<span>lane</span>
-          </div>
-
-          <div class="brand-tagline">
-            Your growth starts here
-          </div>
-        </div>
-
+      <div class="topbar-logo">
+        🚀 Boost<span>lane</span> Admin
       </div>
 
+    </div>
 
-      <div class="user-area">
+    <div class="topbar-right">
 
-        <div
-          class="avatar"
-          id="avatar"
-        >
-          A
-        </div>
+      <span
+        class="admin-label"
+        id="adminEmailDisplay"
+      >
+        Admin
+      </span>
 
-        <span
-          class="user-name"
-          id="topUserName"
-        >
-          Customer
-        </span>
+      <button
+        class="logout-top"
+        id="topLogoutBtn"
+        type="button"
+      >
+        Logout
+      </button>
 
-        <i data-lucide="chevron-down"></i>
+    </div>
 
-      </div>
-
-    </header>
+  </div>
 
 
-    <!-- SIDEBAR -->
+  <!-- SIDEBAR OVERLAY -->
 
-    <aside
-      class="sidebar"
-      id="sidebar"
+  <div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+  ></div>
+
+
+  <!-- SIDEBAR -->
+
+  <aside
+    class="sidebar"
+    id="sidebar"
+  >
+
+    <div class="sidebar-title">
+      Admin Panel
+    </div>
+
+    <button
+      class="nav-btn active"
+      data-page="dashboard"
+    >
+      <span class="nav-icon">📊</span>
+      Dashboard
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="customers"
+    >
+      <span class="nav-icon">👥</span>
+      Users
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="orders"
+    >
+      <span class="nav-icon">📋</span>
+      Orders
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="transactions"
+    >
+      <span class="nav-icon">💳</span>
+      Transactions
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="apiServices"
+    >
+      <span class="nav-icon">🌐</span>
+      API Services
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="tickets"
+    >
+      <span class="nav-icon">🎫</span>
+      Tickets
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="settings"
+    >
+      <span class="nav-icon">⚙️</span>
+      Settings
+    </button>
+
+    <div class="sidebar-bottom">
+
+      <button
+        class="nav-btn"
+        id="sideLogoutBtn"
+        type="button"
+      >
+        <span class="nav-icon">🚪</span>
+        Logout
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- CONTENT -->
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+
+    <section
+      class="page active"
+      id="dashboard"
     >
 
-      <nav class="nav-list">
+      <h1 class="page-title">
+        Dashboard
+      </h1>
 
-        <button
-          class="nav-btn active"
-          data-page="dashboard"
-        >
-          <i data-lucide="layout-dashboard"></i>
-          Dashboard
-        </button>
+      <div class="stats">
 
-        <button
-          class="nav-btn"
-          data-page="orders"
-        >
-          <i data-lucide="clipboard-list"></i>
-          Orders
-        </button>
-
-        <button
-          class="nav-btn"
-          data-page="transactions"
-        >
-          <i data-lucide="credit-card"></i>
-          Transactions
-        </button>
-
-        <button
-          class="nav-btn"
-          data-page="support"
-        >
-          <i data-lucide="headphones"></i>
-          Support
-        </button>
-
-        <button
-          class="nav-btn"
-          data-page="account"
-        >
-          <i data-lucide="user"></i>
-          Account
-        </button>
-
-        <button
-          class="nav-btn logout-nav"
-          id="logoutBtn"
-        >
-          <i data-lucide="log-out"></i>
-          Logout
-        </button>
-
-      </nav>
-
-    </aside>
-
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-      <div class="content">
-
-
-        <!-- =========================
-             DASHBOARD
-        ========================== -->
-
-        <section
-          id="dashboardPage"
-          class="page active"
-        >
-
-          <h1 class="page-title">
-            Dashboard
-          </h1>
-
-          <p class="welcome">
-            Welcome back,
-            <strong id="welcomeName">
-              Customer
-            </strong>!
-          </p>
-
-
-          <!-- WALLET -->
-
-          <div class="wallet-card">
-
-            <div class="wallet-header">
-
-              <div class="wallet-icon">
-                <i data-lucide="wallet"></i>
-              </div>
-
-              <span>
-                Fund Wallet
-              </span>
-
-            </div>
-
-
-            <div class="wallet-content">
-
-              <div>
-
-                <div class="balance-label">
-                  YOUR BALANCE
-                </div>
-
-                <div class="balance">
-                  ₦<span id="balance">
-                    0.00
-                  </span>
-                </div>
-
-              </div>
-
-
-              <button
-                class="fund-btn"
-                id="fundWalletBtn"
-              >
-                <i data-lucide="circle-plus"></i>
-                Add Funds
-              </button>
-
-            </div>
-
-
-            <div class="bank-section">
-
-              <div class="bank-title">
-
-                <i data-lucide="wallet"></i>
-
-                KatPay Account
-
-              </div>
-
-              <div class="bank-details">
-
-                <div>
-                  <strong>Bank:</strong>
-                  <span id="bankName">
-                    PalmPay
-                  </span>
-                </div>
-
-                <div class="account-number-row">
-
-                  <div>
-                    <strong>Account Number:</strong>
-                    <span id="bankAccountNumber">
-                      0000000000
-                    </span>
-                  </div>
-
-                  <button
-                    class="copy-btn"
-                    id="copyAccountBtn"
-                  >
-                    <i data-lucide="copy"></i>
-                    Copy
-                  </button>
-
-                </div>
-
-                <div>
-                  <strong>Account Name:</strong>
-                  <span id="bankAccountName">
-                    Boostlane Customer
-                  </span>
-                </div>
-
-              </div>
-
-            </div>
-
+        <div class="stat-card">
+          <div class="stat-label">
+            Total Customers
           </div>
 
-
-          <!-- QUICK ACTIONS -->
-
-          <div class="white-card">
-
-            <h2 class="section-title">
-              Quick Actions
-            </h2>
-
-            <div class="quick-grid">
-
-              <button
-                class="quick-action"
-                id="buySocialBtn"
-              >
-
-                <div class="quick-icon purple-icon">
-                  <i data-lucide="send"></i>
-                </div>
-
-                Buy
-                <br>
-                Social Media
-
-              </button>
-
-
-              <button
-                class="quick-action"
-                data-page-action="orders"
-              >
-
-                <div class="quick-icon green-icon">
-                  <i data-lucide="list"></i>
-                </div>
-
-                View
-                <br>
-                Orders
-
-              </button>
-
-
-              <button
-                class="quick-action"
-                data-page-action="transactions"
-              >
-
-                <div class="quick-icon blue-icon">
-                  <i data-lucide="wallet-cards"></i>
-                </div>
-
-                Transactions
-
-              </button>
-
-
-              <button
-                class="quick-action"
-                data-page-action="support"
-              >
-
-                <div class="quick-icon red-icon">
-                  <i data-lucide="headphones"></i>
-                </div>
-
-                Support
-
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- RECENT ACTIVITY -->
-
-          <div class="white-card">
-
-            <div class="activity-header">
-
-              <h2 class="section-title">
-                Recent Activity
-              </h2>
-
-              <button
-                class="view-all"
-                data-page-action="orders"
-              >
-                View All
-                <i data-lucide="chevron-right"></i>
-              </button>
-
-            </div>
-
-            <div
-              id="recentActivity"
-              class="empty-state"
-            >
-
-              <i
-                data-lucide="file-clock"
-                class="empty-icon"
-              ></i>
-
-              <h3>
-                No recent activity yet
-              </h3>
-
-              <p>
-                Your orders and transactions will appear here
-                once you start using our services.
-              </p>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- =========================
-             ORDERS
-        ========================== -->
-
-        <section
-          id="ordersPage"
-          class="page"
-        >
-
-          <h1 class="page-title">
-            Orders
-          </h1>
-
-          <p class="welcome">
-            View your social media orders.
-          </p>
-
-          <div class="white-card">
-
-            <div
-              id="ordersList"
-              class="list"
-            ></div>
-
-          </div>
-
-        </section>
-
-
-        <!-- =========================
-             TRANSACTIONS
-        ========================== -->
-
-        <section
-          id="transactionsPage"
-          class="page"
-        >
-
-          <h1 class="page-title">
-            Transactions
-          </h1>
-
-          <p class="welcome">
-            View your wallet transactions.
-          </p>
-
-          <div class="white-card">
-
-            <div
-              id="transactionsList"
-              class="list"
-            ></div>
-
-          </div>
-
-        </section>
-
-
-        <!-- =========================
-             SUPPORT
-        ========================== -->
-
-        <section
-          id="supportPage"
-          class="page"
-        >
-
-          <h1 class="page-title">
-            Support
-          </h1>
-
-          <p class="welcome">
-            We're here to help.
-          </p>
-
-          <div class="white-card">
-
-            <h2 class="section-title">
-              Need help?
-            </h2>
-
-            <p style="color:#64748b;line-height:1.7;margin-bottom:25px;">
-              If you have an issue with an order, wallet funding,
-              or your account, contact Boostlane support.
-            </p>
-
-            <button
-              class="primary-btn"
-              id="whatsappBtn"
-            >
-              <i data-lucide="message-circle"></i>
-              Contact Support on WhatsApp
-            </button>
-
-          </div>
-
-        </section>
-
-
-        <!-- =========================
-             ACCOUNT
-        ========================== -->
-
-        <section
-          id="accountPage"
-          class="page"
-        >
-
-          <h1 class="page-title">
-            My Account
-          </h1>
-
-          <p class="welcome">
-            Manage your account information.
-          </p>
-
-          <div class="white-card">
-
-            <div class="account-grid">
-
-              <div class="account-box">
-
-                <div class="account-label">
-                  Full Name
-                </div>
-
-                <div
-                  class="account-value"
-                  id="accountName"
-                >
-                  -
-                </div>
-
-              </div>
-
-
-              <div class="account-box">
-
-                <div class="account-label">
-                  Email
-                </div>
-
-                <div
-                  class="account-value"
-                  id="accountEmail"
-                >
-                  -
-                </div>
-
-              </div>
-
-
-              <div class="account-box">
-
-                <div class="account-label">
-                  Phone Number
-                </div>
-
-                <div
-                  class="account-value"
-                  id="accountPhone"
-                >
-                  -
-                </div>
-
-              </div>
-
-
-              <div class="account-box">
-
-                <div class="account-label">
-                  Account ID
-                </div>
-
-                <div
-                  class="account-value"
-                  id="accountId"
-                >
-                  -
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <footer class="footer">
-
-          Boostlane
-          <span style="margin:0 8px;">•</span>
-          Your growth starts here
-
-        </footer>
-
-      </div>
-
-    </main>
-
-  </section>
-
-
-  <!-- =========================
-       FUND WALLET MODAL
-  ========================== -->
-
-  <div
-    class="modal-overlay"
-    id="fundModal"
-  >
-
-    <div class="modal">
-
-      <div class="modal-header">
-
-        <h2>
-          Fund Wallet
-        </h2>
-
-        <button
-          class="close-btn"
-          data-close="fundModal"
-        >
-          <i data-lucide="x"></i>
-        </button>
-
-      </div>
-
-
-      <div style="background:#f5f6ff;padding:20px;border-radius:15px;margin-bottom:20px;">
-
-        <strong style="display:block;margin-bottom:12px;">
-          Make your transfer to:
-        </strong>
-
-        <div style="margin-bottom:8px;">
-          Bank:
-          <strong id="modalBankName">
-            PalmPay
-          </strong>
-        </div>
-
-        <div style="margin-bottom:8px;">
-          Account Number:
-          <strong id="modalAccountNumber">
-            0000000000
-          </strong>
-        </div>
-
-        <div>
-          Account Name:
-          <strong id="modalAccountName">
-            Boostlane Customer
-          </strong>
-        </div>
-
-      </div>
-
-
-      <form
-        id="fundForm"
-        class="modal-form"
-      >
-
-        <div class="input-group">
-
-          <label>
-            Amount
-          </label>
-
-          <input
-            id="fundAmount"
-            type="number"
-            min="100"
-            step="0.01"
-            placeholder="Enter amount"
-            required
-          />
-
-        </div>
-
-
-        <div class="input-group">
-
-          <label>
-            Payment Reference
-          </label>
-
-          <input
-            id="fundReference"
-            type="text"
-            placeholder="Optional transfer reference"
-          />
-
-        </div>
-
-
-        <div class="modal-buttons">
-
-          <button
-            type="button"
-            class="secondary-btn"
-            data-close="fundModal"
+          <div
+            class="stat-value"
+            id="totalCustomers"
           >
-            Cancel
-          </button>
-
-          <button
-            type="submit"
-            class="primary-btn"
-          >
-            I Have Paid
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-
-  </div>
-
-
-  <!-- =========================
-       ORDER MODAL
-  ========================== -->
-
-  <div
-    class="modal-overlay"
-    id="orderModal"
-  >
-
-    <div class="modal">
-
-      <div class="modal-header">
-
-        <h2>
-          Buy Social Media
-        </h2>
-
-        <button
-          class="close-btn"
-          data-close="orderModal"
-        >
-          <i data-lucide="x"></i>
-        </button>
-
-      </div>
-
-
-      <form
-        id="orderForm"
-        class="modal-form"
-      >
-
-        <div class="input-group">
-
-          <label>
-            Service
-          </label>
-
-          <select
-            id="orderService"
-            required
-          >
-
-            <option value="">
-              Select service
-            </option>
-
-            <option value="Instagram Followers">
-              Instagram Followers
-            </option>
-
-            <option value="Instagram Likes">
-              Instagram Likes
-            </option>
-
-            <option value="Instagram Views">
-              Instagram Views
-            </option>
-
-            <option value="TikTok Followers">
-              TikTok Followers
-            </option>
-
-            <option value="TikTok Likes">
-              TikTok Likes
-            </option>
-
-            <option value="TikTok Views">
-              TikTok Views
-            </option>
-
-            <option value="YouTube Views">
-              YouTube Views
-            </option>
-
-            <option value="YouTube Subscribers">
-              YouTube Subscribers
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div class="input-group">
-
-          <label>
-            Package / Quantity
-          </label>
-
-          <input
-            id="orderPackage"
-            type="text"
-            placeholder="Example: 1000 Followers"
-            required
-          />
-
-        </div>
-
-
-        <div class="input-group">
-
-          <label>
-            Account / Post Link
-          </label>
-
-          <input
-            id="orderLink"
-            type="url"
-            placeholder="https://..."
-            required
-          />
-
-        </div>
-
-
-        <div class="input-group">
-
-          <label>
-            Instructions
-          </label>
-
-          <textarea
-            id="orderInstructions"
-            placeholder="Any additional instructions..."
-          ></textarea>
-
-        </div>
-
-
-        <div class="modal-buttons">
-
-          <button
-            type="button"
-            class="secondary-btn"
-            data-close="orderModal"
-          >
-            Cancel
-          </button>
-
-          <button
-            type="submit"
-            class="primary-btn"
-          >
-            Place Order
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-
-  </div>
-
-
-  <!-- =========================
-       TOAST
-  ========================== -->
-
-  <div id="toast"></div>
-
-
-  <script>
-
-    /* ============================================================
-       BOOSTLANE CONFIGURATION
-    ============================================================ */
-
-    const SUPABASE_URL =
-      "https://whseefadqutdrsachypc.supabase.co";
-
-    /*
-      PUT YOUR EXISTING SUPABASE PUBLISHABLE / ANON KEY HERE.
-
-      DO NOT PUT:
-      - service_role key
-      - ReallySimpleSocial API key
-    */
-
-    const SUPABASE_ANON_KEY =
-   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
-
-
-    /*
-      CHANGE THESE TO YOUR REAL PAYMENT ACCOUNT.
-    */
-
-    const PAYMENT_BANK =
-      "PalmPay";
-
-    const PAYMENT_ACCOUNT_NUMBER =
-      "0000000000";
-
-    const PAYMENT_ACCOUNT_NAME =
-      "Boostlane";
-
-
-    /*
-      PUT YOUR REAL WHATSAPP NUMBER HERE.
-
-      Format:
-      2349064527157
-
-      Do not use + or spaces.
-    */
-
-    const WHATSAPP_NUMBER =
-      "9064527157";
-
-
-    /* ============================================================
-       SUPABASE
-    ============================================================ */
-
-    const db =
-      supabase.createClient(
-        SUPABASE_URL,
-       eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0
-      );
-
-
-    let currentUser = null;
-    let currentProfile = null;
-    let currentBalance = 0;
-
-
-    /* ============================================================
-       HELPERS
-    ============================================================ */
-
-    function $(id) {
-      return document.getElementById(id);
-    }
-
-
-    function escapeHTML(value) {
-
-      if (value === null || value === undefined) {
-        return "";
-      }
-
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-
-    function formatMoney(amount) {
-
-      return Number(amount || 0).toLocaleString(
-        "en-NG",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }
-      );
-
-    }
-
-
-    function formatDate(date) {
-
-      if (!date) return "-";
-
-      return new Date(date).toLocaleString(
-        "en-NG",
-        {
-          dateStyle: "medium",
-          timeStyle: "short"
-        }
-      );
-
-    }
-
-
-    function statusClass(status) {
-
-      const value =
-        String(status || "pending").toLowerCase();
-
-      if (
-        value === "completed" ||
-        value === "success" ||
-        value === "successful"
-      ) {
-        return "completed";
-      }
-
-      if (
-        value === "processing" ||
-        value === "in progress"
-      ) {
-        return "processing";
-      }
-
-      if (
-        value === "cancelled" ||
-        value === "canceled" ||
-        value === "failed"
-      ) {
-        return "cancelled";
-      }
-
-      return "pending";
-    }
-
-
-    function showToast(
-      message,
-      type = "normal"
-    ) {
-
-      const toast = $("toast");
-
-      toast.textContent = message;
-
-      toast.className = "";
-
-      toast.id = "toast";
-
-      if (type === "success") {
-        toast.classList.add("success");
-      }
-
-      if (type === "error") {
-        toast.classList.add("error");
-      }
-
-      setTimeout(() => {
-        toast.classList.add("show");
-      }, 20);
-
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3500);
-
-    }
-
-
-    function refreshIcons() {
-
-      if (
-        window.lucide &&
-        typeof lucide.createIcons === "function"
-      ) {
-        lucide.createIcons();
-      }
-
-    }
-
-
-    /* ============================================================
-       AUTH SCREEN
-    ============================================================ */
-
-    function showAuth() {
-
-      $("loadingScreen").style.display = "none";
-
-      $("app").style.display = "none";
-
-      $("authScreen").style.display = "flex";
-
-      refreshIcons();
-
-    }
-
-
-    function showApp() {
-
-      $("loadingScreen").style.display = "none";
-
-      $("authScreen").style.display = "none";
-
-      $("app").style.display = "block";
-
-      refreshIcons();
-
-    }
-
-
-    /* ============================================================
-       AUTH
-    ============================================================ */
-
-    $("showSignup").addEventListener(
-      "click",
-      () => {
-
-        $("loginFormBox").style.display = "none";
-
-        $("signupFormBox").style.display = "block";
-
-      }
-    );
-
-
-    $("showLogin").addEventListener(
-      "click",
-      () => {
-
-        $("signupFormBox").style.display = "none";
-
-        $("loginFormBox").style.display = "block";
-
-      }
-    );
-
-
-    $("loginForm").addEventListener(
-      "submit",
-      async (event) => {
-
-        event.preventDefault();
-
-        const email =
-          $("loginEmail").value.trim();
-
-        const password =
-          $("loginPassword").value;
-
-        const button =
-          event.submitter;
-
-        if (button) {
-          button.disabled = true;
-          button.textContent = "Logging in...";
-        }
-
-        const {
-          data,
-          error
-        } =
-          await db.auth.signInWithPassword({
-            email,
-            password
-          });
-
-        if (button) {
-          button.disabled = false;
-          button.textContent = "Login";
-        }
-
-        if (error) {
-
-          showToast(
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-        currentUser =
-          data.user;
-
-        await startApplication();
-
-      }
-    );
-
-
-    $("signupForm").addEventListener(
-      "submit",
-      async (event) => {
-
-        event.preventDefault();
-
-        const fullName =
-          $("signupName").value.trim();
-
-        const phone =
-          $("signupPhone").value.trim();
-
-        const email =
-          $("signupEmail").value.trim();
-
-        const password =
-          $("signupPassword").value;
-
-        const confirm =
-          $("signupConfirm").value;
-
-
-        if (password !== confirm) {
-
-          showToast(
-            "Passwords do not match.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        const button =
-          event.submitter;
-
-        if (button) {
-
-          button.disabled = true;
-
-          button.textContent =
-            "Creating account...";
-
-        }
-
-
-        const {
-          data,
-          error
-        } =
-          await db.auth.signUp({
-
-            email,
-
-            password,
-
-            options: {
-
-              data: {
-                full_name: fullName,
-                phone: phone
-              }
-
-            }
-
-          });
-
-
-        if (button) {
-
-          button.disabled = false;
-
-          button.textContent =
-            "Create Account";
-
-        }
-
-
-        if (error) {
-
-          showToast(
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-        /*
-          If email confirmation is disabled,
-          session will exist immediately.
-        */
-
-        if (data.session) {
-
-          currentUser =
-            data.user;
-
-          /*
-            Try to create/update profile.
-            If RLS blocks this, the existing
-            database trigger can still handle it.
-          */
-
-          await db
-            .from("profiles")
-            .upsert(
-              {
-                id: data.user.id,
-                full_name: fullName,
-                phone: phone,
-                role: "customer"
-              },
-              {
-                onConflict: "id"
-              }
-            );
-
-
-          await startApplication();
-
-        } else {
-
-          showToast(
-            "Account created. Check your email to confirm your account.",
-            "success"
-          );
-
-          $("signupForm").reset();
-
-          $("signupFormBox").style.display =
-            "none";
-
-          $("loginFormBox").style.display =
-            "block";
-
-        }
-
-      }
-    );
-
-
-    $("forgotPasswordBtn").addEventListener(
-      "click",
-      async () => {
-
-        const email =
-          $("loginEmail").value.trim();
-
-        if (!email) {
-
-          showToast(
-            "Enter your email first.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        const {
-          error
-        } =
-          await db.auth.resetPasswordForEmail(
-            email,
-            {
-              redirectTo:
-                window.location.origin +
-                window.location.pathname
-            }
-          );
-
-
-        if (error) {
-
-          showToast(
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-        showToast(
-          "Password reset email sent.",
-          "success"
-        );
-
-      }
-    );
-
-
-    /* ============================================================
-       START APP
-    ============================================================ */
-
-    async function startApplication() {
-
-      const {
-        data
-      } =
-        await db.auth.getUser();
-
-      if (!data.user) {
-
-        showAuth();
-
-        return;
-      }
-
-
-      currentUser =
-        data.user;
-
-
-      showApp();
-
-
-      await loadUser();
-
-
-      await loadDashboard();
-
-
-      refreshIcons();
-
-    }
-
-
-    /* ============================================================
-       LOAD USER
-    ============================================================ */
-
-    async function loadUser() {
-
-      if (!currentUser) return;
-
-
-      const {
-        data: profile
-      } =
-        await db
-          .from("profiles")
-          .select(
-            "id, full_name, phone, role"
-          )
-          .eq(
-            "id",
-            currentUser.id
-          )
-          .maybeSingle();
-
-
-      currentProfile =
-        profile || {};
-
-
-      const fullName =
-        currentProfile.full_name ||
-        currentUser.user_metadata?.full_name ||
-        "Customer";
-
-
-      const firstName =
-        fullName.split(" ")[0] ||
-        "Customer";
-
-
-      $("welcomeName").textContent =
-        firstName;
-
-
-      $("topUserName").textContent =
-        firstName;
-
-
-      $("accountName").textContent =
-        fullName;
-
-
-      $("accountEmail").textContent =
-        currentUser.email || "-";
-
-
-      $("accountPhone").textContent =
-        currentProfile.phone ||
-        currentUser.user_metadata?.phone ||
-        "-";
-
-
-      $("accountId").textContent =
-        currentUser.id;
-
-
-      const firstLetter =
-        firstName.charAt(0).toUpperCase();
-
-
-      $("avatar").textContent =
-        firstLetter;
-
-    }
-
-
-    /* ============================================================
-       LOAD WALLET
-    ============================================================ */
-
-    async function loadWallet() {
-
-      if (!currentUser) return;
-
-
-      const {
-        data,
-        error
-      } =
-        await db
-          .from("wallets")
-          .select("balance")
-          .eq(
-            "user_id",
-            currentUser.id
-          )
-          .maybeSingle();
-
-
-      if (error) {
-
-        console.error(
-          "Wallet error:",
-          error
-        );
-
-        currentBalance = 0;
-
-      } else {
-
-        currentBalance =
-          Number(data?.balance || 0);
-
-      }
-
-
-      $("balance").textContent =
-        formatMoney(currentBalance);
-
-    }
-
-
-    /* ============================================================
-       LOAD ORDERS
-    ============================================================ */
-
-    async function getOrders() {
-
-      if (!currentUser) return [];
-
-
-      const {
-        data,
-        error
-      } =
-        await db
-          .from("orders")
-          .select("*")
-          .eq(
-            "user_id",
-            currentUser.id
-          )
-          .order(
-            "created_at",
-            {
-              ascending: false
-            }
-          );
-
-
-      if (error) {
-
-        console.error(
-          "Orders error:",
-          error
-        );
-
-        return [];
-
-      }
-
-
-      return data || [];
-
-    }
-
-
-    async function loadOrders() {
-
-      const orders =
-        await getOrders();
-
-
-      const container =
-        $("ordersList");
-
-
-      if (!orders.length) {
-
-        container.innerHTML = `
-
-          <div class="empty-state">
-
-            <i
-              data-lucide="clipboard-list"
-              class="empty-icon"
-            ></i>
-
-            <h3>
-              No orders yet
-            </h3>
-
-            <p>
-              Your social media orders will appear here.
-            </p>
-
-          </div>
-
-        `;
-
-        refreshIcons();
-
-        return;
-      }
-
-
-      container.innerHTML =
-        orders.map(order => `
-
-          <div class="list-item">
-
-            <div class="list-left">
-
-              <div class="list-icon">
-                <i data-lucide="send"></i>
-              </div>
-
-              <div>
-
-                <div class="list-title">
-                  ${escapeHTML(order.service)}
-                </div>
-
-                <div class="list-subtitle">
-                  ${escapeHTML(order.package || "")}
-                  •
-                  ${formatDate(order.created_at)}
-                </div>
-
-              </div>
-
-            </div>
-
-            <span
-              class="status ${statusClass(order.status)}"
-            >
-              ${escapeHTML(order.status || "pending")}
-            </span>
-
-          </div>
-
-        `).join("");
-
-
-      refreshIcons();
-
-    }
-
-
-    /* ============================================================
-       LOAD TRANSACTIONS
-    ============================================================ */
-
-    async function getTransactions() {
-
-      if (!currentUser) return [];
-
-
-      const {
-        data,
-        error
-      } =
-        await db
-          .from("transactions")
-          .select("*")
-          .eq(
-            "user_id",
-            currentUser.id
-          )
-          .order(
-            "created_at",
-            {
-              ascending: false
-            }
-          );
-
-
-      if (error) {
-
-        console.error(
-          "Transactions error:",
-          error
-        );
-
-        return [];
-
-      }
-
-
-      return data || [];
-
-    }
-
-
-    async function loadTransactions() {
-
-      const transactions =
-        await getTransactions();
-
-
-      const container =
-        $("transactionsList");
-
-
-      if (!transactions.length) {
-
-        container.innerHTML = `
-
-          <div class="empty-state">
-
-            <i
-              data-lucide="credit-card"
-              class="empty-icon"
-            ></i>
-
-            <h3>
-              No transactions yet
-            </h3>
-
-            <p>
-              Your wallet transactions will appear here.
-            </p>
-
-          </div>
-
-        `;
-
-        refreshIcons();
-
-        return;
-      }
-
-
-      container.innerHTML =
-        transactions.map(transaction => {
-
-          const amount =
-            Number(transaction.amount || 0);
-
-
-          const type =
-            String(
-              transaction.type || "transaction"
-            );
-
-
-          return `
-
-            <div class="list-item">
-
-              <div class="list-left">
-
-                <div class="list-icon">
-                  <i data-lucide="wallet"></i>
-                </div>
-
-                <div>
-
-                  <div class="list-title">
-                    ${escapeHTML(type)}
-                  </div>
-
-                  <div class="list-subtitle">
-                    ${formatDate(transaction.created_at)}
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div style="text-align:right;">
-
-                <strong>
-                  ₦${formatMoney(amount)}
-                </strong>
-
-                <div style="margin-top:5px;">
-
-                  <span
-                    class="status ${statusClass(transaction.status)}"
-                  >
-                    ${escapeHTML(transaction.status || "pending")}
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          `;
-
-        }).join("");
-
-
-      refreshIcons();
-
-    }
-
-
-    /* ============================================================
-       DASHBOARD STATS
-    ============================================================ */
-
-    async function loadDashboard() {
-
-      await loadWallet();
-
-
-      const orders =
-        await getOrders();
-
-
-      const completed =
-        orders.filter(
-          order =>
-            String(order.status).toLowerCase() ===
-            "completed"
-        );
-
-
-      /*
-        Recent activity
-      */
-
-      const recent =
-        orders.slice(0, 5);
-
-
-      const activity =
-        $("recentActivity");
-
-
-      if (!recent.length) {
-
-        activity.innerHTML = `
-
-          <i
-            data-lucide="file-clock"
-            class="empty-icon"
-          ></i>
-
-          <h3>
-            No recent activity yet
-          </h3>
-
-          <p>
-            Your orders and transactions will appear here
-            once you start using our services.
-          </p>
-
-        `;
-
-      } else {
-
-        activity.className = "list";
-
-
-        activity.innerHTML =
-          recent.map(order => `
-
-            <div class="list-item">
-
-              <div class="list-left">
-
-                <div class="list-icon">
-                  <i data-lucide="send"></i>
-                </div>
-
-                <div>
-
-                  <div class="list-title">
-                    ${escapeHTML(order.service)}
-                  </div>
-
-                  <div class="list-subtitle">
-                    ${escapeHTML(order.package || "")}
-                    •
-                    ${formatDate(order.created_at)}
-                  </div>
-
-                </div>
-
-              </div>
-
-              <span
-                class="status ${statusClass(order.status)}"
-              >
-                ${escapeHTML(order.status || "pending")}
-              </span>
-
-            </div>
-
-          `).join("");
-
-      }
-
-
-      refreshIcons();
-
-    }
-
-
-    /* ============================================================
-       NAVIGATION
-    ============================================================ */
-
-    function openPage(page) {
-
-      document
-        .querySelectorAll(".page")
-        .forEach(section => {
-
-          section.classList.remove(
-            "active"
-          );
-
-        });
-
-
-      const selected =
-        $(page + "Page");
-
-
-      if (selected) {
-
-        selected.classList.add(
-          "active"
-        );
-
-      }
-
-
-      document
-        .querySelectorAll(".nav-btn[data-page]")
-        .forEach(button => {
-
-          button.classList.toggle(
-            "active",
-            button.dataset.page === page
-          );
-
-        });
-
-
-      $("sidebar").classList.remove(
-        "open"
-      );
-
-
-      if (page === "orders") {
-        loadOrders();
-      }
-
-      if (page === "transactions") {
-        loadTransactions();
-      }
-
-      refreshIcons();
-
-    }
-
-
-    document
-      .querySelectorAll(".nav-btn[data-page]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            openPage(
-              button.dataset.page
-            );
-
-          }
-        );
-
-      });
-
-
-    document
-      .querySelectorAll("[data-page-action]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            openPage(
-              button.dataset.pageAction
-            );
-
-          }
-        );
-
-      });
-
-
-    /* ============================================================
-       MOBILE MENU
-    ============================================================ */
-
-    $("menuBtn").addEventListener(
-      "click",
-      () => {
-
-        $("sidebar").classList.toggle(
-          "open"
-        );
-
-      }
-    );
-
-
-    /* ============================================================
-       FUND WALLET
-    ============================================================ */
-
-    function openFundModal() {
-
-      $("modalBankName").textContent =
-        PAYMENT_BANK;
-
-      $("modalAccountNumber").textContent =
-        PAYMENT_ACCOUNT_NUMBER;
-
-      $("modalAccountName").textContent =
-        PAYMENT_ACCOUNT_NAME;
-
-      $("fundModal").classList.add(
-        "show"
-      );
-
-      refreshIcons();
-
-    }
-
-
-    $("fundWalletBtn").addEventListener(
-      "click",
-      openFundModal
-    );
-
-
-    $("fundForm").addEventListener(
-      "submit",
-      async (event) => {
-
-        event.preventDefault();
-
-
-        const amount =
-          Number(
-            $("fundAmount").value
-          );
-
-
-        const reference =
-          $("fundReference").value.trim();
-
-
-        if (!amount || amount < 100) {
-
-          showToast(
-            "Minimum funding amount is ₦100.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (!currentUser) return;
-
-
-        const button =
-          event.submitter;
-
-
-        button.disabled = true;
-
-        button.textContent =
-          "Submitting...";
-
-
-        /*
-          IMPORTANT:
-          This does NOT increase the wallet.
-
-          It creates a pending transaction
-          for admin/payment verification.
-        */
-
-        const {
-          error
-        } =
-          await db
-            .from("transactions")
-            .insert({
-
-              user_id:
-                currentUser.id,
-
-              type:
-                "wallet funding",
-
-              amount:
-                amount,
-
-              status:
-                "pending"
-
-            });
-
-
-        button.disabled = false;
-
-        button.textContent =
-          "I Have Paid";
-
-
-        if (error) {
-
-          console.error(error);
-
-          showToast(
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-        $("fundModal")
-          .classList.remove("show");
-
-
-        $("fundForm").reset();
-
-
-        showToast(
-          "Funding request submitted. Awaiting verification.",
-          "success"
-        );
-
-
-        await loadTransactions();
-
-      }
-    );
-
-
-    /* ============================================================
-       COPY ACCOUNT NUMBER
-    ============================================================ */
-
-    $("copyAccountBtn").addEventListener(
-      "click",
-      async () => {
-
-        try {
-
-          await navigator.clipboard.writeText(
-            PAYMENT_ACCOUNT_NUMBER
-          );
-
-          showToast(
-            "Account number copied.",
-            "success"
-          );
-
-        } catch {
-
-          showToast(
-            "Could not copy account number.",
-            "error"
-          );
-
-        }
-
-      }
-    );
-
-
-    /* ============================================================
-       ORDER MODAL
-    ============================================================ */
-
-    function openOrderModal() {
-
-      $("orderModal").classList.add(
-        "show"
-      );
-
-      refreshIcons();
-
-    }
-
-
-    $("buySocialBtn").addEventListener(
-      "click",
-      openOrderModal
-    );
-
-
-    $("orderForm").addEventListener(
-      "submit",
-      async (event) => {
-
-        event.preventDefault();
-
-
-        if (!currentUser) {
-
-          showToast(
-            "Please login again.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        const service =
-          $("orderService").value;
-
-        const packageName =
-          $("orderPackage").value.trim();
-
-        const link =
-          $("orderLink").value.trim();
-
-        const instructions =
-          $("orderInstructions").value.trim();
-
-
-        const button =
-          event.submitter;
-
-
-        button.disabled = true;
-
-        button.textContent =
-          "Placing order...";
-
-
-        /*
-          Creates the order in Supabase.
-
-          Your secure Edge Function will later
-          connect this order to the social-media provider.
-        */
-
-        const {
-          error
-        } =
-          await db
-            .from("orders")
-            .insert({
-
-              user_id:
-                currentUser.id,
-
-              service:
-                service,
-
-              package:
-                packageName,
-
-              account_link:
-                link,
-
-              instructions:
-                instructions,
-
-              status:
-                "pending"
-
-            });
-
-
-        button.disabled = false;
-
-        button.textContent =
-          "Place Order";
-
-
-        if (error) {
-
-          console.error(error);
-
-          showToast(
-            error.message,
-            "error"
-          );
-
-          return;
-        }
-
-
-        $("orderModal")
-          .classList.remove("show");
-
-
-        $("orderForm").reset();
-
-
-        showToast(
-          "Order submitted successfully.",
-          "success"
-        );
-
-
-        await loadDashboard();
-
-      }
-    );
-
-
-    /* ============================================================
-       SUPPORT
-    ============================================================ */
-
-    $("whatsappBtn").addEventListener(
-      "click",
-      () => {
-
-        if (
-          !WHATSAPP_NUMBER ||
-          WHATSAPP_NUMBER.includes("YOUR_")
-        ) {
-
-          showToast(
-            "Add your WhatsApp number in the code first.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        const message =
-          encodeURIComponent(
-            "Hello Boostlane Support, I need help with my account."
-          );
-
-
-        window.open(
-          `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`,
-          "_blank"
-        );
-
-      }
-    );
-
-
-    /* ============================================================
-       CLOSE MODALS
-    ============================================================ */
-
-    document
-      .querySelectorAll("[data-close]")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const modal =
-              $(button.dataset.close);
-
-            if (modal) {
-
-              modal.classList.remove(
-                "show"
-              );
-
-            }
-
-          }
-        );
-
-      });
-
-
-    document
-      .querySelectorAll(".modal-overlay")
-      .forEach(overlay => {
-
-        overlay.addEventListener(
-          "click",
-          event => {
-
-            if (
-              event.target === overlay
-            ) {
-
-              overlay.classList.remove(
-                "show"
-              );
-
-            }
-
-          }
-        );
-
-      });
-
-
-    /* ============================================================
-       LOGOUT
-    ============================================================ */
-
-    $("logoutBtn").addEventListener(
-      "click",
-      async () => {
-
-        await db.auth.signOut();
-
-        currentUser = null;
-
-        currentProfile = null;
-
-        currentBalance = 0;
-
-        showToast(
-          "Logged out successfully.",
-          "success"
-        );
-
-        setTimeout(() => {
-
-          showAuth();
-
-        }, 500);
-
-      }
-    );
-
-
-    /* ============================================================
-       AUTH STATE
-    ============================================================ */
-
-    db.auth.onAuthStateChange(
-      async (event, session) => {
-
-        if (
-          session?.user
-        ) {
-
-          currentUser =
-            session.user;
-
-          /*
-            Small delay prevents auth callback
-            from competing with initial loading.
-          */
-
-          setTimeout(
-            startApplication,
             0
-          );
+          </div>
+        </div>
 
-        } else {
+        <div class="stat-card">
+          <div class="stat-label">
+            Total Orders
+          </div>
 
-          currentUser = null;
+          <div
+            class="stat-value"
+            id="totalOrders"
+          >
+            0
+          </div>
+        </div>
 
-          showAuth();
+        <div class="stat-card">
+          <div class="stat-label">
+            Pending Orders
+          </div>
 
-        }
+          <div
+            class="stat-value"
+            id="pendingOrders"
+          >
+            0
+          </div>
+        </div>
 
-      }
-    );
+        <div class="stat-card">
+          <div class="stat-label">
+            Total Wallet Balance
+          </div>
+
+          <div
+            class="stat-value"
+            id="totalBalance"
+          >
+            ₦0.00
+          </div>
+        </div>
+
+      </div>
 
 
-    /* ============================================================
-       INITIALIZE
-    ============================================================ */
+      <div class="panel">
 
-    async function initialize() {
+        <h2 class="panel-title">
+          Recent Customers
+        </h2>
 
-      try {
+        <div class="table-wrapper">
 
-        const {
-          data
-        } =
-          await db.auth.getSession();
+          <table>
+
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+
+            <tbody id="recentCustomersTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
 
 
-        if (
-          data.session?.user
-        ) {
+      <div class="panel">
 
-          currentUser =
-            data.session.user;
+        <h2 class="panel-title">
+          Recent Orders
+        </h2>
 
-          await startApplication();
+        <div class="table-wrapper">
 
-        } else {
+          <table>
 
-          showAuth();
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Package</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
 
-        }
+            <tbody id="recentOrdersTable"></tbody>
 
-      } catch (error) {
+          </table>
 
-        console.error(error);
+        </div>
 
-        showAuth();
+      </div>
 
-        showToast(
-          "Could not connect to Boostlane.",
-          "error"
-        );
+    </section>
 
-      }
+
+    <!-- CUSTOMERS -->
+
+    <section
+      class="page"
+      id="customers"
+    >
+
+      <h1 class="page-title">
+        Users
+      </h1>
+
+      <div class="panel">
+
+        <input
+          type="text"
+          id="customerSearch"
+          class="search-box"
+          placeholder="Search users..."
+        >
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Wallet</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+
+            <tbody id="customersTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section
+      class="page"
+      id="orders"
+    >
+
+      <h1 class="page-title">
+        Orders
+      </h1>
+
+      <div class="panel">
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Service</th>
+                <th>Package</th>
+                <th>Link</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody id="ordersTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TRANSACTIONS -->
+
+    <section
+      class="page"
+      id="transactions"
+    >
+
+      <h1 class="page-title">
+        Transactions
+      </h1>
+
+      <div class="panel">
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody id="transactionsTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- API SERVICES -->
+
+    <section
+      class="page"
+      id="apiServices"
+    >
+
+      <h1 class="page-title">
+        API Services
+      </h1>
+
+      <div class="panel">
+
+        <div class="empty-box">
+
+          <div class="empty-icon">
+            🌐
+          </div>
+
+          <h2>
+            API Services
+          </h2>
+
+          <p style="margin-top:10px;">
+            Your social-media services will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TICKETS -->
+
+    <section
+      class="page"
+      id="tickets"
+    >
+
+      <h1 class="page-title">
+        Tickets
+      </h1>
+
+      <div class="panel">
+
+        <div class="empty-box">
+
+          <div class="empty-icon">
+            🎫
+          </div>
+
+          <h2>
+            Support Tickets
+          </h2>
+
+          <p style="margin-top:10px;">
+            Customer support tickets will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+
+    <section
+      class="page"
+      id="settings"
+    >
+
+      <h1 class="page-title">
+        Settings
+      </h1>
+
+      <div class="panel">
+
+        <div class="empty-box">
+
+          <div class="empty-icon">
+            ⚙️
+          </div>
+
+          <h2>
+            Admin Settings
+          </h2>
+
+          <p style="margin-top:10px;">
+            Settings will be added here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+  "https://whseefadqutdrsachypc.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =====================================================
+   GLOBAL DATA
+===================================================== */
+
+let currentUser = null;
+let allCustomers = [];
+let allOrders = [];
+let walletMap = {};
+let customerMap = {};
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+document
+  .getElementById("adminLoginBtn")
+  .addEventListener("click", adminLogin);
+
+
+document
+  .getElementById("adminPassword")
+  .addEventListener("keydown", function(event){
+
+    if(event.key === "Enter"){
+      adminLogin();
+    }
+
+  });
+
+
+document
+  .getElementById("adminEmail")
+  .addEventListener("keydown", function(event){
+
+    if(event.key === "Enter"){
+      adminLogin();
+    }
+
+  });
+
+
+async function adminLogin(){
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("adminPassword")
+      .value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  const button =
+    document.getElementById("adminLoginBtn");
+
+
+  message.className = "message";
+  message.textContent = "";
+
+
+  if(!email || !password){
+
+    message.textContent =
+      "Enter your email and password.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+
+  button.disabled = true;
+  button.textContent = "Logging in...";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await db.auth.signInWithPassword({
+        email:email,
+        password:password
+      });
+
+
+    if(error){
+      throw error;
+    }
+
+
+    if(!data || !data.user){
+
+      throw new Error(
+        "Login failed."
+      );
 
     }
 
 
-    /*
-      Start application
-    */
+    currentUser =
+      data.user;
 
-    initialize();
 
-  </script>
+    const {
+      data:profile,
+      error:profileError
+    } =
+      await db
+        .from("profiles")
+        .select("role")
+        .eq(
+          "id",
+          currentUser.id
+        )
+        .maybeSingle();
+
+
+    if(profileError){
+
+      console.error(profileError);
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      throw new Error(
+        "Could not verify administrator account."
+      );
+
+    }
+
+
+    if(!profile || profile.role !== "admin"){
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      throw new Error(
+        "This account is not an administrator."
+      );
+
+    }
+
+
+    message.textContent =
+      "Login successful!";
+
+    message.classList.add("success");
+
+
+    await openAdmin();
+
+
+  }catch(error){
+
+    console.error(
+      "Admin login error:",
+      error
+    );
+
+    message.textContent =
+      error.message ||
+      "Login failed.";
+
+    message.classList.add("error");
+
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent = "Login";
+
+  }
+
+}
+
+
+/* =====================================================
+   CHECK ADMIN
+===================================================== */
+
+async function checkAdmin(){
+
+  if(!currentUser){
+    return false;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("role")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(
+      "Admin check error:",
+      error
+    );
+
+    return false;
+
+  }
+
+
+  return data &&
+         data.role === "admin";
+
+}
+
+
+/* =====================================================
+   OPEN ADMIN
+===================================================== */
+
+async function openAdmin(){
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "none";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display = "block";
+
+
+  document
+    .getElementById("adminEmailDisplay")
+    .textContent =
+      currentUser?.email || "Admin";
+
+
+  await loadAllData();
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+async function checkSession(){
+
+  const {
+    data:{
+      session
+    }
+  } =
+    await db.auth.getSession();
+
+
+  if(!session){
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  currentUser =
+    session.user;
+
+
+  const isAdmin =
+    await checkAdmin();
+
+
+  if(isAdmin){
+
+    await openAdmin();
+
+  }else{
+
+    await db.auth.signOut();
+
+    currentUser = null;
+
+    showLogin();
+
+  }
+
+}
+
+
+/* =====================================================
+   SHOW LOGIN
+===================================================== */
+
+function showLogin(){
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "flex";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display = "none";
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+
+  closeSidebar();
+
+  showLogin();
+
+}
+
+
+document
+  .getElementById("topLogoutBtn")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+document
+  .getElementById("sideLogoutBtn")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+/* =====================================================
+   MOBILE SIDEBAR
+===================================================== */
+
+const sidebar =
+  document.getElementById("sidebar");
+
+const menuBtn =
+  document.getElementById("menuBtn");
+
+const sidebarOverlay =
+  document.getElementById("sidebarOverlay");
+
+
+menuBtn.addEventListener(
+  "click",
+  function(){
+
+    sidebar.classList.toggle("open");
+
+    sidebarOverlay.classList.toggle("show");
+
+  }
+);
+
+
+sidebarOverlay.addEventListener(
+  "click",
+  closeSidebar
+);
+
+
+function closeSidebar(){
+
+  sidebar.classList.remove("open");
+
+  sidebarOverlay.classList.remove("show");
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+document
+  .querySelectorAll(".nav-btn[data-page]")
+  .forEach(function(button){
+
+    button.addEventListener(
+      "click",
+      function(){
+
+        const page =
+          this.dataset.page;
+
+
+        document
+          .querySelectorAll(".nav-btn[data-page]")
+          .forEach(function(btn){
+
+            btn.classList.remove(
+              "active"
+            );
+
+          });
+
+
+        this.classList.add("active");
+
+
+        document
+          .querySelectorAll(".page")
+          .forEach(function(section){
+
+            section.classList.remove(
+              "active"
+            );
+
+          });
+
+
+        const target =
+          document.getElementById(page);
+
+
+        if(target){
+
+          target.classList.add("active");
+
+        }
+
+
+        closeSidebar();
+
+      }
+    );
+
+  });
+
+
+/* =====================================================
+   LOAD ALL DATA
+===================================================== */
+
+async function loadAllData(){
+
+  await loadCustomers();
+
+  await loadWallets();
+
+  await loadOrders();
+
+  await loadTransactions();
+
+  updateDashboard();
+
+}
+
+
+/* =====================================================
+   LOAD CUSTOMERS
+===================================================== */
+
+async function loadCustomers(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Customers error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  allCustomers =
+    data || [];
+
+
+  customerMap = {};
+
+
+  allCustomers.forEach(
+    function(customer){
+
+      customerMap[
+        customer.id
+      ] = customer;
+
+    }
+  );
+
+
+  renderCustomers(
+    allCustomers
+  );
+
+
+  renderRecentCustomers(
+    allCustomers.slice(
+      0,
+      5
+    )
+  );
+
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      allCustomers.length;
+
+}
+
+
+/* =====================================================
+   RENDER CUSTOMERS
+===================================================== */
+
+function renderCustomers(customers){
+
+  const table =
+    document.getElementById(
+      "customersTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  if(!customers.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="5">
+          No customers found.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  customers.forEach(
+    function(customer){
+
+      const wallet =
+        walletMap[
+          customer.id
+        ];
+
+
+      const balance =
+        wallet
+          ? Number(wallet.balance || 0)
+          : 0;
+
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer.full_name ||
+            "No name"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.phone ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${balance.toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits:2
+            }
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            customer.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   RECENT CUSTOMERS
+===================================================== */
+
+function renderRecentCustomers(customers){
+
+  const table =
+    document.getElementById(
+      "recentCustomersTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  if(!customers.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="4">
+          No customers yet.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  customers.forEach(
+    function(customer){
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer.full_name ||
+            "No name"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.phone ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            customer.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   WALLETS
+===================================================== */
+
+async function loadWallets(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("wallets")
+      .select("*");
+
+
+  if(error){
+
+    console.error(
+      "Wallet error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  walletMap = {};
+
+  let total = 0;
+
+
+  (data || []).forEach(
+    function(wallet){
+
+      walletMap[
+        wallet.user_id
+      ] = wallet;
+
+
+      total += Number(
+        wallet.balance || 0
+      );
+
+    }
+  );
+
+
+  document
+    .getElementById("totalBalance")
+    .textContent =
+      "₦" +
+      total.toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits:2
+        }
+      );
+
+}
+
+
+/* =====================================================
+   ORDERS
+===================================================== */
+
+async function loadOrders(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Orders error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  allOrders =
+    data || [];
+
+
+  const table =
+    document.getElementById(
+      "ordersTable"
+    );
+
+
+  const recentTable =
+    document.getElementById(
+      "recentOrdersTable"
+    );
+
+
+  table.innerHTML = "";
+
+  recentTable.innerHTML = "";
+
+
+  allOrders.forEach(
+    function(order){
+
+      const customer =
+        customerMap[
+          order.user_id
+        ];
+
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            customer?.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.service ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.package ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.account_link ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            order.status ||
+            "pending"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            order.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+
+  allOrders
+    .slice(0,5)
+    .forEach(
+      function(order){
+
+        const row =
+          document.createElement("tr");
+
+
+        row.innerHTML = `
+
+          <td>
+            ${escapeHTML(
+              order.service ||
+              "-"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              order.package ||
+              "-"
+            )}
+          </td>
+
+          <td>
+            ${statusBadge(
+              order.status ||
+              "pending"
+            )}
+          </td>
+
+          <td>
+            ${formatDate(
+              order.created_at
+            )}
+          </td>
+
+        `;
+
+
+        recentTable.appendChild(row);
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   TRANSACTIONS
+===================================================== */
+
+async function loadTransactions(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("transactions")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Transactions error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const table =
+    document.getElementById(
+      "transactionsTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  (data || []).forEach(
+    function(transaction){
+
+      const customer =
+        customerMap[
+          transaction.user_id
+        ];
+
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            transaction.type ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${Number(
+            transaction.amount || 0
+          ).toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits:2
+            }
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            transaction.status ||
+            "pending"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            transaction.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   DASHBOARD UPDATE
+===================================================== */
+
+function updateDashboard(){
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      allCustomers.length;
+
+
+  document
+    .getElementById(
+      "totalOrders"
+    )
+    .textContent =
+      allOrders.length;
+
+
+  document
+    .getElementById(
+      "pendingOrders"
+    )
+    .textContent =
+      allOrders.filter(
+        function(order){
+
+          return String(
+            order.status || ""
+          )
+          .toLowerCase()
+          .includes("pending");
+
+        }
+      ).length;
+
+}
+
+
+/* =====================================================
+   CUSTOMER SEARCH
+===================================================== */
+
+document
+  .getElementById(
+    "customerSearch"
+  )
+  .addEventListener(
+    "input",
+    function(){
+
+      const search =
+        this.value
+          .toLowerCase()
+          .trim();
+
+
+      const filtered =
+        allCustomers.filter(
+          function(customer){
+
+            const text =
+              (
+                (customer.full_name || "") +
+                " " +
+                (customer.email || "") +
+                " " +
+                (customer.phone || "")
+              )
+              .toLowerCase();
+
+
+            return text.includes(
+              search
+            );
+
+          }
+        );
+
+
+      renderCustomers(
+        filtered
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   STATUS BADGE
+===================================================== */
+
+function statusBadge(status){
+
+  const value =
+    String(
+      status ||
+      "pending"
+    );
+
+
+  const lower =
+    value.toLowerCase();
+
+
+  let className =
+    "status-pending";
+
+
+  if(
+    lower.includes("completed") ||
+    lower.includes("success")
+  ){
+
+    className =
+      "status-completed";
+
+  }
+  else if(
+    lower.includes("failed") ||
+    lower.includes("cancel")
+  ){
+
+    className =
+      "status-failed";
+
+  }
+  else if(
+    lower.includes("processing")
+  ){
+
+    className =
+      "status-processing";
+
+  }
+
+
+  return `
+    <span class="status ${className}">
+      ${escapeHTML(value)}
+    </span>
+  `;
+
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function escapeHTML(value){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return "";
+
+  }
+
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function formatDate(date){
+
+  if(!date){
+    return "-";
+  }
+
+
+  return new Date(
+    date
+  ).toLocaleString(
+    "en-NG"
+  );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+checkSession();
+
+</script>
 
 </body>
-</htm>
+</html>
