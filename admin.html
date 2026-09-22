@@ -930,4 +930,1421 @@ tr:hover td{
       id="transactions"
     >
 
-      <h1 class="page-title
+      <h1 class="page-title">
+        Transactions
+      </h1>
+
+      <div class="panel">
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody id="transactionsTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- API SERVICES -->
+
+    <section
+      class="page"
+      id="apiServices"
+    >
+
+      <h1 class="page-title">
+        API Services
+      </h1>
+
+      <div class="panel">
+
+        <div class="empty-box">
+
+          <div class="empty-icon">
+            🌐
+          </div>
+
+          <h2>
+            API Services
+          </h2>
+
+          <p style="margin-top:10px;">
+            Your social-media services will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TICKETS -->
+
+    <section
+      class="page"
+      id="tickets"
+    >
+
+      <h1 class="page-title">
+        Tickets
+      </h1>
+
+      <div class="panel">
+
+        <div class="empty-box">
+
+          <div class="empty-icon">
+            🎫
+          </div>
+
+          <h2>
+            Support Tickets
+          </h2>
+
+          <p style="margin-top:10px;">
+            Customer support tickets will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+
+    <section
+      class="page"
+      id="settings"
+    >
+
+      <h1 class="page-title">
+        Settings
+      </h1>
+
+      <div class="panel">
+
+        <div class="empty-box">
+
+          <div class="empty-icon">
+            ⚙️
+          </div>
+
+          <h2>
+            Admin Settings
+          </h2>
+
+          <p style="margin-top:10px;">
+            Settings will be added here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+  "https://whseefadqutdrsachypc.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2VlZmFkcXV0ZHJzYWNoeXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzYyMjUsImV4cCI6MjEwNTI1MjIyNX0.a0LAPGnV5uOA0x2RdI1cXm7oUtINdpNJUrCSfOexlU0";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =====================================================
+   GLOBAL DATA
+===================================================== */
+
+let currentUser = null;
+let allCustomers = [];
+let allOrders = [];
+let walletMap = {};
+let customerMap = {};
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+document
+  .getElementById("adminLoginBtn")
+  .addEventListener("click", adminLogin);
+
+
+document
+  .getElementById("adminPassword")
+  .addEventListener("keydown", function(event){
+
+    if(event.key === "Enter"){
+      adminLogin();
+    }
+
+  });
+
+
+document
+  .getElementById("adminEmail")
+  .addEventListener("keydown", function(event){
+
+    if(event.key === "Enter"){
+      adminLogin();
+    }
+
+  });
+
+
+async function adminLogin(){
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("adminPassword")
+      .value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  const button =
+    document.getElementById("adminLoginBtn");
+
+
+  message.className = "message";
+  message.textContent = "";
+
+
+  if(!email || !password){
+
+    message.textContent =
+      "Enter your email and password.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+
+  button.disabled = true;
+  button.textContent = "Logging in...";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await db.auth.signInWithPassword({
+        email:email,
+        password:password
+      });
+
+
+    if(error){
+      throw error;
+    }
+
+
+    if(!data || !data.user){
+
+      throw new Error(
+        "Login failed."
+      );
+
+    }
+
+
+    currentUser =
+      data.user;
+
+
+    const {
+      data:profile,
+      error:profileError
+    } =
+      await db
+        .from("profiles")
+        .select("role")
+        .eq(
+          "id",
+          currentUser.id
+        )
+        .maybeSingle();
+
+
+    if(profileError){
+
+      console.error(profileError);
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      throw new Error(
+        "Could not verify administrator account."
+      );
+
+    }
+
+
+    if(!profile || profile.role !== "admin"){
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      throw new Error(
+        "This account is not an administrator."
+      );
+
+    }
+
+
+    message.textContent =
+      "Login successful!";
+
+    message.classList.add("success");
+
+
+    await openAdmin();
+
+
+  }catch(error){
+
+    console.error(
+      "Admin login error:",
+      error
+    );
+
+    message.textContent =
+      error.message ||
+      "Login failed.";
+
+    message.classList.add("error");
+
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent = "Login";
+
+  }
+
+}
+
+
+/* =====================================================
+   CHECK ADMIN
+===================================================== */
+
+async function checkAdmin(){
+
+  if(!currentUser){
+    return false;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("role")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(
+      "Admin check error:",
+      error
+    );
+
+    return false;
+
+  }
+
+
+  return data &&
+         data.role === "admin";
+
+}
+
+
+/* =====================================================
+   OPEN ADMIN
+===================================================== */
+
+async function openAdmin(){
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "none";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display = "block";
+
+
+  document
+    .getElementById("adminEmailDisplay")
+    .textContent =
+      currentUser?.email || "Admin";
+
+
+  await loadAllData();
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+async function checkSession(){
+
+  const {
+    data:{
+      session
+    }
+  } =
+    await db.auth.getSession();
+
+
+  if(!session){
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  currentUser =
+    session.user;
+
+
+  const isAdmin =
+    await checkAdmin();
+
+
+  if(isAdmin){
+
+    await openAdmin();
+
+  }else{
+
+    await db.auth.signOut();
+
+    currentUser = null;
+
+    showLogin();
+
+  }
+
+}
+
+
+/* =====================================================
+   SHOW LOGIN
+===================================================== */
+
+function showLogin(){
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "flex";
+
+
+  document
+    .getElementById("adminApp")
+    .style.display = "none";
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+
+  closeSidebar();
+
+  showLogin();
+
+}
+
+
+document
+  .getElementById("topLogoutBtn")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+document
+  .getElementById("sideLogoutBtn")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+/* =====================================================
+   MOBILE SIDEBAR
+===================================================== */
+
+const sidebar =
+  document.getElementById("sidebar");
+
+const menuBtn =
+  document.getElementById("menuBtn");
+
+const sidebarOverlay =
+  document.getElementById("sidebarOverlay");
+
+
+menuBtn.addEventListener(
+  "click",
+  function(){
+
+    sidebar.classList.toggle("open");
+
+    sidebarOverlay.classList.toggle("show");
+
+  }
+);
+
+
+sidebarOverlay.addEventListener(
+  "click",
+  closeSidebar
+);
+
+
+function closeSidebar(){
+
+  sidebar.classList.remove("open");
+
+  sidebarOverlay.classList.remove("show");
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+document
+  .querySelectorAll(".nav-btn[data-page]")
+  .forEach(function(button){
+
+    button.addEventListener(
+      "click",
+      function(){
+
+        const page =
+          this.dataset.page;
+
+
+        document
+          .querySelectorAll(".nav-btn[data-page]")
+          .forEach(function(btn){
+
+            btn.classList.remove(
+              "active"
+            );
+
+          });
+
+
+        this.classList.add("active");
+
+
+        document
+          .querySelectorAll(".page")
+          .forEach(function(section){
+
+            section.classList.remove(
+              "active"
+            );
+
+          });
+
+
+        const target =
+          document.getElementById(page);
+
+
+        if(target){
+
+          target.classList.add("active");
+
+        }
+
+
+        closeSidebar();
+
+      }
+    );
+
+  });
+
+
+/* =====================================================
+   LOAD ALL DATA
+===================================================== */
+
+async function loadAllData(){
+
+  await loadCustomers();
+
+  await loadWallets();
+
+  await loadOrders();
+
+  await loadTransactions();
+
+  updateDashboard();
+
+}
+
+
+/* =====================================================
+   LOAD CUSTOMERS
+===================================================== */
+
+async function loadCustomers(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Customers error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  allCustomers =
+    data || [];
+
+
+  customerMap = {};
+
+
+  allCustomers.forEach(
+    function(customer){
+
+      customerMap[
+        customer.id
+      ] = customer;
+
+    }
+  );
+
+
+  renderCustomers(
+    allCustomers
+  );
+
+
+  renderRecentCustomers(
+    allCustomers.slice(
+      0,
+      5
+    )
+  );
+
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      allCustomers.length;
+
+}
+
+
+/* =====================================================
+   RENDER CUSTOMERS
+===================================================== */
+
+function renderCustomers(customers){
+
+  const table =
+    document.getElementById(
+      "customersTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  if(!customers.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="5">
+          No customers found.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  customers.forEach(
+    function(customer){
+
+      const wallet =
+        walletMap[
+          customer.id
+        ];
+
+
+      const balance =
+        wallet
+          ? Number(wallet.balance || 0)
+          : 0;
+
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer.full_name ||
+            "No name"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.phone ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${balance.toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits:2
+            }
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            customer.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   RECENT CUSTOMERS
+===================================================== */
+
+function renderRecentCustomers(customers){
+
+  const table =
+    document.getElementById(
+      "recentCustomersTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  if(!customers.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="4">
+          No customers yet.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  customers.forEach(
+    function(customer){
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer.full_name ||
+            "No name"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            customer.phone ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            customer.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   WALLETS
+===================================================== */
+
+async function loadWallets(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("wallets")
+      .select("*");
+
+
+  if(error){
+
+    console.error(
+      "Wallet error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  walletMap = {};
+
+  let total = 0;
+
+
+  (data || []).forEach(
+    function(wallet){
+
+      walletMap[
+        wallet.user_id
+      ] = wallet;
+
+
+      total += Number(
+        wallet.balance || 0
+      );
+
+    }
+  );
+
+
+  document
+    .getElementById("totalBalance")
+    .textContent =
+      "₦" +
+      total.toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits:2
+        }
+      );
+
+}
+
+
+/* =====================================================
+   ORDERS
+===================================================== */
+
+async function loadOrders(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Orders error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  allOrders =
+    data || [];
+
+
+  const table =
+    document.getElementById(
+      "ordersTable"
+    );
+
+
+  const recentTable =
+    document.getElementById(
+      "recentOrdersTable"
+    );
+
+
+  table.innerHTML = "";
+
+  recentTable.innerHTML = "";
+
+
+  allOrders.forEach(
+    function(order){
+
+      const customer =
+        customerMap[
+          order.user_id
+        ];
+
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            customer?.email ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.service ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.package ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            order.account_link ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            order.status ||
+            "pending"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            order.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+
+  allOrders
+    .slice(0,5)
+    .forEach(
+      function(order){
+
+        const row =
+          document.createElement("tr");
+
+
+        row.innerHTML = `
+
+          <td>
+            ${escapeHTML(
+              order.service ||
+              "-"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              order.package ||
+              "-"
+            )}
+          </td>
+
+          <td>
+            ${statusBadge(
+              order.status ||
+              "pending"
+            )}
+          </td>
+
+          <td>
+            ${formatDate(
+              order.created_at
+            )}
+          </td>
+
+        `;
+
+
+        recentTable.appendChild(row);
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   TRANSACTIONS
+===================================================== */
+
+async function loadTransactions(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("transactions")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Transactions error:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const table =
+    document.getElementById(
+      "transactionsTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  (data || []).forEach(
+    function(transaction){
+
+      const customer =
+        customerMap[
+          transaction.user_id
+        ];
+
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            customer?.full_name ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(
+            transaction.type ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${Number(
+            transaction.amount || 0
+          ).toLocaleString(
+            "en-NG",
+            {
+              minimumFractionDigits:2
+            }
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            transaction.status ||
+            "pending"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            transaction.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   DASHBOARD UPDATE
+===================================================== */
+
+function updateDashboard(){
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      allCustomers.length;
+
+
+  document
+    .getElementById(
+      "totalOrders"
+    )
+    .textContent =
+      allOrders.length;
+
+
+  document
+    .getElementById(
+      "pendingOrders"
+    )
+    .textContent =
+      allOrders.filter(
+        function(order){
+
+          return String(
+            order.status || ""
+          )
+          .toLowerCase()
+          .includes("pending");
+
+        }
+      ).length;
+
+}
+
+
+/* =====================================================
+   CUSTOMER SEARCH
+===================================================== */
+
+document
+  .getElementById(
+    "customerSearch"
+  )
+  .addEventListener(
+    "input",
+    function(){
+
+      const search =
+        this.value
+          .toLowerCase()
+          .trim();
+
+
+      const filtered =
+        allCustomers.filter(
+          function(customer){
+
+            const text =
+              (
+                (customer.full_name || "") +
+                " " +
+                (customer.email || "") +
+                " " +
+                (customer.phone || "")
+              )
+              .toLowerCase();
+
+
+            return text.includes(
+              search
+            );
+
+          }
+        );
+
+
+      renderCustomers(
+        filtered
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   STATUS BADGE
+===================================================== */
+
+function statusBadge(status){
+
+  const value =
+    String(
+      status ||
+      "pending"
+    );
+
+
+  const lower =
+    value.toLowerCase();
+
+
+  let className =
+    "status-pending";
+
+
+  if(
+    lower.includes("completed") ||
+    lower.includes("success")
+  ){
+
+    className =
+      "status-completed";
+
+  }
+  else if(
+    lower.includes("failed") ||
+    lower.includes("cancel")
+  ){
+
+    className =
+      "status-failed";
+
+  }
+  else if(
+    lower.includes("processing")
+  ){
+
+    className =
+      "status-processing";
+
+  }
+
+
+  return `
+    <span class="status ${className}">
+      ${escapeHTML(value)}
+    </span>
+  `;
+
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function escapeHTML(value){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return "";
+
+  }
+
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function formatDate(date){
+
+  if(!date){
+    return "-";
+  }
+
+
+  return new Date(
+    date
+  ).toLocaleString(
+    "en-NG"
+  );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+checkSession();
+
+</script>
+
+</body>
+</html>
