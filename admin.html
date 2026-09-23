@@ -21,6 +21,14 @@ body{
   color:#172554;
 }
 
+button,input{
+  font-family:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
 /* ================= LOGIN ================= */
 
 #loginScreen{
@@ -72,7 +80,7 @@ body{
 .btn{
   border:0;
   border-radius:10px;
-  padding:14px 18px;
+  padding:13px 18px;
   font-weight:bold;
   color:white;
   background:#4f46e5;
@@ -84,7 +92,7 @@ body{
 }
 
 .btn:disabled{
-  opacity:.7;
+  opacity:.65;
   cursor:not-allowed;
 }
 
@@ -106,7 +114,7 @@ body{
   color:#16a34a;
 }
 
-/* ================= ADMIN APP ================= */
+/* ================= ADMIN ================= */
 
 #adminApp{
   display:none;
@@ -144,7 +152,6 @@ body{
   background:#4f46e5;
   color:white;
   font-size:25px;
-  cursor:pointer;
   display:none;
 }
 
@@ -175,7 +182,6 @@ body{
   color:white;
   padding:10px 16px;
   border-radius:9px;
-  cursor:pointer;
   font-weight:bold;
 }
 
@@ -208,21 +214,20 @@ body{
   background:transparent;
   color:#475569;
   text-align:left;
-  padding:15px 18px;
+  padding:14px 18px;
   border-radius:12px;
   margin-bottom:7px;
   font-size:16px;
-  cursor:pointer;
   transition:.2s;
 }
 
 .nav-btn:hover{
-  background:rgba(255,255,255,.55);
+  background:rgba(255,255,255,.65);
   color:#4338ca;
 }
 
 .nav-btn.active{
-  background:rgba(255,255,255,.55);
+  background:rgba(255,255,255,.7);
   color:#4338ca;
   font-weight:bold;
   border-left:5px solid #4f46e5;
@@ -246,7 +251,6 @@ body{
   margin-left:255px;
   padding:100px 30px 30px;
   min-height:100vh;
-  transition:.3s ease;
 }
 
 .page{
@@ -262,6 +266,12 @@ body{
   font-weight:800;
   margin-bottom:25px;
   color:#172554;
+}
+
+.page-subtitle{
+  color:#64748b;
+  margin-top:-15px;
+  margin-bottom:25px;
 }
 
 /* ================= STATS ================= */
@@ -304,11 +314,56 @@ body{
   border:1px solid #eef2f7;
 }
 
+.panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
 .panel-title{
   font-size:20px;
   font-weight:700;
-  margin-bottom:18px;
   color:#172554;
+}
+
+.panel-description{
+  color:#64748b;
+  font-size:14px;
+  margin-top:6px;
+}
+
+/* ================= BUTTONS ================= */
+
+.btn-blue{
+  background:#2563eb;
+}
+
+.btn-blue:hover{
+  background:#1d4ed8;
+}
+
+.btn-green{
+  background:#16a34a;
+}
+
+.btn-green:hover{
+  background:#15803d;
+}
+
+.btn-red{
+  background:#dc2626;
+}
+
+.btn-gray{
+  background:#64748b;
+}
+
+.btn-small{
+  padding:9px 13px;
+  font-size:13px;
 }
 
 /* ================= TABLE ================= */
@@ -329,6 +384,7 @@ th{
   background:#f8fafc;
   color:#475569;
   font-size:13px;
+  white-space:nowrap;
 }
 
 td{
@@ -336,6 +392,7 @@ td{
   border-bottom:1px solid #eef2f7;
   font-size:14px;
   color:#334155;
+  vertical-align:middle;
 }
 
 tr:hover td{
@@ -372,33 +429,237 @@ tr:hover td{
   color:#1e40af;
 }
 
+.status-neutral{
+  background:#e2e8f0;
+  color:#475569;
+}
+
 /* ================= SEARCH ================= */
 
 .search-box{
   width:100%;
-  max-width:400px;
+  max-width:450px;
   padding:13px;
   border:1px solid #d1d5db;
   border-radius:10px;
   outline:none;
-  margin-bottom:18px;
 }
 
 .search-box:focus{
   border-color:#4f46e5;
 }
 
-/* ================= EMPTY PAGES ================= */
+/* ================= API SERVICES ================= */
 
-.empty-box{
-  text-align:center;
-  padding:60px 20px;
+.api-toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+
+.api-status-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  background:#f8fafc;
+  border-radius:12px;
+  margin-bottom:20px;
+  color:#475569;
+  font-size:14px;
+}
+
+.service-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.service-card{
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  background:#fff;
+  transition:.2s;
+}
+
+.service-card:hover{
+  border-color:#93c5fd;
+  box-shadow:0 6px 20px rgba(37,99,235,.08);
+}
+
+.service-id{
+  color:#64748b;
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.service-name{
+  font-size:16px;
+  font-weight:700;
+  color:#172554;
+  margin-bottom:12px;
+  line-height:1.4;
+}
+
+.service-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:7px 0;
+  border-top:1px solid #f1f5f9;
+  font-size:13px;
+}
+
+.service-row span:first-child{
   color:#64748b;
 }
 
-.empty-icon{
-  font-size:50px;
-  margin-bottom:15px;
+.service-row span:last-child{
+  color:#172554;
+  font-weight:600;
+  text-align:right;
+}
+
+/* ================= SETTINGS ================= */
+
+.settings-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+}
+
+.setting-item{
+  padding:18px;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  background:#fff;
+}
+
+.setting-label{
+  font-size:13px;
+  color:#64748b;
+  margin-bottom:7px;
+}
+
+.setting-value{
+  font-size:16px;
+  font-weight:700;
+  color:#172554;
+  word-break:break-word;
+}
+
+.setting-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+/* ================= API SERVER ================= */
+
+.connection-list{
+  display:grid;
+  gap:12px;
+}
+
+.connection-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:16px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+}
+
+.connection-name{
+  font-weight:700;
+  color:#172554;
+}
+
+.connection-detail{
+  color:#64748b;
+  font-size:13px;
+  margin-top:4px;
+  word-break:break-all;
+}
+
+/* ================= INFO BOX ================= */
+
+.info-box{
+  padding:16px;
+  border-radius:12px;
+  background:#eff6ff;
+  color:#1e40af;
+  border:1px solid #bfdbfe;
+  margin-bottom:20px;
+  line-height:1.6;
+}
+
+.warning-box{
+  padding:16px;
+  border-radius:12px;
+  background:#fffbeb;
+  color:#92400e;
+  border:1px solid #fde68a;
+  margin-bottom:20px;
+  line-height:1.6;
+}
+
+.success-box{
+  padding:16px;
+  border-radius:12px;
+  background:#f0fdf4;
+  color:#166534;
+  border:1px solid #bbf7d0;
+  margin-bottom:20px;
+  line-height:1.6;
+}
+
+/* ================= LOADING ================= */
+
+.loading{
+  text-align:center;
+  padding:35px 15px;
+  color:#64748b;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#64748b;
+}
+
+/* ================= TOAST ================= */
+
+#toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  max-width:380px;
+  padding:15px 18px;
+  background:#172554;
+  color:white;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  display:none;
+  z-index:3000;
+  font-size:14px;
+  line-height:1.5;
+}
+
+#toast.show{
+  display:block;
+}
+
+#toast.success{
+  background:#15803d;
+}
+
+#toast.error{
+  background:#b91c1c;
 }
 
 /* ================= OVERLAY ================= */
@@ -409,9 +670,13 @@ tr:hover td{
 
 /* ================= MOBILE ================= */
 
-@media(max-width:1000px){
+@media(max-width:1100px){
 
   .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .service-grid{
     grid-template-columns:repeat(2,1fr);
   }
 
@@ -492,15 +757,17 @@ tr:hover td{
     padding:16px;
   }
 
+  .service-grid{
+    grid-template-columns:1fr;
+  }
+
+  .settings-grid{
+    grid-template-columns:1fr;
+  }
+
 }
 
-/* ================= SMALL PHONE ================= */
-
 @media(max-width:420px){
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
 
   .stat-label{
     font-size:12px;
@@ -571,12 +838,12 @@ tr:hover td{
 
 
 <!-- =====================================================
-     ADMIN APPLICATION
+     ADMIN APP
 ===================================================== -->
 
 <div id="adminApp">
 
-  <!-- TOP BAR -->
+  <!-- TOPBAR -->
 
   <div class="topbar">
 
@@ -618,8 +885,6 @@ tr:hover td{
   </div>
 
 
-  <!-- SIDEBAR OVERLAY -->
-
   <div
     class="sidebar-overlay"
     id="sidebarOverlay"
@@ -637,58 +902,47 @@ tr:hover td{
       Admin Panel
     </div>
 
-    <button
-      class="nav-btn active"
-      data-page="dashboard"
-    >
+    <button class="nav-btn active" data-page="dashboard">
       <span class="nav-icon">📊</span>
       Dashboard
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="customers"
-    >
+    <button class="nav-btn" data-page="customers">
       <span class="nav-icon">👥</span>
       Users
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="orders"
-    >
+    <button class="nav-btn" data-page="orders">
       <span class="nav-icon">📋</span>
       Orders
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="transactions"
-    >
+    <button class="nav-btn" data-page="transactions">
       <span class="nav-icon">💳</span>
       Transactions
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="apiServices"
-    >
+    <button class="nav-btn" data-page="apiServices">
       <span class="nav-icon">🌐</span>
       API Services
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="tickets"
-    >
+    <button class="nav-btn" data-page="apiServer">
+      <span class="nav-icon">🔌</span>
+      API Server
+    </button>
+
+    <button class="nav-btn" data-page="katpay">
+      <span class="nav-icon">💰</span>
+      KatPay
+    </button>
+
+    <button class="nav-btn" data-page="tickets">
       <span class="nav-icon">🎫</span>
       Tickets
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="settings"
-    >
+    <button class="nav-btn" data-page="settings">
       <span class="nav-icon">⚙️</span>
       Settings
     </button>
@@ -709,20 +963,23 @@ tr:hover td{
   </aside>
 
 
-  <!-- CONTENT -->
+  <!-- =====================================================
+       CONTENT
+  ===================================================== -->
 
   <main class="content">
 
     <!-- DASHBOARD -->
 
-    <section
-      class="page active"
-      id="dashboard"
-    >
+    <section class="page active" id="dashboard">
 
       <h1 class="page-title">
         Dashboard
       </h1>
+
+      <p class="page-subtitle">
+        Welcome to your Boostlane administration panel.
+      </p>
 
       <div class="stats">
 
@@ -731,10 +988,7 @@ tr:hover td{
             Total Customers
           </div>
 
-          <div
-            class="stat-value"
-            id="totalCustomers"
-          >
+          <div class="stat-value" id="totalCustomers">
             0
           </div>
         </div>
@@ -744,10 +998,7 @@ tr:hover td{
             Total Orders
           </div>
 
-          <div
-            class="stat-value"
-            id="totalOrders"
-          >
+          <div class="stat-value" id="totalOrders">
             0
           </div>
         </div>
@@ -757,10 +1008,7 @@ tr:hover td{
             Pending Orders
           </div>
 
-          <div
-            class="stat-value"
-            id="pendingOrders"
-          >
+          <div class="stat-value" id="pendingOrders">
             0
           </div>
         </div>
@@ -770,10 +1018,7 @@ tr:hover td{
             Total Wallet Balance
           </div>
 
-          <div
-            class="stat-value"
-            id="totalBalance"
-          >
+          <div class="stat-value" id="totalBalance">
             ₦0.00
           </div>
         </div>
@@ -783,9 +1028,19 @@ tr:hover td{
 
       <div class="panel">
 
-        <h2 class="panel-title">
-          Recent Customers
-        </h2>
+        <div class="panel-header">
+
+          <div>
+            <div class="panel-title">
+              Recent Customers
+            </div>
+
+            <div class="panel-description">
+              Latest registered Boostlane customers.
+            </div>
+          </div>
+
+        </div>
 
         <div class="table-wrapper">
 
@@ -811,9 +1066,19 @@ tr:hover td{
 
       <div class="panel">
 
-        <h2 class="panel-title">
-          Recent Orders
-        </h2>
+        <div class="panel-header">
+
+          <div>
+            <div class="panel-title">
+              Recent Orders
+            </div>
+
+            <div class="panel-description">
+              Latest orders placed by customers.
+            </div>
+          </div>
+
+        </div>
 
         <div class="table-wrapper">
 
@@ -841,23 +1106,36 @@ tr:hover td{
 
     <!-- CUSTOMERS -->
 
-    <section
-      class="page"
-      id="customers"
-    >
+    <section class="page" id="customers">
 
       <h1 class="page-title">
         Users
       </h1>
 
+      <p class="page-subtitle">
+        Manage and view registered customers.
+      </p>
+
       <div class="panel">
 
-        <input
-          type="text"
-          id="customerSearch"
-          class="search-box"
-          placeholder="Search users..."
-        >
+        <div class="panel-header">
+
+          <input
+            type="text"
+            id="customerSearch"
+            class="search-box"
+            placeholder="Search name, email or phone..."
+          >
+
+          <button
+            class="btn btn-blue btn-small"
+            id="refreshCustomersBtn"
+            type="button"
+          >
+            🔄 Refresh
+          </button>
+
+        </div>
 
         <div class="table-wrapper">
 
@@ -886,16 +1164,33 @@ tr:hover td{
 
     <!-- ORDERS -->
 
-    <section
-      class="page"
-      id="orders"
-    >
+    <section class="page" id="orders">
 
       <h1 class="page-title">
         Orders
       </h1>
 
+      <p class="page-subtitle">
+        All customer social-media orders.
+      </p>
+
       <div class="panel">
+
+        <div class="panel-header">
+
+          <div class="panel-title">
+            Order History
+          </div>
+
+          <button
+            class="btn btn-blue btn-small"
+            id="refreshOrdersBtn"
+            type="button"
+          >
+            🔄 Refresh
+          </button>
+
+        </div>
 
         <div class="table-wrapper">
 
@@ -925,16 +1220,33 @@ tr:hover td{
 
     <!-- TRANSACTIONS -->
 
-    <section
-      class="page"
-      id="transactions"
-    >
+    <section class="page" id="transactions">
 
       <h1 class="page-title">
         Transactions
       </h1>
 
+      <p class="page-subtitle">
+        Customer wallet funding and transaction history.
+      </p>
+
       <div class="panel">
+
+        <div class="panel-header">
+
+          <div class="panel-title">
+            Transaction History
+          </div>
+
+          <button
+            class="btn btn-blue btn-small"
+            id="refreshTransactionsBtn"
+            type="button"
+          >
+            🔄 Refresh
+          </button>
+
+        </div>
 
         <div class="table-wrapper">
 
@@ -963,30 +1275,284 @@ tr:hover td{
 
     <!-- API SERVICES -->
 
-    <section
-      class="page"
-      id="apiServices"
-    >
+    <section class="page" id="apiServices">
 
       <h1 class="page-title">
         API Services
       </h1>
 
+      <p class="page-subtitle">
+        Services returned directly from ReallySimpleSocial.
+      </p>
+
       <div class="panel">
 
-        <div class="empty-box">
+        <div class="api-toolbar">
 
-          <div class="empty-icon">
-            🌐
+          <input
+            type="text"
+            id="serviceSearch"
+            class="search-box"
+            placeholder="Search services..."
+          >
+
+          <button
+            class="btn btn-blue"
+            id="loadServicesBtn"
+            type="button"
+          >
+            🔄 Load Services
+          </button>
+
+        </div>
+
+        <div
+          id="serviceStatus"
+          class="api-status-box"
+        >
+          Ready to connect to ReallySimpleSocial.
+        </div>
+
+        <div
+          id="servicesContainer"
+          class="service-grid"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- API SERVER -->
+
+    <section class="page" id="apiServer">
+
+      <h1 class="page-title">
+        API Server
+      </h1>
+
+      <p class="page-subtitle">
+        Check the connection between Boostlane and its backend services.
+      </p>
+
+      <div class="panel">
+
+        <div class="panel-title">
+          Server Connections
+        </div>
+
+        <br>
+
+        <div class="connection-list">
+
+          <div class="connection-item">
+
+            <div>
+              <div class="connection-name">
+                Supabase
+              </div>
+
+              <div class="connection-detail">
+                Database + Authentication
+              </div>
+            </div>
+
+            <span
+              id="supabaseStatus"
+              class="status status-neutral"
+            >
+              Checking...
+            </span>
+
           </div>
 
-          <h2>
-            API Services
-          </h2>
 
-          <p style="margin-top:10px;">
-            Your social-media services will appear here.
-          </p>
+          <div class="connection-item">
+
+            <div>
+              <div class="connection-name">
+                ReallySimpleSocial
+              </div>
+
+              <div class="connection-detail">
+                Supabase Edge Function: reallysimple-services
+              </div>
+            </div>
+
+            <span
+              id="rssStatus"
+              class="status status-neutral"
+            >
+              Not tested
+            </span>
+
+          </div>
+
+
+          <div class="connection-item">
+
+            <div>
+              <div class="connection-name">
+                KatPay
+              </div>
+
+              <div class="connection-detail">
+                Supabase Edge Function: katpay
+              </div>
+            </div>
+
+            <span
+              id="katpayStatus"
+              class="status status-neutral"
+            >
+              Deployed
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="setting-actions">
+
+          <button
+            class="btn btn-blue"
+            id="testApiBtn"
+            type="button"
+          >
+            🔌 Test API Connection
+          </button>
+
+        </div>
+
+        <div
+          id="apiTestResult"
+          style="margin-top:18px;"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- KATPAY -->
+
+    <section class="page" id="katpay">
+
+      <h1 class="page-title">
+        KatPay
+      </h1>
+
+      <p class="page-subtitle">
+        Payment gateway configuration for customer wallet funding.
+      </p>
+
+      <div class="panel">
+
+        <div class="success-box">
+          <strong>KatPay Edge Function detected.</strong><br>
+          The payment backend is deployed through Supabase Edge Functions.
+        </div>
+
+        <div class="settings-grid">
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Function
+            </div>
+
+            <div class="setting-value">
+              katpay
+            </div>
+
+          </div>
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Secret
+            </div>
+
+            <div class="setting-value">
+              🔐 Stored securely in Supabase
+            </div>
+
+          </div>
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Payment Records
+            </div>
+
+            <div class="setting-value">
+              katpay_payments
+            </div>
+
+          </div>
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Wallet System
+            </div>
+
+            <div class="setting-value">
+              Supabase wallets
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="warning-box" style="margin-top:20px;">
+          Payment secrets are intentionally not displayed in this dashboard.
+          Keep them inside Supabase Edge Function Secrets.
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+            <div class="panel-title">
+              Recent KatPay Payments
+            </div>
+
+            <div class="panel-description">
+              Payment records stored in Supabase.
+            </div>
+          </div>
+
+          <button
+            class="btn btn-blue btn-small"
+            id="refreshKatpayBtn"
+            type="button"
+          >
+            🔄 Refresh
+          </button>
+
+        </div>
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+
+            <tbody id="katpayPaymentsTable"></tbody>
+
+          </table>
 
         </div>
 
@@ -997,30 +1563,50 @@ tr:hover td{
 
     <!-- TICKETS -->
 
-    <section
-      class="page"
-      id="tickets"
-    >
+    <section class="page" id="tickets">
 
       <h1 class="page-title">
         Tickets
       </h1>
 
+      <p class="page-subtitle">
+        Customer support area.
+      </p>
+
       <div class="panel">
 
-        <div class="empty-box">
+        <div class="info-box">
+          The admin dashboard is ready for support tickets, but your current
+          database does not yet contain a dedicated support/tickets table.
+          Your existing customer support channel can continue to be used until
+          that table is added.
+        </div>
 
-          <div class="empty-icon">
-            🎫
+        <div class="settings-grid">
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Support Status
+            </div>
+
+            <div class="setting-value">
+              🟢 Available
+            </div>
+
           </div>
 
-          <h2>
-            Support Tickets
-          </h2>
+          <div class="setting-item">
 
-          <p style="margin-top:10px;">
-            Customer support tickets will appear here.
-          </p>
+            <div class="setting-label">
+              Ticket Database
+            </div>
+
+            <div class="setting-value">
+              Not configured yet
+            </div>
+
+          </div>
 
         </div>
 
@@ -1031,30 +1617,144 @@ tr:hover td{
 
     <!-- SETTINGS -->
 
-    <section
-      class="page"
-      id="settings"
-    >
+    <section class="page" id="settings">
 
       <h1 class="page-title">
         Settings
       </h1>
 
+      <p class="page-subtitle">
+        Boostlane administrator and system configuration.
+      </p>
+
       <div class="panel">
 
-        <div class="empty-box">
+        <div class="panel-title">
+          Administrator
+        </div>
 
-          <div class="empty-icon">
-            ⚙️
+        <br>
+
+        <div class="settings-grid">
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Logged-in Admin
+            </div>
+
+            <div
+              class="setting-value"
+              id="settingsAdminEmail"
+            >
+              -
+            </div>
+
           </div>
 
-          <h2>
-            Admin Settings
-          </h2>
+          <div class="setting-item">
 
-          <p style="margin-top:10px;">
-            Settings will be added here.
-          </p>
+            <div class="setting-label">
+              Account Role
+            </div>
+
+            <div class="setting-value">
+              Administrator
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-title">
+          System Configuration
+        </div>
+
+        <br>
+
+        <div class="settings-grid">
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Supabase Project
+            </div>
+
+            <div class="setting-value">
+              whseefadqutdrsachypc
+            </div>
+
+          </div>
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Social API
+            </div>
+
+            <div class="setting-value">
+              ReallySimpleSocial
+            </div>
+
+          </div>
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Social API Function
+            </div>
+
+            <div class="setting-value">
+              reallysimple-services
+            </div>
+
+          </div>
+
+          <div class="setting-item">
+
+            <div class="setting-label">
+              Payment Function
+            </div>
+
+            <div class="setting-value">
+              katpay
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-title">
+          Admin Actions
+        </div>
+
+        <div class="setting-actions">
+
+          <button
+            class="btn btn-blue"
+            id="settingsRefreshBtn"
+            type="button"
+          >
+            🔄 Refresh Dashboard Data
+          </button>
+
+          <button
+            class="btn btn-red"
+            id="settingsLogoutBtn"
+            type="button"
+          >
+            🚪 Logout
+          </button>
 
         </div>
 
@@ -1065,6 +1765,9 @@ tr:hover td{
   </main>
 
 </div>
+
+
+<div id="toast"></div>
 
 
 <script>
@@ -1091,24 +1794,60 @@ const db =
 ===================================================== */
 
 let currentUser = null;
+
 let allCustomers = [];
 let allOrders = [];
+
 let walletMap = {};
 let customerMap = {};
+
+let allServices = [];
+
+
+/* =====================================================
+   ELEMENT HELPERS
+===================================================== */
+
+function $(id){
+  return document.getElementById(id);
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+let toastTimer = null;
+
+function showToast(message,type="success"){
+
+  const toast = $("toast");
+
+  toast.textContent = message;
+
+  toast.className = "show " + type;
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(function(){
+
+    toast.className = "";
+
+  },4000);
+
+}
 
 
 /* =====================================================
    LOGIN
 ===================================================== */
 
-document
-  .getElementById("adminLoginBtn")
-  .addEventListener("click", adminLogin);
+$("adminLoginBtn")
+  .addEventListener("click",adminLogin);
 
 
-document
-  .getElementById("adminPassword")
-  .addEventListener("keydown", function(event){
+$("adminPassword")
+  .addEventListener("keydown",function(event){
 
     if(event.key === "Enter"){
       adminLogin();
@@ -1117,9 +1856,8 @@ document
   });
 
 
-document
-  .getElementById("adminEmail")
-  .addEventListener("keydown", function(event){
+$("adminEmail")
+  .addEventListener("keydown",function(event){
 
     if(event.key === "Enter"){
       adminLogin();
@@ -1131,24 +1869,20 @@ document
 async function adminLogin(){
 
   const email =
-    document
-      .getElementById("adminEmail")
-      .value
-      .trim();
+    $("adminEmail").value.trim();
 
   const password =
-    document
-      .getElementById("adminPassword")
-      .value;
+    $("adminPassword").value;
 
   const message =
-    document.getElementById("loginMessage");
+    $("loginMessage");
 
   const button =
-    document.getElementById("adminLoginBtn");
+    $("adminLoginBtn");
 
 
   message.className = "message";
+
   message.textContent = "";
 
 
@@ -1160,11 +1894,14 @@ async function adminLogin(){
     message.classList.add("error");
 
     return;
+
   }
 
 
   button.disabled = true;
-  button.textContent = "Logging in...";
+
+  button.textContent =
+    "Logging in...";
 
 
   try{
@@ -1174,8 +1911,8 @@ async function adminLogin(){
       error
     } =
       await db.auth.signInWithPassword({
-        email:email,
-        password:password
+        email,
+        password
       });
 
 
@@ -1197,36 +1934,11 @@ async function adminLogin(){
       data.user;
 
 
-    const {
-      data:profile,
-      error:profileError
-    } =
-      await db
-        .from("profiles")
-        .select("role")
-        .eq(
-          "id",
-          currentUser.id
-        )
-        .maybeSingle();
+    const isAdmin =
+      await checkAdmin();
 
 
-    if(profileError){
-
-      console.error(profileError);
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      throw new Error(
-        "Could not verify administrator account."
-      );
-
-    }
-
-
-    if(!profile || profile.role !== "admin"){
+    if(!isAdmin){
 
       await db.auth.signOut();
 
@@ -1265,7 +1977,9 @@ async function adminLogin(){
   }finally{
 
     button.disabled = false;
-    button.textContent = "Login";
+
+    button.textContent =
+      "Login";
 
   }
 
@@ -1290,10 +2004,7 @@ async function checkAdmin(){
     await db
       .from("profiles")
       .select("role")
-      .eq(
-        "id",
-        currentUser.id
-      )
+      .eq("id",currentUser.id)
       .maybeSingle();
 
 
@@ -1321,20 +2032,28 @@ async function checkAdmin(){
 
 async function openAdmin(){
 
-  document
-    .getElementById("loginScreen")
-    .style.display = "none";
+  $("loginScreen").style.display =
+    "none";
+
+  $("adminApp").style.display =
+    "block";
 
 
-  document
-    .getElementById("adminApp")
-    .style.display = "block";
+  $("adminEmailDisplay").textContent =
+    currentUser?.email ||
+    "Admin";
 
 
-  document
-    .getElementById("adminEmailDisplay")
-    .textContent =
-      currentUser?.email || "Admin";
+  $("settingsAdminEmail").textContent =
+    currentUser?.email ||
+    "-";
+
+
+  $("supabaseStatus").textContent =
+    "Connected";
+
+  $("supabaseStatus").className =
+    "status status-completed";
 
 
   await loadAllData();
@@ -1348,40 +2067,53 @@ async function openAdmin(){
 
 async function checkSession(){
 
-  const {
-    data:{
-      session
+  try{
+
+    const {
+      data:{
+        session
+      }
+    } =
+      await db.auth.getSession();
+
+
+    if(!session){
+
+      showLogin();
+
+      return;
+
     }
-  } =
-    await db.auth.getSession();
 
 
-  if(!session){
-
-    showLogin();
-
-    return;
-
-  }
+    currentUser =
+      session.user;
 
 
-  currentUser =
-    session.user;
+    const isAdmin =
+      await checkAdmin();
 
 
-  const isAdmin =
-    await checkAdmin();
+    if(isAdmin){
 
+      await openAdmin();
 
-  if(isAdmin){
+    }else{
 
-    await openAdmin();
+      await db.auth.signOut();
 
-  }else{
+      currentUser = null;
 
-    await db.auth.signOut();
+      showLogin();
 
-    currentUser = null;
+    }
+
+  }catch(error){
+
+    console.error(
+      "Session error:",
+      error
+    );
 
     showLogin();
 
@@ -1396,14 +2128,11 @@ async function checkSession(){
 
 function showLogin(){
 
-  document
-    .getElementById("loginScreen")
-    .style.display = "flex";
+  $("loginScreen").style.display =
+    "flex";
 
-
-  document
-    .getElementById("adminApp")
-    .style.display = "none";
+  $("adminApp").style.display =
+    "none";
 
 }
 
@@ -1422,23 +2151,23 @@ async function logout(){
 
   showLogin();
 
+  showToast(
+    "Logged out successfully."
+  );
+
 }
 
 
-document
-  .getElementById("topLogoutBtn")
-  .addEventListener(
-    "click",
-    logout
-  );
+$("topLogoutBtn")
+  .addEventListener("click",logout);
 
 
-document
-  .getElementById("sideLogoutBtn")
-  .addEventListener(
-    "click",
-    logout
-  );
+$("sideLogoutBtn")
+  .addEventListener("click",logout);
+
+
+$("settingsLogoutBtn")
+  .addEventListener("click",logout);
 
 
 /* =====================================================
@@ -1446,22 +2175,26 @@ document
 ===================================================== */
 
 const sidebar =
-  document.getElementById("sidebar");
+  $("sidebar");
 
 const menuBtn =
-  document.getElementById("menuBtn");
+  $("menuBtn");
 
 const sidebarOverlay =
-  document.getElementById("sidebarOverlay");
+  $("sidebarOverlay");
 
 
 menuBtn.addEventListener(
   "click",
   function(){
 
-    sidebar.classList.toggle("open");
+    sidebar.classList.toggle(
+      "open"
+    );
 
-    sidebarOverlay.classList.toggle("show");
+    sidebarOverlay.classList.toggle(
+      "show"
+    );
 
   }
 );
@@ -1475,9 +2208,13 @@ sidebarOverlay.addEventListener(
 
 function closeSidebar(){
 
-  sidebar.classList.remove("open");
+  sidebar.classList.remove(
+    "open"
+  );
 
-  sidebarOverlay.classList.remove("show");
+  sidebarOverlay.classList.remove(
+    "show"
+  );
 
 }
 
@@ -1487,19 +2224,23 @@ function closeSidebar(){
 ===================================================== */
 
 document
-  .querySelectorAll(".nav-btn[data-page]")
+  .querySelectorAll(
+    ".nav-btn[data-page]"
+  )
   .forEach(function(button){
 
     button.addEventListener(
       "click",
-      function(){
+      async function(){
 
         const page =
           this.dataset.page;
 
 
         document
-          .querySelectorAll(".nav-btn[data-page]")
+          .querySelectorAll(
+            ".nav-btn[data-page]"
+          )
           .forEach(function(btn){
 
             btn.classList.remove(
@@ -1509,11 +2250,15 @@ document
           });
 
 
-        this.classList.add("active");
+        this.classList.add(
+          "active"
+        );
 
 
         document
-          .querySelectorAll(".page")
+          .querySelectorAll(
+            ".page"
+          )
           .forEach(function(section){
 
             section.classList.remove(
@@ -1524,17 +2269,44 @@ document
 
 
         const target =
-          document.getElementById(page);
+          $(page);
 
 
         if(target){
 
-          target.classList.add("active");
+          target.classList.add(
+            "active"
+          );
 
         }
 
 
         closeSidebar();
+
+
+        if(page === "apiServices"){
+
+          if(!allServices.length){
+
+            await loadServices();
+
+          }
+
+        }
+
+
+        if(page === "apiServer"){
+
+          await testApiConnection();
+
+        }
+
+
+        if(page === "katpay"){
+
+          await loadKatpayPayments();
+
+        }
 
       }
     );
@@ -1548,15 +2320,29 @@ document
 
 async function loadAllData(){
 
+  showToast(
+    "Loading dashboard data..."
+  );
+
+
   await loadCustomers();
 
   await loadWallets();
+
+  renderCustomers(
+    allCustomers
+  );
 
   await loadOrders();
 
   await loadTransactions();
 
   updateDashboard();
+
+
+  showToast(
+    "Dashboard data refreshed."
+  );
 
 }
 
@@ -1587,6 +2373,12 @@ async function loadCustomers(){
     console.error(
       "Customers error:",
       error
+    );
+
+    showToast(
+      "Could not load customers: " +
+      error.message,
+      "error"
     );
 
     return;
@@ -1625,12 +2417,8 @@ async function loadCustomers(){
   );
 
 
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      allCustomers.length;
+  $("totalCustomers").textContent =
+    allCustomers.length;
 
 }
 
@@ -1642,9 +2430,7 @@ async function loadCustomers(){
 function renderCustomers(customers){
 
   const table =
-    document.getElementById(
-      "customersTable"
-    );
+    $("customersTable");
 
 
   table.innerHTML = "";
@@ -1655,7 +2441,9 @@ function renderCustomers(customers){
     table.innerHTML = `
       <tr>
         <td colspan="5">
-          No customers found.
+          <div class="empty">
+            No customers found.
+          </div>
         </td>
       </tr>
     `;
@@ -1676,7 +2464,9 @@ function renderCustomers(customers){
 
       const balance =
         wallet
-          ? Number(wallet.balance || 0)
+          ? Number(
+              wallet.balance || 0
+            )
           : 0;
 
 
@@ -1708,12 +2498,7 @@ function renderCustomers(customers){
         </td>
 
         <td>
-          ₦${balance.toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits:2
-            }
-          )}
+          ₦${formatMoney(balance)}
         </td>
 
         <td>
@@ -1740,9 +2525,7 @@ function renderCustomers(customers){
 function renderRecentCustomers(customers){
 
   const table =
-    document.getElementById(
-      "recentCustomersTable"
-    );
+    $("recentCustomersTable");
 
 
   table.innerHTML = "";
@@ -1753,7 +2536,9 @@ function renderRecentCustomers(customers){
     table.innerHTML = `
       <tr>
         <td colspan="4">
-          No customers yet.
+          <div class="empty">
+            No customers yet.
+          </div>
         </td>
       </tr>
     `;
@@ -1832,6 +2617,12 @@ async function loadWallets(){
       error
     );
 
+    showToast(
+      "Could not load wallets: " +
+      error.message,
+      "error"
+    );
+
     return;
 
   }
@@ -1858,16 +2649,9 @@ async function loadWallets(){
   );
 
 
-  document
-    .getElementById("totalBalance")
-    .textContent =
-      "₦" +
-      total.toLocaleString(
-        "en-NG",
-        {
-          minimumFractionDigits:2
-        }
-      );
+  $("totalBalance").textContent =
+    "₦" +
+    formatMoney(total);
 
 }
 
@@ -1900,6 +2684,12 @@ async function loadOrders(){
       error
     );
 
+    showToast(
+      "Could not load orders: " +
+      error.message,
+      "error"
+    );
+
     return;
 
   }
@@ -1909,21 +2699,54 @@ async function loadOrders(){
     data || [];
 
 
-  const table =
-    document.getElementById(
-      "ordersTable"
-    );
+  renderOrders();
 
+}
+
+
+/* =====================================================
+   RENDER ORDERS
+===================================================== */
+
+function renderOrders(){
+
+  const table =
+    $("ordersTable");
 
   const recentTable =
-    document.getElementById(
-      "recentOrdersTable"
-    );
+    $("recentOrdersTable");
 
 
   table.innerHTML = "";
 
   recentTable.innerHTML = "";
+
+
+  if(!allOrders.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="empty">
+            No orders yet.
+          </div>
+        </td>
+      </tr>
+    `;
+
+    recentTable.innerHTML = `
+      <tr>
+        <td colspan="4">
+          <div class="empty">
+            No orders yet.
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
 
 
   allOrders.forEach(
@@ -1964,10 +2787,12 @@ async function loadOrders(){
         </td>
 
         <td>
-          ${escapeHTML(
-            order.account_link ||
-            "-"
-          )}
+          ${order.account_link
+            ? escapeHTML(
+                order.account_link
+              )
+            : "-"
+          }
         </td>
 
         <td>
@@ -2069,21 +2894,42 @@ async function loadTransactions(){
       error
     );
 
+    showToast(
+      "Could not load transactions: " +
+      error.message,
+      "error"
+    );
+
     return;
 
   }
 
 
   const table =
-    document.getElementById(
-      "transactionsTable"
-    );
+    $("transactionsTable");
 
 
   table.innerHTML = "";
 
 
-  (data || []).forEach(
+  if(!data || !data.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty">
+            No transactions yet.
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  data.forEach(
     function(transaction){
 
       const customer =
@@ -2101,6 +2947,7 @@ async function loadTransactions(){
         <td>
           ${escapeHTML(
             customer?.full_name ||
+            customer?.email ||
             "-"
           )}
         </td>
@@ -2113,13 +2960,11 @@ async function loadTransactions(){
         </td>
 
         <td>
-          ₦${Number(
-            transaction.amount || 0
-          ).toLocaleString(
-            "en-NG",
-            {
-              minimumFractionDigits:2
-            }
+          ₦${formatMoney(
+            Number(
+              transaction.amount ||
+              0
+            )
           )}
         </td>
 
@@ -2153,38 +2998,32 @@ async function loadTransactions(){
 
 function updateDashboard(){
 
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      allCustomers.length;
+  $("totalCustomers").textContent =
+    allCustomers.length;
 
 
-  document
-    .getElementById(
-      "totalOrders"
-    )
-    .textContent =
-      allOrders.length;
+  $("totalOrders").textContent =
+    allOrders.length;
 
 
-  document
-    .getElementById(
-      "pendingOrders"
-    )
-    .textContent =
-      allOrders.filter(
-        function(order){
+  $("pendingOrders").textContent =
+    allOrders.filter(
+      function(order){
 
-          return String(
-            order.status || ""
-          )
-          .toLowerCase()
-          .includes("pending");
+        const status =
+          String(
+            order.status ||
+            ""
+          ).toLowerCase();
 
-        }
-      ).length;
+
+        return (
+          status.includes("pending") ||
+          status.includes("processing")
+        );
+
+      }
+    ).length;
 
 }
 
@@ -2193,10 +3032,7 @@ function updateDashboard(){
    CUSTOMER SEARCH
 ===================================================== */
 
-document
-  .getElementById(
-    "customerSearch"
-  )
+$("customerSearch")
   .addEventListener(
     "input",
     function(){
@@ -2239,6 +3075,703 @@ document
 
 
 /* =====================================================
+   API SERVICES
+===================================================== */
+
+$("loadServicesBtn")
+  .addEventListener(
+    "click",
+    loadServices
+  );
+
+
+async function loadServices(){
+
+  const status =
+    $("serviceStatus");
+
+  const container =
+    $("servicesContainer");
+
+  const button =
+    $("loadServicesBtn");
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Loading...";
+
+
+  status.className =
+    "api-status-box";
+
+  status.textContent =
+    "Connecting to ReallySimpleSocial...";
+
+
+  container.innerHTML = `
+    <div class="loading">
+      Loading services...
+    </div>
+  `;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await db.functions.invoke(
+        "reallysimple-services",
+        {
+          body:{}
+        }
+      );
+
+
+    if(error){
+      throw error;
+    }
+
+
+    /*
+      The Edge Function normally returns
+      the provider's JSON response.
+
+      Accept several common response shapes
+      without assuming a single provider format.
+    */
+
+    let services = [];
+
+
+    if(Array.isArray(data)){
+
+      services = data;
+
+    }
+    else if(
+      data &&
+      Array.isArray(data.services)
+    ){
+
+      services = data.services;
+
+    }
+    else if(
+      data &&
+      Array.isArray(data.data)
+    ){
+
+      services = data.data;
+
+    }
+
+
+    if(!services.length){
+
+      status.className =
+        "api-status-box";
+
+      status.textContent =
+        "API connected, but no service list was returned. Check the Edge Function response.";
+
+
+      container.innerHTML = `
+        <div class="empty">
+          No services returned.
+        </div>
+      `;
+
+      allServices = [];
+
+      return;
+
+    }
+
+
+    allServices =
+      services;
+
+
+    status.className =
+      "api-status-box";
+
+    status.innerHTML =
+      "🟢 Connected — " +
+      services.length +
+      " services loaded.";
+
+
+    renderServices(
+      services
+    );
+
+
+    $("rssStatus").textContent =
+      "Connected";
+
+    $("rssStatus").className =
+      "status status-completed";
+
+
+    showToast(
+      services.length +
+      " API services loaded."
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "ReallySimpleSocial error:",
+      error
+    );
+
+
+    status.className =
+      "api-status-box";
+
+    status.textContent =
+      "🔴 API connection failed: " +
+      (error.message ||
+      "Unknown error");
+
+
+    container.innerHTML = `
+      <div class="empty">
+        Could not load API services.
+      </div>
+    `;
+
+
+    $("rssStatus").textContent =
+      "Connection failed";
+
+    $("rssStatus").className =
+      "status status-failed";
+
+
+    showToast(
+      "ReallySimpleSocial connection failed.",
+      "error"
+    );
+
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "🔄 Load Services";
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER SERVICES
+===================================================== */
+
+function renderServices(services){
+
+  const container =
+    $("servicesContainer");
+
+
+  container.innerHTML = "";
+
+
+  if(!services.length){
+
+    container.innerHTML = `
+      <div class="empty">
+        No services found.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  services.forEach(
+    function(service){
+
+      const card =
+        document.createElement("div");
+
+
+      card.className =
+        "service-card";
+
+
+      const id =
+        service.service ??
+        service.id ??
+        "-";
+
+
+      const name =
+        service.name ??
+        service.title ??
+        "Unnamed Service";
+
+
+      const category =
+        service.category ??
+        "-";
+
+
+      const type =
+        service.type ??
+        "-";
+
+
+      const rate =
+        service.rate ??
+        service.price ??
+        "-";
+
+
+      const min =
+        service.min ??
+        service.minimum ??
+        "-";
+
+
+      const max =
+        service.max ??
+        service.maximum ??
+        "-";
+
+
+      card.innerHTML = `
+
+        <div class="service-id">
+          Service ID: ${escapeHTML(id)}
+        </div>
+
+        <div class="service-name">
+          ${escapeHTML(name)}
+        </div>
+
+        <div class="service-row">
+          <span>Category</span>
+          <span>${escapeHTML(category)}</span>
+        </div>
+
+        <div class="service-row">
+          <span>Type</span>
+          <span>${escapeHTML(type)}</span>
+        </div>
+
+        <div class="service-row">
+          <span>Rate</span>
+          <span>${escapeHTML(rate)}</span>
+        </div>
+
+        <div class="service-row">
+          <span>Minimum</span>
+          <span>${escapeHTML(min)}</span>
+        </div>
+
+        <div class="service-row">
+          <span>Maximum</span>
+          <span>${escapeHTML(max)}</span>
+        </div>
+
+      `;
+
+
+      container.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   SERVICE SEARCH
+===================================================== */
+
+$("serviceSearch")
+  .addEventListener(
+    "input",
+    function(){
+
+      const search =
+        this.value
+          .toLowerCase()
+          .trim();
+
+
+      const filtered =
+        allServices.filter(
+          function(service){
+
+            return JSON.stringify(
+              service
+            )
+            .toLowerCase()
+            .includes(
+              search
+            );
+
+          }
+        );
+
+
+      renderServices(
+        filtered
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   API SERVER TEST
+===================================================== */
+
+$("testApiBtn")
+  .addEventListener(
+    "click",
+    testApiConnection
+  );
+
+
+async function testApiConnection(){
+
+  const button =
+    $("testApiBtn");
+
+  const result =
+    $("apiTestResult");
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Testing...";
+
+
+  $("rssStatus").textContent =
+    "Testing...";
+
+  $("rssStatus").className =
+    "status status-processing";
+
+
+  result.innerHTML = `
+    <div class="info-box">
+      Testing the ReallySimpleSocial Edge Function...
+    </div>
+  `;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await db.functions.invoke(
+        "reallysimple-services",
+        {
+          body:{}
+        }
+      );
+
+
+    if(error){
+      throw error;
+    }
+
+
+    $("rssStatus").textContent =
+      "Connected";
+
+    $("rssStatus").className =
+      "status status-completed";
+
+
+    result.innerHTML = `
+      <div class="success-box">
+        <strong>API connection successful.</strong><br>
+        Boostlane successfully reached the
+        <strong>reallysimple-services</strong>
+        Supabase Edge Function.
+      </div>
+    `;
+
+
+    showToast(
+      "API server connection successful."
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "API test error:",
+      error
+    );
+
+
+    $("rssStatus").textContent =
+      "Failed";
+
+    $("rssStatus").className =
+      "status status-failed";
+
+
+    result.innerHTML = `
+      <div class="warning-box">
+        <strong>API connection failed.</strong><br>
+        ${escapeHTML(
+          error.message ||
+          "Unknown error"
+        )}
+      </div>
+    `;
+
+
+    showToast(
+      "API connection failed.",
+      "error"
+    );
+
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "🔌 Test API Connection";
+
+  }
+
+}
+
+
+/* =====================================================
+   KATPAY PAYMENTS
+===================================================== */
+
+$("refreshKatpayBtn")
+  .addEventListener(
+    "click",
+    loadKatpayPayments
+  );
+
+
+async function loadKatpayPayments(){
+
+  const table =
+    $("katpayPaymentsTable");
+
+
+  table.innerHTML = `
+    <tr>
+      <td colspan="4">
+        <div class="loading">
+          Loading KatPay payments...
+        </div>
+      </td>
+    </tr>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("katpay_payments")
+      .select(
+        "reference,amount,status,created_at"
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(100);
+
+
+  if(error){
+
+    console.error(
+      "KatPay payments error:",
+      error
+    );
+
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="4">
+          <div class="warning-box">
+            Could not load KatPay payments:
+            ${escapeHTML(error.message)}
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  if(!data || !data.length){
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="4">
+          <div class="empty">
+            No KatPay payments yet.
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  table.innerHTML = "";
+
+
+  data.forEach(
+    function(payment){
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHTML(
+            payment.reference ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ₦${formatMoney(
+            payment.amount
+          )}
+        </td>
+
+        <td>
+          ${statusBadge(
+            payment.status ||
+            "pending"
+          )}
+        </td>
+
+        <td>
+          ${formatDate(
+            payment.created_at
+          )}
+        </td>
+
+      `;
+
+
+      table.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   REFRESH BUTTONS
+===================================================== */
+
+$("refreshCustomersBtn")
+  .addEventListener(
+    "click",
+    async function(){
+
+      await loadCustomers();
+
+      await loadWallets();
+
+      renderCustomers(
+        allCustomers
+      );
+
+      showToast(
+        "Customers refreshed."
+      );
+
+    }
+  );
+
+
+$("refreshOrdersBtn")
+  .addEventListener(
+    "click",
+    async function(){
+
+      await loadCustomers();
+
+      await loadOrders();
+
+      updateDashboard();
+
+      showToast(
+        "Orders refreshed."
+      );
+
+    }
+  );
+
+
+$("refreshTransactionsBtn")
+  .addEventListener(
+    "click",
+    async function(){
+
+      await loadCustomers();
+
+      await loadTransactions();
+
+      showToast(
+        "Transactions refreshed."
+      );
+
+    }
+  );
+
+
+$("settingsRefreshBtn")
+  .addEventListener(
+    "click",
+    async function(){
+
+      await loadAllData();
+
+    }
+  );
+
+
+/* =====================================================
    STATUS BADGE
 ===================================================== */
 
@@ -2261,7 +3794,8 @@ function statusBadge(status){
 
   if(
     lower.includes("completed") ||
-    lower.includes("success")
+    lower.includes("success") ||
+    lower.includes("paid")
   ){
 
     className =
@@ -2270,7 +3804,8 @@ function statusBadge(status){
   }
   else if(
     lower.includes("failed") ||
-    lower.includes("cancel")
+    lower.includes("cancel") ||
+    lower.includes("rejected")
   ){
 
     className =
@@ -2278,7 +3813,8 @@ function statusBadge(status){
 
   }
   else if(
-    lower.includes("processing")
+    lower.includes("processing") ||
+    lower.includes("progress")
   ){
 
     className =
@@ -2297,7 +3833,26 @@ function statusBadge(status){
 
 
 /* =====================================================
-   HELPERS
+   MONEY
+===================================================== */
+
+function formatMoney(value){
+
+  return Number(
+    value || 0
+  ).toLocaleString(
+    "en-NG",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
 ===================================================== */
 
 function escapeHTML(value){
@@ -2322,6 +3877,10 @@ function escapeHTML(value){
 }
 
 
+/* =====================================================
+   DATE
+===================================================== */
+
 function formatDate(date){
 
   if(!date){
@@ -2329,13 +3888,47 @@ function formatDate(date){
   }
 
 
-  return new Date(
-    date
-  ).toLocaleString(
+  const parsed =
+    new Date(date);
+
+
+  if(
+    Number.isNaN(
+      parsed.getTime()
+    )
+  ){
+
+    return "-";
+
+  }
+
+
+  return parsed.toLocaleString(
     "en-NG"
   );
 
 }
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+db.auth.onAuthStateChange(
+  function(event,session){
+
+    if(
+      event === "SIGNED_OUT"
+    ){
+
+      currentUser = null;
+
+      showLogin();
+
+    }
+
+  }
+);
 
 
 /* =====================================================
